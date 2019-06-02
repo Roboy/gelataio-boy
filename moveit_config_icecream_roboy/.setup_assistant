@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: robots
+    relative_path: roboy_icecream/model.urdf
+    xacro_args: ""
+  SRDF:
+    relative_path: config/roboy_icecream.srdf
+  CONFIG:
+    author_name: mohamad.ayman
+    author_email: m.elbadrawy@tum.de
+    generated_timestamp: 1559456365
