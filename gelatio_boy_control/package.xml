@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>gelataio-boy-control</name>
+  <name>gelataio_boy_control</name>
   <version>0.0.0</version>
   <description>The full body control team package for the ice cream project in SS19</description>
 

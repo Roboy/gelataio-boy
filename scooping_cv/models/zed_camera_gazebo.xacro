@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+<robot name="zed_camera_gazebo" 
+xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<xacro:include filename="$(find scooping_cv)/models/zed_camera_gazebo.gazebo"/>
+
+<!--__________CONSTANTS__________-->
+<xacro:property name="deg_to_rad" value="0.01745329251994329577"/>
+
+
+<!--__________VARIABLES__________-->
+<xacro:property name= "baseline" value="0.05" />
+<xacro:property name= "camera_size" value="0.01"/>
+
+<!--__________LINKS____________-->
+
+
+        <!-- <plugin name="camera_plugin" filename="libgazebo_ros_openni_kinect.so">
+          <baseline>0.2</baseline>
+          <alwaysOn>true</alwaysOn>
+          Keep this zero, update_rate in the parent <sensor> tag
+            will control the frame rate.
+          <updateRate>0.0</updateRate>
+          <cameraName>camera_ir</cameraName>
+          <imageTopicName>/camera/depth/image_raw</imageTopicName>
+          <cameraInfoTopicName>/camera/depth/camera_info</cameraInfoTopicName>
+          <depthImageTopicName>/camera/depth/image_raw</depthImageTopicName>
+          <depthImageInfoTopicName>/camera/depth/camera_info</depthImageInfoTopicName>
+          <pointCloudTopicName>/camera/depth/points</pointCloudTopicName>
+          <frameName>camera_link</frameName>
+          <pointCloudCutoff>0.05</pointCloudCutoff>
+          <distortionK1>0</distortionK1>
+          <distortionK2>0</distortionK2>
+          <distortionK3>0</distortionK3>
+          <distortionT1>0</distortionT1>
+          <distortionT2>0</distortionT2>
+          <CxPrime>0</CxPrime>
+          <Cx>0</Cx>
+          <Cy>0</Cy>
+          <focalLength>0</focalLength>
+          <hackBaseline>0</hackBaseline>
+        </plugin> -->
+
+	<link name= "world"/> <!--fixed world link-->
+
+	<link name= "base_link">
+		<visual>
+			<geometry>
+				<box size="0.1 0.1 0.1"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 0 0.05"/>
+			<material name="white"/> <!--colors in stereo_cam.gazebo-->
+		</visual>
+
+		<inertial>
+			<mass value="1"/>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1" />
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+		</inertial>
+
+		<collision>
+			<geometry>
+				<box size="0.1 0.1 0.1"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 0 0.05"/>
+		</collision>
+	</link>
+
+	<link name= "cam_left_link">
+		<visual>
+			<geometry>
+				<box size="${camera_size} ${camera_size} ${camera_size}"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+			<material name="white"/>
+		</visual>
+
+		<inertial>
+			<mass value="1e-5"/>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+		</inertial>
+
+		<collision>
+			<geometry>
+				<box size="${camera_size} ${camera_size} ${camera_size}"/>
+			</geometry>
+			<origin rpy="0 0 ${deg_to_rad *90}" xyz="0 0 0"/>
+		</collision>
+	</link>
+
+	<link name= "cam_right_link">
+		<visual>
+			<geometry>
+				<box size="${camera_size} ${camera_size} ${camera_size}"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+			<material name="white"/>
+		</visual>
+
+		<inertial>
+			<mass value="1e-5"/>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+		</inertial>
+
+		<collision>
+			<geometry>
+				<box size="${camera_size} ${camera_size} ${camera_size}"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+		</collision>
+	</link>
+
+
+<!--___________JOINTS___________-->
+	<joint name= "fixed_joint" type="fixed">
+		<parent link="world"/>
+		<child link="base_link"/>
+   		<origin xyz="0 0 0"/>
+	</joint>
+
+	<joint name= "joint1" type="continuous">
+		<parent link="base_link"/>
+		<child link="cam_left_link"/>
+		<origin xyz="${-(baseline/2)} 0 0.5" rpy="0 0 ${deg_to_rad*90}"/>
+<!--		<origin xyz="${-(baseline/2)} ${-triangle_height/2} 0.5" rpy="0 0 ${deg_to_rad*120}"/>-->
+<!--		<origin xyz="${-(baseline/2)} ${-triangle_height/2} 0.5" rpy="0 0 ${deg_to_rad*150}"/>-->
+		<axis xyz="0 0 1" rpy="0 0 0"/>
+	</joint>
+
+	<joint name= "joint2" type="continuous">
+		<parent link="base_link"/>
+		<child link="cam_right_link"/>
+<!--		<origin xyz="${baseline/2} ${-triangle_height/2} 0.5" rpy="0 0 ${deg_to_rad*30}"/>-->
+<!--		<origin xyz="${baseline/2} ${-triangle_height/2} 0.5" rpy="0 0 ${deg_to_rad*60}"/>-->
+		<origin xyz="${baseline/2} 0 0.5" rpy="0 0 ${deg_to_rad*90}"/>
+		<axis xyz="0 0 1"/>
+	</joint>
+
+
+</robot>
+

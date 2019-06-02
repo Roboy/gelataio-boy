@@ -1,3 +1,21 @@
 # gelataio-boy
-SS19 Full Body Control Team: Generating motions and control for scooping ice cream, picking cups and handing it over to the customer
 
+SS19 Full Body Control and Vision Team. We handle the vision and control parts for the ice-cream project.
+
+# How to use the code
+
+Clone the repository into the `src` folder of your catkin workspace. Like this
+```
+cakin_ws/
+	build/
+		...
+	devel/
+		...
+	src/
+		CARDSflow/
+			...
+		gelatatio-boy/
+			<subpackages of our project>
+		<further packages if required>
+```
+Catkin build the packages recursively.
