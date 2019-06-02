@@ -1,0 +1,147 @@
+<?xml version="1.0"?>
+<robot>
+
+<!-- colors -->
+<gazebo reference="cam_left_link">
+	<material>Gazebo/Blue</material>
+</gazebo>
+
+<gazebo reference="cam_right_link">
+	<material>Gazebo/Blue</material>
+</gazebo>
+
+
+<!-- camera 1 -->
+  <gazebo reference="cam_left_link">
+    <sensor type="depth" name="zed_camera_left_sensor">
+      <update_rate>30.0</update_rate>
+      <!-- math.atan(320 / 687.8065795898438) * 2 -->
+      <camera name="zed_camera_left_camera">
+        <horizontal_fov>0.8709216071359963</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>B8G8R8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.007</stddev>
+        </noise>
+      </camera>
+      <!-- <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>30.0</updateRate>
+        <cameraName>zed</cameraName>
+        <imageTopicName>rgb/image_rect_color</imageTopicName>
+        <cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
+        <frameName>camera_link</frameName>
+        <hackBaseline>0</hackBaseline>
+        <distortionK1>0.0</distortionK1>
+        <distortionK2>0.0</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>0.0</distortionT1>
+        <distortionT2>0.0</distortionT2>
+      </plugin> -->
+
+<plugin name="depth_camera_controller" filename="libgazebo_ros_openni_kinect.so">
+      <baseline>0</baseline>
+      <alwaysOn>true</alwaysOn>
+      <updateRate>0</updateRate>
+      <cameraName>zed</cameraName>
+      <imageTopicName>/zed/rgb/image_raw_color</imageTopicName>
+      <cameraInfoTopicName>/zed/rgb/camera_info</cameraInfoTopicName>
+      <depthImageTopicName>/zed/depth/depth_registered</depthImageTopicName>
+      <depthImageInfoTopicName>/zed/depth/camera_info</depthImageInfoTopicName>
+      <pointCloudTopicName>/zed/point_cloud/cloud_registered</pointCloudTopicName>
+      <frameName>cam_left_link</frameName>
+      <pointCloudCutoff>0.5</pointCloudCutoff>
+      <distortionK1>0.00000001</distortionK1>
+      <distortionK2>0.00000001</distortionK2>
+      <distortionK3>0.00000001</distortionK3>
+      <distortionT1>0.00000001</distortionT1>
+      <distortionT2>0.00000001</distortionT2>
+      <CxPrime>0</CxPrime>
+      <Cx>0</Cx>
+      <Cy>0</Cy>
+      <focalLength>0</focalLength>
+      <hackBaseline>0</hackBaseline>
+    </plugin>
+
+
+    </sensor>
+  </gazebo>
+
+<!-- camera 2 -->
+  <gazebo reference="cam_right_link">
+    <sensor type="camera" name="zed_camera_right_sensor">
+      <update_rate>30.0</update_rate>
+      <!-- math.atan(320 / 687.8065795898438) * 2 -->
+      <camera name="zed_camera_right_camera">
+        <horizontal_fov>0.8709216071359963</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>B8G8R8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.007</stddev>
+        </noise>
+      </camera>
+
+      <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>30.0</updateRate>
+        <cameraName>zed</cameraName>
+        <imageTopicName>/zed/right/image_raw_color</imageTopicName>
+        <cameraInfoTopicName>/zed/right/camera_info</cameraInfoTopicName>
+        <frameName>cam_right_link</frameName>
+        <hackBaseline>0.12</hackBaseline>
+        <distortionK1>0.0</distortionK1>
+        <distortionK2>0.0</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>0.0</distortionT1>
+        <distortionT2>0.0</distortionT2>
+      </plugin>
+
+        
+        <!-- <plugin name="camera_plugin" filename="libgazebo_ros_openni_kinect.so">
+          <baseline>0.12</baseline>
+          <alwaysOn>true</alwaysOn>
+          <updateRate>0.0</updateRate>
+          <cameraName>zed_camera</cameraName>
+          <imageTopicName>/zed/right/image_raw_color</imageTopicName>
+          <cameraInfoTopicName>/zed/right/camera_info</cameraInfoTopicName>
+          <depthImageTopicName>/camera/depth/image_raw</depthImageTopicName>
+          <depthImageInfoTopicName>/camera/depth/camera_info</depthImageInfoTopicName>
+          <pointCloudTopicName>/camera/depth/points</pointCloudTopicName>
+          <frameName>cam_right_link</frameName>
+          <pointCloudCutoff>0.05</pointCloudCutoff>
+          <distortionK1>0.000001</distortionK1>
+          <distortionK2>0.000001</distortionK2>
+          <distortionK3>0.000001</distortionK3>
+          <distortionT1>0.000001</distortionT1>
+          <distortionT2>0.000001</distortionT2>
+          <CxPrime>0</CxPrime>
+          <Cx>0</Cx>
+          <Cy>0</Cy>
+          <focalLength>0</focalLength>
+          <hackBaseline>0.12</hackBaseline>
+        </plugin> -->
+
+
+    </sensor>
+  </gazebo>
+
+
+</robot>

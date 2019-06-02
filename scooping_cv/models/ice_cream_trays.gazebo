@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<robot>
+
+<!-- colors -->
+<gazebo reference="vanilla_link">
+	<material>Gazebo/Blue</material>
+</gazebo>
+
+<gazebo reference="chocolate_link">
+	<material>Gazebo/Red</material>
+</gazebo>
+
+<!-- <gazebo reference="cam3_link">
+	<material>Gazebo/Blue</material>
+</gazebo> -->
+
+</robot>

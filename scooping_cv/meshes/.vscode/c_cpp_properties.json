@@ -1,0 +1,29 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "",
+        "limitSymbolsToIncludedHeaders": true
+      },
+      "includePath": [
+        "/home/ruofan/catkin_ws/devel/include",
+        "/opt/ros/kinetic/include",
+        "/home/ruofan/catkin_ws/src/CARDSflow/cardsflow_gazebo/include",
+        "/home/ruofan/catkin_ws/src/CARDSflow/cardsflow_rviz/include",
+        "/home/ruofan/catkin_ws/src/CARDSflow/cardsflow_rqt/include",
+        "/home/ruofan/catkin_ws/src/CARDSflow/common_utilities/include",
+        "/home/ruofan/catkin_ws/src/cpp_h1/include",
+        "/home/ruofan/catkin_ws/src/cpp_h2/include",
+        "/home/ruofan/catkin_ws/src/cpp_sose2018/include",
+        "/home/ruofan/catkin_ws/src/ekf_turtlebot/include",
+        "/home/ruofan/catkin_ws/src/CARDSflow/kindyn/include",
+        "/home/ruofan/catkin_ws/src/roboy_communication/roboy_middleware_msgs/include",
+        "/home/ruofan/catkin_ws/src/scooping_cv/include",
+        "/home/ruofan/catkin_ws/src/shy_roboy/include",
+        "/home/ruofan/catkin_ws/src/template_warp_cpp/include",
+        "/usr/include"
+      ],
+      "name": "Linux"
+    }
+  ]
+}
