@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(gelataio-boy)
+project(gelataio-boy-control)
 
 add_compile_options(-std=c++11)
 
