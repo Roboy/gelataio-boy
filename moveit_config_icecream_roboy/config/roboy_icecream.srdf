@@ -44,7 +44,7 @@
         <joint name="hand_right_thumb_joint2" />
     </group>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
-    <end_effector name="left_grip" parent_link="hand_left_thumb_link2" group="left_hand" parent_group="left_hand" />
+    <end_effector name="left_grip" parent_link="hand_left_thumb_link2" group="left_hand" />
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
     <disable_collisions link1="arm_left_lower" link2="arm_left_palm" reason="Default" />
     <disable_collisions link1="arm_left_lower" link2="arm_left_upper" reason="Adjacent" />

@@ -9,16 +9,16 @@
   <param if="$(arg load_robot_description)" name="$(arg robot_description)" textfile="$(find robots)/roboy_icecream/model.urdf"/>
 
   <!-- The semantic description that corresponds to the URDF -->
-  <param name="$(arg robot_description)_semantic" textfile="$(find icecream-roboy-moveit-config)/config/roboy_icecream.srdf" />
+  <param name="$(arg robot_description)_semantic" textfile="$(find moveit_config_icecream_roboy)/config/roboy_icecream.srdf" />
 
   <!-- Load updated joint limits (override information from URDF) -->
   <group ns="$(arg robot_description)_planning">
-    <rosparam command="load" file="$(find icecream-roboy-moveit-config)/config/joint_limits.yaml"/>
+    <rosparam command="load" file="$(find moveit_config_icecream_roboy)/config/joint_limits.yaml"/>
   </group>
 
   <!-- Load default settings for kinematics; these settings are overridden by settings in a node's namespace -->
   <group ns="$(arg robot_description)_kinematics">
-    <rosparam command="load" file="$(find icecream-roboy-moveit-config)/config/kinematics.yaml"/>
+    <rosparam command="load" file="$(find moveit_config_icecream_roboy)/config/kinematics.yaml"/>
   </group>
 
 </launch>

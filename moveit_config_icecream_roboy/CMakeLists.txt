@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(icecream-roboy-moveit-config)
+project(moveit_config_icecream_roboy)
 
 find_package(catkin REQUIRED)
 
