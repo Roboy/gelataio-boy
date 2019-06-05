@@ -1,0 +1,25 @@
+<sdf version="1.6">
+	<model name="platform">
+
+          <link name='base_link'>
+            <pose>0 0 0 0 0 0</pose>
+				<static>true</static>
+
+            <collision name='collision'>
+				<geometry>
+					<box>
+                  <size>1 .5 .5</size>
+               </box>
+				</geometry>
+            </collision>
+
+            <visual name='visual'>
+				<geometry>
+					<box>
+                  <size>1 .5 .5</size>
+               </box>
+				</geometry>
+				</visual>
+          </link>
+	</model>
+</sdf>

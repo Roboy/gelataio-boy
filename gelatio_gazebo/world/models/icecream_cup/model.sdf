@@ -1,0 +1,26 @@
+<sdf version="1.6">
+	<model name="icecream_cup">
+
+          <link name='base_link'>
+            <pose>0 0 0 0 0 0</pose>
+
+            <collision name='collision'>
+				<geometry>
+					<cylinder>
+						<radius>.05</radius>
+						<length>.1</length>
+					</cylinder>
+				</geometry>
+            </collision>
+
+            <visual name='visual'>
+				<geometry>
+					<cylinder>
+						<radius>.05</radius>
+						<length>.1</length>
+					</cylinder>
+				</geometry>
+				</visual>
+          </link>
+	</model>
+</sdf>
