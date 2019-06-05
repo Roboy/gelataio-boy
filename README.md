@@ -18,3 +18,4 @@ cakin_ws/
 			<subpackages of our project>
 		<further packages if required>
 ```
+Catkin build the packages recursively.
