@@ -53,11 +53,11 @@
       <alwaysOn>true</alwaysOn>
       <updateRate>0</updateRate>
       <cameraName>zed</cameraName>
-      <imageTopicName>/zed/rgb/image_raw_color</imageTopicName>
-      <cameraInfoTopicName>/zed/rgb/camera_info</cameraInfoTopicName>
-      <depthImageTopicName>/zed/depth/depth_registered</depthImageTopicName>
-      <depthImageInfoTopicName>/zed/depth/camera_info</depthImageInfoTopicName>
-      <pointCloudTopicName>/zed/point_cloud/cloud_registered</pointCloudTopicName>
+      <imageTopicName>/zed/zed_node/rgb/image_raw_color</imageTopicName>
+      <cameraInfoTopicName>/zed/zed_node/rgb/camera_info</cameraInfoTopicName>
+      <depthImageTopicName>/zed/zed_node/depth/depth_registered</depthImageTopicName>
+      <depthImageInfoTopicName>/zed/zed_node/depth/camera_info</depthImageInfoTopicName>
+      <pointCloudTopicName>/zed/zed_node/point_cloud/cloud_registered</pointCloudTopicName>
       <frameName>cam_left_link</frameName>
       <pointCloudCutoff>0.5</pointCloudCutoff>
       <distortionK1>0.00000001</distortionK1>
@@ -103,8 +103,8 @@
         <alwaysOn>true</alwaysOn>
         <updateRate>30.0</updateRate>
         <cameraName>zed</cameraName>
-        <imageTopicName>/zed/right/image_raw_color</imageTopicName>
-        <cameraInfoTopicName>/zed/right/camera_info</cameraInfoTopicName>
+        <imageTopicName>/zed/zed_node/right/image_raw_color</imageTopicName>
+        <cameraInfoTopicName>/zed/zed_node/right/camera_info</cameraInfoTopicName>
         <frameName>cam_right_link</frameName>
         <hackBaseline>0.12</hackBaseline>
         <distortionK1>0.0</distortionK1>
