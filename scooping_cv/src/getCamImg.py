@@ -7,6 +7,7 @@ import numpy as np
 from std_msgs.msg import String, Float32
 from sensor_msgs.msg import Image, PointCloud2
 from cv_bridge import CvBridge, CvBridgeError
+from color_filter import ColorFilter
 
 # This script listens /zed/zed_node/depth/depth_registered
 # and calculates the average distance of the closest objects.
@@ -56,9 +57,15 @@ class ImageConverter:
         cv2.waitKey(1)
 
 
+    def get_rgb(self):
+        
+        # Show images.
+        cv2.imshow('depth image', self.cv_image_rgb)
+        cv2.waitKey(1)
+
 def main():
     ic = ImageConverter()
-
+	filt = ColorFilter("C")
     rospy.init_node('image_converter', anonymous=True)
     rospy.loginfo("Node running.")
 
@@ -69,13 +76,13 @@ def main():
         while not rospy.is_shutdown():
 
             if ic.callback_received:
-                ic.get_depth()
+				cv2.imshow('filtered_img', filt.filter(ic.cv_image_rgb))
+				cv2.waitKey(1)
 
             rate.sleep()
     except KeyboardInterrupt:
         print "Shutting down"
     cv2.destroyAllWindows()
-
 
 if __name__ == '__main__':
     main()
