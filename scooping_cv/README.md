@@ -6,6 +6,8 @@ Bayesian Object Tracking - follow the guide here: https://github.com/bayesian-ob
 
 The .obj files are located in scooping_cv/meshes/tracking, which can be placed in dbot_getting_started/object_meshes to start testing. (Probably needs to be restructured later)
 
+To get real-time results, a GPU should be used.
+
 Usage:
 `roslaunch dbot_ros particle_tracker.launch` 
 
@@ -21,3 +23,8 @@ calling the service:
 `/object_tracker_service/object_state`
 
 **NOTE**: WORK IN PROGRESS: For the moment the service doesn't provide any tracking results, it is merely a working ROS communication node
+## Camera choice
+
+THe problem with the ZED camera is that it cannot track homogeneous surfaces, e.g. the cup. The cup itself will be detected as flat surface, which corrupts the bayesian object tracking.
+
+Using the Intel Realsense R200 (which has an infrared depth sensor), the cup is recognized without problems. However, the scooping tool has a special surface that does not go well with infrared - it is not detectable in the depth cloud. This needs to be solved. An alternative would be using AR Tags.
