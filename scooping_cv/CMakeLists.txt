@@ -2,13 +2,30 @@ cmake_minimum_required(VERSION 2.8.3)
 project(scooping_cv)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+add_compile_options(-std=c++11)
+# set (CMAKE_CXX_STANDARD 11)
+
+set(PROJECT_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+set(CMAKE_MODULE_PATH ${PROJECT_MODULE_PATH})
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+
+find_package(Boost REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
+
+find_package(Eigen3 3.2 EXACT REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIR})
+
+find_package(OpenCV REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS})
+
+
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  gazebo_plugins
+  # gazebo_plugins
   geometry_msgs
   roscpp
   rospy
@@ -18,6 +35,9 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   urdf
   xacro
+  dbot
+  dbot_ros_msgs
+  dbot_ros
 )
 
 ## System dependencies are found with CMake's conventions
@@ -110,10 +130,24 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES scooping_cv
-#  CATKIN_DEPENDS gazebo_plugins geometry_msgs roscpp rospy rviz sensor_msgs std_msgs tf urdf xacro
-#  DEPENDS system_lib
+ INCLUDE_DIRS include
+  LIBRARIES scooping_cv
+ CATKIN_DEPENDS 
+#  gazebo_plugins 
+ geometry_msgs 
+ roscpp 
+ rospy 
+ rviz 
+ sensor_msgs 
+ std_msgs 
+ tf 
+ urdf 
+ xacro 
+ dbot 
+ dbot_ros 
+ dbot_ros_msgs
+ DEPENDS 
+ Eigen3
 )
 
 ###########
@@ -141,6 +175,16 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/scooping_cv_node.cpp)
+
+add_executable(multi_object_tracker_service src/tracking/multi_object_tracker_service_node.cpp)
+add_dependencies(multi_object_tracker_service
+  dbot_ros_msgs_generate_messages_cpp)
+target_link_libraries(multi_object_tracker_service
+  ${catkin_LIBRARIES}
+#  ${PROJECT_NAME}
+)
+
+#set_target_properties(multi_object_tracker_service PROPERTIES LINKER_LANGUAGE CXX)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
