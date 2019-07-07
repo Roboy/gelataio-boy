@@ -1,0 +1,24 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "",
+        "limitSymbolsToIncludedHeaders": true
+      },
+      "includePath": [
+        "/home/alona/catkin_ws/devel/include",
+        "/opt/ros/melodic/include",
+        "/home/alona/catkin_ws/src/CARDSflow/cardsflow_gazebo/include",
+        "/home/alona/catkin_ws/src/CARDSflow/cardsflow_rqt/include",
+        "/home/alona/catkin_ws/src/CARDSflow/cardsflow_rviz/include",
+        "/home/alona/catkin_ws/src/CARDSflow/common_utilities/include",
+        "/home/alona/catkin_ws/src/gelataio-boy/gelatio_boy_control/include",
+        "/home/alona/catkin_ws/src/CARDSflow/kindyn/include",
+        "/home/alona/catkin_ws/src/CARDSflow/roboy_communication/roboy_middleware_msgs/include",
+        "/home/alona/catkin_ws/src/gelataio-boy/scooping_cv/include",
+        "/usr/include"
+      ],
+      "name": "Linux"
+    }
+  ]
+}

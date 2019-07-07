@@ -52,12 +52,22 @@ joint_limits:
     max_velocity: 0
     has_acceleration_limits: false
     max_acceleration: 0
+  wrist_left_axis2:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
   wrist_right_axis0:
     has_velocity_limits: false
     max_velocity: 0
     has_acceleration_limits: false
     max_acceleration: 0
   wrist_right_axis1:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  wrist_right_axis2:
     has_velocity_limits: false
     max_velocity: 0
     has_acceleration_limits: false

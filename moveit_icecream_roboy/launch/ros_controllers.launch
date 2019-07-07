@@ -2,16 +2,10 @@
 <launch>
 
   <!-- Load joint controller configurations from YAML file to parameter server -->
-  <rosparam file="$(find moveit_roboy_icecream)/config/ros_controllers.yaml" command="load"/>
+  <rosparam file="$(find moveit_icecream_roboy)/config/ros_controllers.yaml" command="load"/>
 
   <!-- Load the controllers -->
   <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
-    output="screen" ns="roboy_icecream" args="left_arm_controller right_arm_controller "/>
-
-  <!-- Convert joint states to TF transforms for rviz, etc -->
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
-    respawn="false" output="screen">
-    <remap from="/joint_states" to="roboy_icecream/joint_states" />
-  </node>
+    output="screen" args=""/>
 
 </launch>
