@@ -1,0 +1,7 @@
+
+object:
+  package:    object_meshes
+  directory:  object_models
+  meshes:     [ cup.obj ]
+
+

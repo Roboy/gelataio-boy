@@ -5,4 +5,7 @@
 
 <node type="rviz" name="rviz" pkg="rviz" args="-d $(find scooping_cv)/launch/dbot_realsense.rviz" />
 
+<node name="foo_throttler" type="throttle" pkg="topic_tools" args="messages /camera/depth/image_raw 10.0" />
+
+
 </launch>

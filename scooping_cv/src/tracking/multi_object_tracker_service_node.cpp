@@ -242,7 +242,6 @@ void run(dbot::ObjectResourceIdentifier ori, std::vector<dbot::Tracker::State> p
 
         if (ros_object_tracker.run_once())
         {
-            ROS_INFO("run once!");
             tracker_publisher.publish(
                 ros_object_tracker.current_state_messages());
         }
@@ -325,8 +324,7 @@ int main(int argc, char** argv)
     auto srv = nh.advertiseService(service_name, run_object_tracker_srv);
 
     ROS_INFO("Object tracker service up and running.");
-    ROS_INFO("Object tracker service up and running.");
-    ROS_INFO("Object tracker service up and running.");
+
     ROS_INFO("Waiting for tracking requests...");
 
     ros::spin();

@@ -11,6 +11,10 @@ from geometry_msgs.msg import Point
 from geometry_msgs.msg import Quaternion
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import PoseStamped
+from ar_track_alvar_msgs.msg import AlvarMarkers
+
+
+ar_marker = True
 
 def track_object(object_name):
 
@@ -19,15 +23,31 @@ def track_object(object_name):
   print("Waiting for service...")
   rospy.wait_for_service("/multi_object_tracker_service")
 
+  if ar_marker:
+    print("Waiting for init pose...")
+
+    marker_msg_array = rospy.wait_for_message("ar_pose_marker",AlvarMarkers)
+    print("Waiting for init pose done...")
+
+    while(len(marker_msg_array.markers)==0):
+      marker_msg_array = rospy.wait_for_message("ar_pose_marker",AlvarMarkers)
+
+    marker_msg = marker_msg_array.markers[0]
+
   try:
     run_object_tracker = rospy.ServiceProxy('/multi_object_tracker_service', RunMultiObjectTracker)
 
     # set initial pose
     pose=[]
-    pose.append(Pose(position=Point(0, 0.1, 0.7),
-                orientation=Quaternion(0, 0, 0, 0)))
-    pose.append(Pose(position=Point(-0.1, 0.1, 0.7),
-                orientation=Quaternion(0, 0, 0, 0)))
+
+    if ar_marker:
+      pose.append(marker_msg.pose.pose)
+    else:
+      pose.append(Pose(position=Point(0, 0.1, 0.7),
+                  orientation=Quaternion(0, 0, 0, 0)))
+      pose.append(Pose(position=Point(-0.1, 0.1, 0.7),
+                  orientation=Quaternion(0, 0, 0, 0)))
+      
 
     # set Object resource identifier to find the model
     ori =[]
@@ -78,5 +98,9 @@ def track_object(object_name):
       print("Calling object tracker service failed: %s" % e)
 
 if __name__ == "__main__":
+  rospy.init_node("tracking_client")
+
   track_object(sys.argv[1:])
+
+  rospy.spin()
   #track_object(sys.argv) #for more arguments

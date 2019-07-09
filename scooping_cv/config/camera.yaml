@@ -1,0 +1,17 @@
+# although openni is started with registered:=true  there is no data arriving at
+# /camera/depth_registered/image. Therefore, we use /camera/depth
+
+# depth_image_topic: /zed/zed_node/depth/depth_registered
+# camera_info_topic: /zed/zed_node/depth/camera_info 
+depth_image_topic: /camera/depth/image_raw_throttle
+camera_info_topic: /camera/depth/camera_info
+# depth_image_topic: /camera/depth/image
+# camera_info_topic: /camera/depth/camera_info
+downsampling_factor: 10
+
+resolution:
+  width: 640
+  height: 480
+  # width: 1280
+  # height: 720
+
