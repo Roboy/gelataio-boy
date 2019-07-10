@@ -15,6 +15,11 @@ class HandController
          * @param planning_group   Name of the planning group of the arm
          */
         HandController(std::string planning_group, int planning_attempts = 1);
+
+        enum PlanningExecutorType {
+          MOVE_IT = 1,
+          CARDSFLOW = 2
+        };
         /**
          * Getter for current pose of the arm.
          * @return     Position and orientation of the current position.
@@ -62,10 +67,10 @@ class HandController
          */
         bool moveToKnownPose(std::string pose_name);
         void grasp();
-        
+
 
     private:
-        struct PlanningResult 
+        struct PlanningResult
         {
             moveit::planning_interface::MoveGroupInterface::Plan plan;
             moveit::planning_interface::MoveItErrorCode planning_status;
@@ -76,9 +81,9 @@ class HandController
         bool planAndExecute();
 
         moveit::planning_interface::MoveGroupInterface* m_move_group_ptr;
-        
+
         std::string m_planning_group;
-        
+
         int m_planning_attempts;
 };
 
