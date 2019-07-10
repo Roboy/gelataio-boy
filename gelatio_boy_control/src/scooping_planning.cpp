@@ -64,7 +64,7 @@ int main(int argc, char** argv)
 
   defineEnvironment(planning_scene_interface);
 
-  HandController left_arm("right_arm", 1, PlanningExecutorMode::CARDSFLOW);
+  HandController left_arm("right_arm", 1, PlanningExecutorMode::MOVE_IT);
 
   while(true)
   {
