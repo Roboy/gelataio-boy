@@ -9,7 +9,6 @@ void defineEnvironment(moveit::planning_interface::PlanningSceneInterface& plann
   std::vector<moveit_msgs::CollisionObject> collision_objects;
   collision_objects.resize(3);
 
-
   // -------------------- Table -----------------------
   collision_objects[0].id = "ice_cream_table";
   collision_objects[0].header.frame_id = "torso";
@@ -20,13 +19,13 @@ void defineEnvironment(moveit::planning_interface::PlanningSceneInterface& plann
   collision_objects[0].primitives[0].dimensions.resize(3);
   collision_objects[0].primitives[0].dimensions[0] = 0.8;
   collision_objects[0].primitives[0].dimensions[1] = 0.4;
-  collision_objects[0].primitives[0].dimensions[2] = 0.4;
+  collision_objects[0].primitives[0].dimensions[2] = 0.3;
 
   // Define the pose of the table.
   collision_objects[0].primitive_poses.resize(1);
   collision_objects[0].primitive_poses[0].position.x = 0;
   collision_objects[0].primitive_poses[0].position.y = -0.5;
-  collision_objects[0].primitive_poses[0].position.z = 0.2;
+  collision_objects[0].primitive_poses[0].position.z = 0.15;
 
   collision_objects[0].operation = collision_objects[0].ADD;
 
@@ -44,9 +43,9 @@ void defineEnvironment(moveit::planning_interface::PlanningSceneInterface& plann
 
   // Define the pose of the table.
   collision_objects[1].primitive_poses.resize(1);
-  collision_objects[1].primitive_poses[0].position.x = -0.2;
-  collision_objects[1].primitive_poses[0].position.y = -0.4;
-  collision_objects[1].primitive_poses[0].position.z = 0.45;
+  collision_objects[1].primitive_poses[0].position.x = -0.3;
+  collision_objects[1].primitive_poses[0].position.y = -0.5;
+  collision_objects[1].primitive_poses[0].position.z = 0.35;
 
   collision_objects[1].operation = collision_objects[1].ADD;
 
@@ -62,14 +61,16 @@ int main(int argc, char** argv)
 
   moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
 
-  defineEnvironment(planning_scene_interface);
+  HandController right_arm("right_arm", 1, PlanningExecutorMode::MOVE_IT);
 
-  HandController left_arm("right_arm", 1, PlanningExecutorMode::MOVE_IT);
+  defineEnvironment(planning_scene_interface);
+      
+  right_arm.grasp("ice_cup");
 
   while(true)
   {
-    left_arm.moveToKnownPose("hello_start");
-    left_arm.moveToKnownPose("hello_end");
+    right_arm.moveToKnownPose("hello_start");
+    right_arm.moveToKnownPose("hello_end");
   }
 
   return 0;

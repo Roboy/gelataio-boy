@@ -4,6 +4,8 @@
 #include <vector>
 #include <ros/ros.h>
 
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+
 #include <moveit/planning_interface/planning_interface.h>
 #include <moveit/move_group_interface/move_group_interface.h>
 
@@ -23,13 +25,12 @@ class HandController
          * Constructor.
          * @param planning_group   Name of the planning group of the arm
          */
-        HandController(std::string planning_group, int planning_attempts = 1, PlanningExecutorMode type = PlanningExecutorMode::MOVE_IT);
+        HandController(std::string planning_group, int planning_attempts = 5, PlanningExecutorMode mode = PlanningExecutorMode::MOVE_IT);
 
         /**
-         * Destructor
+         * Destructor.
          */
         virtual ~HandController();
-
         /**
          * Getter for current pose of the arm.
          * @return     Position and orientation of the current position.
@@ -76,8 +77,14 @@ class HandController
          * @return true if successful
          */
         bool moveToKnownPose(std::string pose_name);
-        void grasp();
-
+        /**
+         * Grasp object at position
+         * @param object_pose   Pose of an object
+         * @param object_name   Object name in the scene
+         * @return true if successful
+         */
+        void grasp(std::string object_name);
+        
 
     private:
         struct PlanningResult

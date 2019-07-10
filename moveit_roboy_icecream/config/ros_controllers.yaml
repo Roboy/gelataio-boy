@@ -63,27 +63,4 @@ joint_state_controller:
   type: joint_state_controller/JointStateController
   publish_rate: 50
 controller_list:
-  - name: left_arm_controller
-      action_ns: follow_joint_trajectory
-      default: True
-      type: FollowJointTrajectory
-      joints:
-        - shoulder_left_axis0
-        - shoulder_left_axis1
-        - shoulder_left_axis2
-        - elbow_left
-        - wrist_left_axis0
-        - wrist_left_axis1
-        - wrist_left_axis2
-    - name: right_arm_controller
-      action_ns: follow_joint_trajectory
-      default: True
-      type: FollowJointTrajectory
-      joints:
-        - shoulder_right_axis0
-        - shoulder_right_axis1
-        - shoulder_right_axis2
-        - elbow_right
-        - wrist_right_axis0
-        - wrist_right_axis1
-        - wrist_right_axis2
+  []
