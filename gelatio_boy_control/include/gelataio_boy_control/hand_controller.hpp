@@ -7,6 +7,15 @@
 #include <moveit/planning_interface/planning_interface.h>
 #include <moveit/move_group_interface/move_group_interface.h>
 
+enum PlanningExecutorMode {
+    MOVE_IT = 1,
+    CARDSFLOW = 2
+};
+
+class PlanExecutor {
+    public: virtual bool executePlan(moveit::planning_interface::MoveGroupInterface::Plan &plan) = 0;
+};
+
 class HandController
 {
     public:
@@ -14,12 +23,13 @@ class HandController
          * Constructor.
          * @param planning_group   Name of the planning group of the arm
          */
-        HandController(std::string planning_group, int planning_attempts = 1);
+        HandController(std::string planning_group, int planning_attempts = 1, PlanningExecutorMode type = PlanningExecutorMode::MOVE_IT);
 
-        enum PlanningExecutorType {
-          MOVE_IT = 1,
-          CARDSFLOW = 2
-        };
+        /**
+         * Destructor
+         */
+        virtual ~HandController();
+
         /**
          * Getter for current pose of the arm.
          * @return     Position and orientation of the current position.
@@ -82,9 +92,32 @@ class HandController
 
         moveit::planning_interface::MoveGroupInterface* m_move_group_ptr;
 
+        PlanExecutor* m_plan_executor_ptr;
+
         std::string m_planning_group;
 
         int m_planning_attempts;
+};
+
+class MoveItPlanExecutor : public PlanExecutor {
+
+public:
+  explicit MoveItPlanExecutor(moveit::planning_interface::MoveGroupInterface* move_it) : move_it(move_it) {}
+
+  virtual bool executePlan(moveit::planning_interface::MoveGroupInterface::Plan &plan) override;
+
+private:
+  moveit::planning_interface::MoveGroupInterface* move_it;
+};
+
+class CardsflowPlanExecutor : public PlanExecutor {
+public:
+  explicit CardsflowPlanExecutor(std::string &group_name);
+
+  virtual bool executePlan(moveit::planning_interface::MoveGroupInterface::Plan &plan) override;
+
+private:
+  std::string group_name;
 };
 
 #endif

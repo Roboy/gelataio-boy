@@ -64,13 +64,13 @@ int main(int argc, char** argv)
 
   defineEnvironment(planning_scene_interface);
 
-  HandController left_arm("right_arm");
+  HandController left_arm("right_arm", 1, PlanningExecutorMode::CARDSFLOW);
 
   while(true)
   {
     left_arm.moveToKnownPose("hello_start");
     left_arm.moveToKnownPose("hello_end");
   }
-  
+
   return 0;
 }
