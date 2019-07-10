@@ -25,7 +25,7 @@ void defineEnvironment(moveit::planning_interface::PlanningSceneInterface& plann
   collision_objects[0].primitive_poses.resize(1);
   collision_objects[0].primitive_poses[0].position.x = 0;
   collision_objects[0].primitive_poses[0].position.y = -0.5;
-  collision_objects[0].primitive_poses[0].position.z = 0.2;
+  collision_objects[0].primitive_poses[0].position.z = 0.15;
 
   collision_objects[0].operation = collision_objects[0].ADD;
 
@@ -45,7 +45,7 @@ void defineEnvironment(moveit::planning_interface::PlanningSceneInterface& plann
   collision_objects[1].primitive_poses.resize(1);
   collision_objects[1].primitive_poses[0].position.x = -0.3;
   collision_objects[1].primitive_poses[0].position.y = -0.5;
-  collision_objects[1].primitive_poses[0].position.z = 0.3;
+  collision_objects[1].primitive_poses[0].position.z = 0.35;
 
   collision_objects[1].operation = collision_objects[1].ADD;
 
@@ -62,20 +62,16 @@ int main(int argc, char** argv)
   moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
 
   HandController right_arm("right_arm");
+
+  defineEnvironment(planning_scene_interface);
       
   right_arm.grasp("ice_cup");
 
-  defineEnvironment(planning_scene_interface);
-
-  int counter = 0;
-  while(counter < 3)
+  while(true)
   {
     right_arm.moveToKnownPose("hello_start");
     right_arm.moveToKnownPose("hello_end");
-    counter++;
   }
-
-  right_arm.grasp("ice_cup");
   
   return 0;
 }
