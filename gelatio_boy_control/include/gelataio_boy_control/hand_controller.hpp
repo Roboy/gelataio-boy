@@ -17,6 +17,11 @@ class HandController
          * @param planning_group   Name of the planning group of the arm
          */
         HandController(std::string planning_group, int planning_attempts = 5);
+
+        /**
+         * Destructor.
+         */
+        ~HandController() {delete m_move_group_ptr;}
         /**
          * Getter for current pose of the arm.
          * @return     Position and orientation of the current position.
