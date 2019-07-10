@@ -188,7 +188,6 @@ target_link_libraries(${PROJECT_NAME}
 install(DIRECTORY include/moveit/
    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
    FILES_MATCHING PATTERN "*.h"
-   PATTERN ".svn" EXCLUDE
  )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
