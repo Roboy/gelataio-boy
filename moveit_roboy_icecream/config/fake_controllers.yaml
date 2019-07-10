@@ -7,6 +7,7 @@ controller_list:
       - elbow_left
       - wrist_left_axis0
       - wrist_left_axis1
+      - wrist_left_axis2
   - name: fake_right_arm_controller
     joints:
       - shoulder_right_axis0
@@ -15,3 +16,21 @@ controller_list:
       - elbow_right
       - wrist_right_axis0
       - wrist_right_axis1
+      - wrist_right_axis2
+  - name: fake_right_hand_controller
+    joints:
+      - hand_right_index_joint0
+      - hand_right_index_joint1
+      - hand_right_index_joint2
+      - hand_right_thumb_joint0
+      - hand_right_thumb_joint1
+      - hand_right_thumb_joint2
+  - name: fake_left_hand_controller
+    joints:
+      - hand_left_index_joint0
+      - hand_left_little_joint0
+      - hand_left_index_joint1
+      - hand_left_index_joint2
+      - hand_left_thumb_joint0
+      - hand_left_thumb_joint1
+      - hand_left_thumb_joint2

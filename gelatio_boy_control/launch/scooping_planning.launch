@@ -1,0 +1,6 @@
+<launch>
+
+  <node name="scooping_planning" pkg="gelataio_boy_control" type="scooping_planning" respawn="false" output="screen">
+  </node>
+
+</launch>
