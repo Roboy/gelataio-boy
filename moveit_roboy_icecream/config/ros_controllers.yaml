@@ -12,9 +12,6 @@ hardware_interface:
     - neck_axis0
     - neck_axis1
     - neck_axis2
-    - zed_camera_mount
-    - zed_camera_left
-    - zed_camera_right
     - shoulder_left_axis0
     - shoulder_left_axis1
     - shoulder_left_axis2
@@ -66,43 +63,4 @@ joint_state_controller:
   type: joint_state_controller/JointStateController
   publish_rate: 50
 controller_list:
-  - name: left_hand_controller
-    action_ns: follow_joint_trajectory
-    default: True
-    type: FollowJointTrajectory
-    joints:
-      - hand_left_index_joint0
-      - hand_left_little_joint1
-      - hand_left_little_joint2
-      - hand_left_little_joint0
-      - hand_left_index_joint1
-      - hand_left_index_joint2
-      - hand_left_middle_joint0
-      - hand_left_middle_joint1
-      - hand_left_middle_joint2
-      - hand_left_ring_joint0
-      - hand_left_ring_joint1
-      - hand_left_ring_joint2
-      - hand_left_thumb_joint0
-      - hand_left_thumb_joint1
-      - hand_left_thumb_joint2
-  - name: right_hand_controller
-    action_ns: follow_joint_trajectory
-    default: True
-    type: FollowJointTrajectory
-    joints:
-      - hand_right_index_joint0
-      - hand_right_index_joint1
-      - hand_right_index_joint2
-      - hand_right_little_joint0
-      - hand_right_little_joint1
-      - hand_right_little_joint2
-      - hand_right_middle_joint0
-      - hand_right_middle_joint1
-      - hand_right_middle_joint2
-      - hand_right_ring_joint0
-      - hand_right_ring_joint1
-      - hand_right_ring_joint2
-      - hand_right_thumb_joint0
-      - hand_right_thumb_joint1
-      - hand_right_thumb_joint2
+  []
