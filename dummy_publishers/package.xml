@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>dummy_publishgers</name>
+  <name>dummy_publishers</name>
   <version>0.0.0</version>
   <description>Dummy publishers for testing the interaction with gelatio boy. </description>
   <maintainer email="stanislav.lukyanenko@tum.de">Stanislav Lukyanenko</maintainer>
@@ -9,6 +9,12 @@
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roboy_cognition_msgs</build_depend>
   <build_depend>rospy</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>rviz</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>urdf</build_depend>
+  <build_depend>xacro</build_depend>
 
 
   <build_export_depend>geometryroboy_cognition_msgs_msgs</build_export_depend>
@@ -19,6 +25,12 @@
   <exec_depend>roboy_cognition_msgs</exec_depend>
   <exec_depend>roscpp</exec_depend>
   <exec_depend>rospy</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>rviz</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>urdf</exec_depend>
+  <exec_depend>xacro</exec_depend>
 
 
 
