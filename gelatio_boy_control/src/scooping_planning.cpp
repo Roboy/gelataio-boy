@@ -52,22 +52,22 @@ void defineEnvironment(moveit::planning_interface::PlanningSceneInterface &plann
 }
 
 int main(int argc, char **argv) {
-    ros::init(argc, argv, "gelataio_hand_controller");
+    ros::init(argc, argv, "gelataio_arm_controller");
     ros::NodeHandle node_handle;
     ros::AsyncSpinner spinner(1);
     spinner.start();
 
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
 
-    HandController right_arm("right_arm", 1, PlanningExecutorMode::MOVE_IT);
+    HandController arm("left_arm");
 
     defineEnvironment(planning_scene_interface);
 
-    right_arm.grasp("ice_cup");
+    arm.grasp("ice_cup");
 
     while (true) {
-        right_arm.moveToKnownPose("hello_start");
-        right_arm.moveToKnownPose("hello_end");
+        arm.moveToKnownPose("hello_start");
+        arm.moveToKnownPose("hello_end");
     }
 
     return 0;
