@@ -37,7 +37,12 @@ Using the Intel Realsense R200 (which has an infrared depth sensor), the cup is 
 
 Note on the realsense r200:
 https://github.com/IntelRealSense/realsense-ros/issues/386    
-Here is how to get the camera work with the old librealsense package version
+Here is how to get the camera work with the old librealsense package version -- 
+if using ROS kinetic,   
+`sudo apt-get install ros-kinetic-librealsense`    
+and    
+`sudo apt-get install ros-kinetic-realsense_camera`     
+should work
 
 
 ## Example Usage

@@ -3,10 +3,10 @@
 import sys
 import rospy
 from std_msgs.msg import Header
-from dbot_ros_msgs.srv import RunMultiObjectTracker
 from dbot_ros_msgs.msg import ObjectState
 from dbot_ros_msgs.msg import ObjectOri
-from dbot_ros_msgs.msg import MultiObjectState
+from scooping_cv.msg import MultiObjectState
+from scooping_cv.srv import RunMultiObjectTracker
 from geometry_msgs.msg import Point
 from geometry_msgs.msg import Quaternion
 from geometry_msgs.msg import Pose

@@ -37,7 +37,7 @@
 #include <ros/ros.h>
 #include <thread>
 
-#include <dbot_ros_msgs/RunMultiObjectTracker.h>
+#include <scooping_cv/RunMultiObjectTracker.h>
 
 #include <typeinfo>
 
@@ -251,8 +251,8 @@ void run(dbot::ObjectResourceIdentifier ori, std::vector<dbot::Tracker::State> p
     ROS_INFO("Tracking terminated.");
 }
 
-bool run_object_tracker_srv(dbot_ros_msgs::RunMultiObjectTrackerRequest& req,
-                            dbot_ros_msgs::RunMultiObjectTrackerResponse& res)
+bool run_object_tracker_srv(scooping_cv::RunMultiObjectTrackerRequest& req,
+                            scooping_cv::RunMultiObjectTrackerResponse& res)
 {
 
     std::vector<std::string> names = {};

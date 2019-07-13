@@ -38,6 +38,7 @@ find_package(catkin REQUIRED COMPONENTS
   dbot
   dbot_ros_msgs
   dbot_ros
+  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -73,19 +74,17 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * uncomment the generate_messages entry below
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
-## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+# Generate messages in the 'msg' folder
+add_message_files(
+  FILES
+  MultiObjectState.msg
+)
 
-## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+# Generate services in the 'srv' folder
+add_service_files(
+  FILES
+  RunMultiObjectTracker.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -95,10 +94,13 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   geometry_msgs#   sensor_msgs#   std_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+    std_msgs
+    geometry_msgs
+    sensor_msgs
+    dbot_ros_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -178,7 +180,7 @@ include_directories(
 
 add_executable(multi_object_tracker_service src/tracking/multi_object_tracker_service_node.cpp)
 add_dependencies(multi_object_tracker_service
-  dbot_ros_msgs_generate_messages_cpp)
+  dbot_ros_msgs_generate_messages_cpp scooping_cv_generate_messages_cpp)
 target_link_libraries(multi_object_tracker_service
   ${catkin_LIBRARIES}
 #  ${PROJECT_NAME}
