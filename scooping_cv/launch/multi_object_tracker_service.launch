@@ -1,7 +1,7 @@
 <launch>
   <arg name="camera_config" default="$(find scooping_cv)/config/camera.yaml"/>
   <arg name="filter_config" default="$(find scooping_cv)/config/particle_tracker.yaml"/>
-  <arg name="service_config" default="$(find scooping)/config/object_tracker_services.yaml"/>
+  <arg name="service_config" default="$(find scooping_cv)/config/object_tracker_services.yaml"/>
 
   <node
     name="multi_object_tracker_service"
