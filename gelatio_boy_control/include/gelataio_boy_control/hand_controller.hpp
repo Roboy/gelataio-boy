@@ -8,16 +8,7 @@
 
 #include <moveit/planning_interface/planning_interface.h>
 #include <moveit/move_group_interface/move_group_interface.h>
-
-enum PlanningExecutorMode {
-    MOVE_IT = 1,
-    CARDSFLOW = 2
-};
-
-class PlanExecutor {
-public:
-    virtual bool executePlan(moveit::planning_interface::MoveGroupInterface::Plan &plan) = 0;
-};
+#include "plan_executor.h"
 
 class HandController {
 public:
@@ -108,32 +99,11 @@ private:
 
     moveit::planning_interface::MoveGroupInterface *m_move_group_ptr;
 
-    PlanExecutor *m_plan_executor_ptr;
+    plan_executor *m_plan_executor_ptr;
 
     std::string m_planning_group;
 
     int m_planning_attempts;
-};
-
-class MoveItPlanExecutor : public PlanExecutor {
-
-public:
-    explicit MoveItPlanExecutor(moveit::planning_interface::MoveGroupInterface *move_it) : move_it(move_it) {}
-
-    virtual bool executePlan(moveit::planning_interface::MoveGroupInterface::Plan &plan) override;
-
-private:
-    moveit::planning_interface::MoveGroupInterface *move_it;
-};
-
-class CardsflowPlanExecutor : public PlanExecutor {
-public:
-    explicit CardsflowPlanExecutor(std::string &group_name);
-
-    virtual bool executePlan(moveit::planning_interface::MoveGroupInterface::Plan &plan) override;
-
-private:
-    std::string group_name;
 };
 
 #endif
