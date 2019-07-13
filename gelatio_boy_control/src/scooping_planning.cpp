@@ -66,8 +66,8 @@ int main(int argc, char **argv) {
     arm.grasp("ice_cup");
 
     while (true) {
-        arm.moveToKnownPose("hello_start");
-        arm.moveToKnownPose("hello_end");
+        arm.moveToKnownPose("hello_start_left");
+        arm.moveToKnownPose("hello_end_left");
     }
 
     return 0;

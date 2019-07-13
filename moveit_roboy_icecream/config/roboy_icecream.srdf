@@ -76,6 +76,24 @@
         <joint name="wrist_right_axis1" value="0" />
         <joint name="wrist_right_axis2" value="1.6489" />
     </group_state>
+     <group_state name="hello_start_left" group="left_arm">
+        <joint name="elbow_left" value="0.6075" />
+        <joint name="shoulder_left_axis0" value="0" />
+        <joint name="shoulder_left_axis1" value="2.0307" />
+        <joint name="shoulder_left_axis2" value="0.538" />
+        <joint name="wrist_left_axis0" value="0" />
+        <joint name="wrist_left_axis1" value="0" />
+        <joint name="wrist_left_axis2" value="1.6489" />
+    </group_state>
+    <group_state name="hello_end_left" group="left_arm">
+        <joint name="elbow_left" value="1.1976" />
+        <joint name="shoulder_left_axis0" value="0" />
+        <joint name="shoulder_left_axis1" value="2.0307" />
+        <joint name="shoulder_left_axis2" value="0.538" />
+        <joint name="wrist_left_axis0" value="0" />
+        <joint name="wrist_left_axis1" value="0" />
+        <joint name="wrist_left_axis2" value="1.6489" />
+    </group_state>
     <group_state name="ready_to_grab" group="right_arm">
         <joint name="elbow_right" value="-0.9" />
         <joint name="shoulder_right_axis0" value="0.75" />
