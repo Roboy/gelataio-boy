@@ -102,5 +102,5 @@ if __name__ == "__main__":
 
   track_object(sys.argv[1:])
 
-  rospy.spin()
+  # rospy.spin()
   #track_object(sys.argv) #for more arguments

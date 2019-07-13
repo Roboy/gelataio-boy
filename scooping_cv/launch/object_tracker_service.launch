@@ -8,10 +8,10 @@
     type="object_tracker_service"
     pkg="dbot_ros"
     output="screen"
-    respawn="false"
-    launch-prefix="xterm -bg FloralWhite -fg MistyRose4 -e">
+    respawn="false">
+    <!-- launch-prefix="xterm -bg FloralWhite -fg MistyRose4 -e">
         <rosparam command="load" file="$(arg filter_config)" />
         <rosparam command="load" file="$(arg camera_config)" />
-        <rosparam command="load" file="$(arg service_config)" />
+        <rosparam command="load" file="$(arg service_config)" /> -->
   </node>
 </launch>

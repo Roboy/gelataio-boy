@@ -131,7 +131,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
  INCLUDE_DIRS include
-  LIBRARIES scooping_cv
+ LIBRARIES scooping_cv
  CATKIN_DEPENDS 
 #  gazebo_plugins 
  geometry_msgs 

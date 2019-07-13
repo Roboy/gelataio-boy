@@ -1,7 +1,7 @@
 
 object:
-  package:    object_meshes
-  directory:  object_models
+  package:    scooping_cv
+  directory:  meshes/tracking
   meshes:     [ cup.obj ]
 
 
