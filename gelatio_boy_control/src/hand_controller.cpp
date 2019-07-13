@@ -1,47 +1,45 @@
 #include "gelataio_boy_control/hand_controller.hpp"
 
-HandController::HandController(std::string planning_group, int planning_attempts, PlanningExecutorMode mode)
-{
+HandController::HandController(std::string planning_group, int planning_attempts, PlanningExecutorMode mode) {
     this->m_planning_group = planning_group;
     this->m_move_group_ptr = new moveit::planning_interface::MoveGroupInterface(planning_group);
     this->m_planning_attempts = planning_attempts;
 
     switch (mode) {
-      case PlanningExecutorMode::MOVE_IT:
-        this->m_plan_executor_ptr = new MoveItPlanExecutor(m_move_group_ptr);
-        break;
-      case PlanningExecutorMode::CARDSFLOW:
-        this->m_plan_executor_ptr = new CardsflowPlanExecutor(planning_group);
-        break;
+        case PlanningExecutorMode::MOVE_IT:
+            this->m_plan_executor_ptr = new MoveItPlanExecutor(m_move_group_ptr);
+            break;
+        case PlanningExecutorMode::CARDSFLOW:
+            this->m_plan_executor_ptr = new CardsflowPlanExecutor(planning_group);
+            break;
     }
 }
 
 HandController::~HandController() {
-  delete this->m_move_group_ptr;
-  delete this->m_plan_executor_ptr;
+    delete this->m_move_group_ptr;
+    delete this->m_plan_executor_ptr;
 }
 
-HandController::PlanningResult HandController::plan()
-{
+HandController::PlanningResult HandController::plan() {
     this->m_move_group_ptr->setStartStateToCurrentState();
 
-    ROS_INFO_NAMED("HandController", "HandController::Planning frame: %s", this->m_move_group_ptr->getPlanningFrame().c_str());
-    ROS_INFO_NAMED("HandController", "HandController::End effector link: %s", this->m_move_group_ptr->getEndEffectorLink().c_str());
+    ROS_INFO_NAMED("HandController", "HandController::Planning frame: %s",
+                   this->m_move_group_ptr->getPlanningFrame().c_str());
+    ROS_INFO_NAMED("HandController", "HandController::End effector link: %s",
+                   this->m_move_group_ptr->getEndEffectorLink().c_str());
 
     moveit::planning_interface::MoveGroupInterface::Plan plan;
     moveit::planning_interface::MoveItErrorCode planning_result = this->m_move_group_ptr->plan(plan);
     return HandController::PlanningResult{plan, planning_result};
 }
 
-bool HandController::planAndExecute()
-{
+bool HandController::planAndExecute() {
     HandController::PlanningResult planning_result = this->plan();
 
     int attempts_counter = 0;
     bool path_found = planning_result.planning_status == moveit::planning_interface::MoveItErrorCode::SUCCESS;
 
-    while(attempts_counter <= this->m_planning_attempts && !path_found)
-    {
+    while (attempts_counter <= this->m_planning_attempts && !path_found) {
         planning_result = this->plan();
 
         path_found = planning_result.planning_status == moveit::planning_interface::MoveItErrorCode::SUCCESS;
@@ -51,62 +49,56 @@ bool HandController::planAndExecute()
     return this->m_plan_executor_ptr->executePlan(planning_result.plan);
 }
 
-bool HandController::moveToPose(geometry_msgs::PoseStamped target_pose)
-{
+bool HandController::moveToPose(geometry_msgs::PoseStamped target_pose) {
     this->m_move_group_ptr->setPoseTarget(target_pose);
 
     return this->planAndExecute();
 }
 
-bool HandController::moveToPose(geometry_msgs::Pose target_pose)
-{
+bool HandController::moveToPose(geometry_msgs::Pose target_pose) {
     this->m_move_group_ptr->setPoseTarget(target_pose);
 
     return this->planAndExecute();
 }
 
-bool HandController::moveToPoses(std::vector<geometry_msgs::Pose> &targets)
-{
+bool HandController::moveToPoses(std::vector<geometry_msgs::Pose> &targets) {
     this->m_move_group_ptr->setPoseTargets(targets);
 
     return this->planAndExecute();
 }
 
-bool HandController::moveToPosition(geometry_msgs::Point target_position)
-{
+bool HandController::moveToPosition(geometry_msgs::Point target_position) {
     geometry_msgs::PoseStamped target_pose_st = this->getCurrentPose();
-    ROS_ERROR_STREAM("CURRENT POSE "<<target_pose_st.header.frame_id);
+    ROS_ERROR_STREAM("CURRENT POSE " << target_pose_st.header.frame_id);
     geometry_msgs::Pose target_pose = target_pose_st.pose;
-    ROS_ERROR_STREAM("CURRENT POSE "<<target_pose.position.x<<" "<<target_pose.position.y<<" "<<target_pose.position.z);
+    ROS_ERROR_STREAM("CURRENT POSE " << target_pose.position.x << " " << target_pose.position.y << " "
+                                     << target_pose.position.z);
     target_pose.position = target_position;
-    
+
     return this->moveToPose(target_pose);
 }
 
-bool HandController::moveToOrientation(geometry_msgs::Quaternion target_orientation)
-{
+bool HandController::moveToOrientation(geometry_msgs::Quaternion target_orientation) {
     geometry_msgs::Pose target_pose = this->getCurrentPose().pose;
     target_pose.orientation = target_orientation;
 
     return this->moveToPose(target_pose);
 }
 
-bool HandController::moveToKnownPose(std::string pose_name)
-{
+bool HandController::moveToKnownPose(std::string pose_name) {
     this->m_move_group_ptr->setNamedTarget(pose_name);
 
     return this->planAndExecute();
 }
 
-void HandController::grasp(std::string object_name)
-{
+void HandController::grasp(std::string object_name) {
 
     this->moveToKnownPose("ready_to_grab");
-    
+
     // TODO: figure out how to move properly the palm to the cup
     geometry_msgs::Point target_pose = this->getCurrentPose().pose.position;
     target_pose.x -= 0.05;
-    
+
     this->moveToPosition(target_pose);
 
     // TODO: part of pick and place tutorial - adjust to Roboy
@@ -175,7 +167,7 @@ CardsflowPlanExecutor::CardsflowPlanExecutor(std::string &group_name) : group_na
 }
 
 bool CardsflowPlanExecutor::executePlan(moveit::planning_interface::MoveGroupInterface::Plan &plan) {
-  std::cout << "Moving " << group_name << " using CARDSflow to:" << std::endl;
-  std::cout << plan.trajectory_ << std::endl;
-  return true;
+    std::cout << "Moving " << group_name << " using CARDSflow to:" << std::endl;
+    std::cout << plan.trajectory_ << std::endl;
+    return true;
 }
