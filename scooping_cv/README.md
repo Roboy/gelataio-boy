@@ -33,7 +33,7 @@ $ sudo make install
 
 THe problem with the ZED camera is that it cannot track homogeneous surfaces, e.g. the cup. The cup itself will be detected as flat surface, which corrupts the bayesian object tracking.
 
-Using the Intel Realsense R200 (which has an infrared depth sensor), the cup is recognized without problems. However, the scooping tool has a special surface that does not go well with infrared - it is not detectable in the depth cloud. This needs to be solved. An alternative would be using AR Tags.
+Using the Intel Realsense R200 (which has an infrared depth sensor), the cup is recognized without problems. However, the scooping tool has a special surface that does not go well with infrared - it is not detectable in the depth cloud. A temporary solution is to wrap the handle in paper, however tracking is still not accurate enough. This needs to be solved. An alternative would be using AR Tags.
 
 Note on the realsense r200:
 https://github.com/IntelRealSense/realsense-ros/issues/386    
@@ -54,7 +54,7 @@ Start service:
 `roslaunch scooping_cv multi_object_tracker_service.launch`
 
 Start visualization stuff:    
-`roslaunch scooping_cv object_tracking_client.launch`    
+`roslaunch scooping_cv rviz_tracking.launch`    
 
 
 Start AR Track Alvar for initial pose:    
@@ -67,3 +67,5 @@ Call tracking service (track cup):
 `/object_tracker_service/object_state` 
 and the object pose under:  
 `/object_pose`
+
+<!-- <node name="foo_throttler" type="throttle" pkg="topic_tools" args="messages /camera/depth/image_raw 10.0" /> -->

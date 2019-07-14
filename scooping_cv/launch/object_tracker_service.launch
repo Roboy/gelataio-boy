@@ -14,4 +14,7 @@
         <rosparam command="load" file="$(arg camera_config)" />
         <rosparam command="load" file="$(arg service_config)" />
   </node>
+
+
+
 </launch>
