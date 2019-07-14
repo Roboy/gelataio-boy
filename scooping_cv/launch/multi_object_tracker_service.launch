@@ -15,7 +15,7 @@
         <rosparam command="load" file="$(arg service_config)" />
   </node>
 
-    <node name="foo_throttler" type="throttle" pkg="topic_tools" args="messages /camera/depth/image_raw 10.0" />
+    <!-- <node name="foo_throttler" type="throttle" pkg="topic_tools" args="messages /camera/depth/image_raw 10.0" /> -->
 
   <node name="multi_obj_state_to_pose" type="multi_obj_state_to_pose.py" pkg="scooping_cv" output="screen"/>    
 </launch>
