@@ -44,6 +44,9 @@ and
 `sudo apt-get install ros-kinetic-realsense_camera`     
 should work
 
+## Transform coordinate to robot reference frame
+THe magic happens in the src/tracking/multi_obj_state_to_pose.py file, where the coordinates of the tracked object will be converted to a common world frame. As of 14th July 2019 21:14, we still need to change the name of the camera frame in line 28 to the proper camera frame name. Right now it is set to "torso" because the camera frame does not exist in the current urdf file.
+
 
 ## Example Usage
 
