@@ -1,3 +1,5 @@
+#!/usr/bin/env
+
 import triad_openvr
 import time
 import rospy
@@ -6,6 +8,7 @@ import numpy as np
 import math
 from pyquaternion import Quaternion
 import std_msgs, sensor_msgs
+import csv
 rospy.init_node('tracker_tf_broadcaster')
 
 # Checks if a matrix is a valid rotation matrix.
@@ -47,6 +50,20 @@ def process_transform(device_name, pose ):
     q_tracker = Quaternion(pose[6],pose[3],pose[4],pose[5])                 #*q_init1.inverse
     return q_tracker
 
+def _get_instance_eulers():
+    q_tracker_1 = process_transform("tracker_1", initial_pose1)
+    q_tracker_2 = process_transform("tracker_3", initial_pose2)
+    q_tracker_3 = process_transform("tracker_2", initial_pose3)
+
+    q_tracker_diff_12 = q_tracker_2*q_tracker_1.inverse
+    q_tracker_diff_23 = q_tracker_3*q_tracker_2.inverse
+
+    euler_12 = rotationMatrixToEulerAngles(q_tracker_diff_12.rotation_matrix)
+    euler_23 = rotationMatrixToEulerAngles(q_tracker_diff_23.rotation_matrix)
+
+    return euler_12, euler_23
+
+
 if __name__ == "__main__":
     # use these to change publishing behaviour
     head = False
@@ -64,14 +81,6 @@ if __name__ == "__main__":
     q_init1 = Quaternion(initial_pose1[6],initial_pose1[3],initial_pose1[4],initial_pose1[5])
     q_init2 = Quaternion(initial_pose2[6],initial_pose2[3],initial_pose2[4],initial_pose2[5])
     q_init3 = Quaternion(initial_pose3[6],initial_pose3[3],initial_pose3[4],initial_pose3[5])
-
-    joint_state = rospy.Publisher('/joint_states', sensor_msgs.msg.JointState , queue_size=1)
-    shoulder_right_axis0_publisher = rospy.Publisher('/shoulder_right_axis0/shoulder_right_axis0/target', std_msgs.msg.Float32 , queue_size=1)
-    shoulder_right_axis1_publisher = rospy.Publisher('/shoulder_right_axis1/shoulder_right_axis1/target', std_msgs.msg.Float32 , queue_size=1)
-    shoulder_right_axis2_publisher = rospy.Publisher('/shoulder_right_axis2/shoulder_right_axis2/target', std_msgs.msg.Float32 , queue_size=1)
-
-    elbow_right_publisher = rospy.Publisher('elbow_right/elbow_right/target', std_msgs.msg.Float32 , queue_size=1)
-
 
     X0 = np.array([1,0,0])
     X1 = np.array([0,1,0])
@@ -102,38 +111,6 @@ if __name__ == "__main__":
     rot_align_23 = np.array([[X0.dot(Y0_23),X0.dot(Y1_23),X0.dot(Y2_23)],[X1.dot(Y0_23),X1.dot(Y1_23),X1.dot(Y2_23)],[X2.dot(Y0_23),X2.dot(Y1_23),X2.dot(Y2_23)]])
 
 
-    while not rospy.is_shutdown():
-        start = time.time()
+    input("Relax your arm")
 
-        q_tracker_1 = process_transform("tracker_1", initial_pose1)
-        q_tracker_2 = process_transform("tracker_3", initial_pose2)
-        q_tracker_3 = process_transform("tracker_2", initial_pose3)
-
-        q_top_estimate = q_tracker_2*q_tracker_1.inverse
-
-        q_tracker_diff_12 = q_tracker_2*q_tracker_1.inverse
-        q_tracker_diff_23 = q_tracker_3*q_tracker_2.inverse
-
-        euler_12 = rotationMatrixToEulerAngles(q_tracker_diff_12.rotation_matrix)
-        euler_23 = rotationMatrixToEulerAngles(q_tracker_diff_23.rotation_matrix)
-
-        """
-        msg = sensor_msgs.msg.JointState()
-        msg.header = std_msgs.msg.Header()
-        msg.header.stamp = rospy.Time.now()
-        msg.name = ['sphere_axis0', 'sphere_axis1', 'sphere_axis2']
-        """
-
-
-        print ("Shoulder angles: ", euler_12)
-        print ("Elbow angles: ", euler_23)
-
-
-
-
-        shoulder_right_axis0_publisher.publish(std_msgs.msg.Float32(-euler_12[2]))
-        shoulder_right_axis1_publisher.publish(std_msgs.msg.Float32(euler_12[0]+1.57))
-        shoulder_right_axis2_publisher.publish(std_msgs.msg.Float32(-euler_12[1]))
-
-        elbow_right_publisher.publish(std_msgs.msg.Float32(-euler_23[2]))
-
+    euler_relaxed_12, euler_relaxed_23 = _get_instance_eulers()

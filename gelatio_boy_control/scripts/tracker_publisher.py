@@ -8,6 +8,7 @@ import numpy as np
 import math
 from pyquaternion import Quaternion
 import std_msgs, sensor_msgs
+import csv
 rospy.init_node('tracker_tf_broadcaster')
 
 # Checks if a matrix is a valid rotation matrix.
@@ -53,6 +54,14 @@ if __name__ == "__main__":
     # use these to change publishing behaviour
     head = False
     shoulder_left = True
+
+    coefficients = []
+    csvfile =  open('calibration.csv', 'rb')
+    reader = csv.reader(csvfile)
+
+    for row in reader:
+        coefficients.append(row)
+
 
     v = triad_openvr.triad_openvr()
     v.print_discovered_objects()
@@ -129,9 +138,14 @@ if __name__ == "__main__":
         print ("Shoulder angles: ", euler_12)
         print ("Elbow angles: ", euler_23)
 
-        shoulder_right_axis0_publisher.publish(std_msgs.msg.Float32(-euler_12[2]))
-        shoulder_right_axis1_publisher.publish(std_msgs.msg.Float32(euler_12[0]+1.57))
-        shoulder_right_axis2_publisher.publish(std_msgs.msg.Float32(-euler_12[1]))
+        shoulder_axis0 = coefficients[0][0]*euler_12[0] + coefficients[0][1]*euler_12[1] + coefficients[0][2]*euler_12[2] + coefficients[0][6]
+        shoulder_axis1 = coefficients[1][0]*euler_12[0] + coefficients[1][1]*euler_12[1] + coefficients[1][2]*euler_12[2] + coefficients[1][6]
+        shoulder_axis2 = coefficients[2][0]*euler_12[0] + coefficients[2][1]*euler_12[1] + coefficients[2][2]*euler_12[2] + coefficients[2][6]
+        elbow_axis = coefficients[3][3]*euler_12[0] + coefficients[3][4]*euler_12[1] + coefficients[3][5]*euler_12[2] + coefficients[3][6]
 
-        elbow_right_publisher.publish(std_msgs.msg.Float32(-euler_23[2]))
+        shoulder_right_axis0_publisher.publish(std_msgs.msg.Float32(shoulder_axis0))
+        shoulder_right_axis1_publisher.publish(std_msgs.msg.Float32(shoulder_axis1))
+        shoulder_right_axis2_publisher.publish(std_msgs.msg.Float32(shoulder_axis2))
+
+        elbow_right_publisher.publish(std_msgs.msg.Float32(elbow_axis))
 
