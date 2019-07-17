@@ -84,7 +84,7 @@ class Republisher():
 
         # self.pub.publish(pose)
         self.pose_prev = tag_pose
-        # self.pub_marker.publish(self.marker)
+        self.pub_marker.publish(self.marker)
 
 
 if __name__ == "__main__":
