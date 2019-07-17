@@ -29,11 +29,11 @@ class Republisher():
 
         tag_pose = data.pose
 
-        if(abs(tag_pose.position.x - self.pose_prev.position.x) < 0.02):
+        if(abs(tag_pose.position.x - self.pose_prev.position.x) < 0.02 or abs(tag_pose.position.x - self.pose_prev.position.x) > 0.9):
             tag_pose.position.x = self.pose_prev.position.x
-        if(abs(tag_pose.position.y - self.pose_prev.position.y) < 0.02):
+        if(abs(tag_pose.position.y - self.pose_prev.position.y) < 0.02 or abs(tag_pose.position.y - self.pose_prev.position.y) > 0.09):
             tag_pose.position.y = self.pose_prev.position.y
-        if(abs(tag_pose.position.z - self.pose_prev.position.z) < 0.02):
+        if(abs(tag_pose.position.z - self.pose_prev.position.z) < 0.02 or abs(tag_pose.position.z - self.pose_prev.position.z) > 0.09):
             tag_pose.position.z = self.pose_prev.position.z
 
 
@@ -49,12 +49,13 @@ class Republisher():
 
         self.marker.pose.position.x = world_pose.pose.position.x
         self.marker.pose.position.y = world_pose.pose.position.y
-        self.marker.pose.position.z = world_pose.pose.position.z
+        self.marker.pose.position.z = world_pose.pose.position.z + 0.3
         self.marker.pose.orientation.x = world_pose.pose.orientation.x
         self.marker.pose.orientation.y = world_pose.pose.orientation.y
         self.marker.pose.orientation.z = world_pose.pose.orientation.z
         self.marker.pose.orientation.w = world_pose.pose.orientation.w
-        rospy.loginfo_throttle(1,"%f %f %f"%(self.marker.pose.position.x, self.marker.pose.position.y, self.marker.pose.position.z))
+        # rospy.loginfo_throttle(1,"%f %f %f"%(self.marker.pose.position.x, self.marker.pose.position.y, self.marker.pose.position.z))
+        rospy.loginfo("%f %f %f"%(self.marker.pose.position.x, self.marker.pose.position.y, self.marker.pose.position.z))
 
 
 
@@ -83,7 +84,7 @@ class Republisher():
 
         # self.pub.publish(pose)
         self.pose_prev = tag_pose
-        self.pub_marker.publish(self.marker)
+        # self.pub_marker.publish(self.marker)
 
 
 if __name__ == "__main__":

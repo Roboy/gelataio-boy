@@ -8,7 +8,7 @@ from std_msgs.msg import String, Float32
 from geometry_msgs.msg import PoseStamped
 from dbot_ros_msgs.msg import ObjectState
 import tf
-from visualization_msgs.msg import InteractiveMarkerUpdate
+from visualization_msgs.msg import InteractiveMarkerUpdate, InteractiveMarkerFeedback
 
 
 class Republisher():
@@ -25,15 +25,25 @@ class Republisher():
     def callback(self, data):
 
         pose = data.pose
-        pose.header.frame_id = "torso"  # TODO: change this to the camera frame "zed_camera_left"
-        target_frame = 'world'  # or 'world'
+        # pose.header.frame_id = "torso"  # TODO: change this to the camera frame "zed_camera_left"
+        # target_frame = 'world'  # or 'world'
 
-        t = self.tf_listener_.getLatestCommonTime(
-            target_frame, pose.header.frame_id)
+        # t = self.tf_listener_.getLatestCommonTime(
+        #     target_frame, pose.header.frame_id)
 
-        # transform stuff
-        world_pose = self.tf_listener_.transformPose(target_frame, pose)
-        print(world_pose)
+        # # transform stuff
+        # world_pose = self.tf_listener_.transformPose(target_frame, pose)
+        # print(world_pose)
+
+        # pos = InteractiveMarkerFeedback()
+        # pos.header.frame_id = 'world'
+        # pos.marker_name = "cup"
+        # pos.event_type = 5
+        # pos.pose.position.x = world_pose.pose.x
+        # pos.pose.position.y = world_pose.pose.y
+        # pos.pose.position.z = world_pose.pose.z
+        # rospy.loginfo_throttle(1,"%f %f %f"%(pos.pose.position.x, pos.pose.position.y, pos.pose.position.z))
+
 
         # #create interactive marker
         # self.marker.markers[0].

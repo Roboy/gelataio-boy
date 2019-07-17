@@ -17,8 +17,8 @@ def main():
     world_pose = PoseStamped()
 
     world_pose.pose.position.x = 0
-    world_pose.pose.position.y = -1
-    world_pose.pose.position.z = 0
+    world_pose.pose.position.y = 0
+    world_pose.pose.position.z = 1
     # world_pose.pose.position.x = 0
     # world_pose.pose.position.y = 0
     # world_pose.pose.position.z = 0
