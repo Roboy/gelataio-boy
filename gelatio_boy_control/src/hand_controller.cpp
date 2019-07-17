@@ -94,6 +94,7 @@ bool HandController::moveToKnownPose(std::string pose_name, enum HandController:
 void HandController::grasp(std::string object_name, geometry_msgs::Pose target_pose) {
 
     this->moveToKnownPose("ready_to_grab", HandController::PlanningGroups::ARM);
+    //this->moveToKnownPose("ready_to_grab", HandController::PlanningGroups::HAND);
 
     // TODO: figure out how to move properly the palm to the cup
     geometry_msgs::Point adjusted_pose = this->getCurrentPose().pose.position;
