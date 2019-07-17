@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
 
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
     
-    HandController right_arm("right_hand", "right_arm");
+    //HandController right_arm("right_hand", "right_arm");
     HandController left_arm("left_hand", "left_arm");
     
     defineEnvironment(planning_scene_interface);
@@ -89,8 +89,8 @@ int main(int argc, char **argv) {
     right_arm.grasp("ice_cup", cup_pose);
 
     geometry_msgs::Pose scooper_pose;
-    cup_pose.position.x = 0.24;
-    cup_pose.position.y = -0.5;
+    scooper_pose.position.x = 0.24;
+    scooper_pose.position.y = -0.45;
 
     left_arm.grasp("ice_scooper", scooper_pose);
 
@@ -101,10 +101,10 @@ int main(int argc, char **argv) {
 
     left_arm.moveToKnownPose("ready_to_grab");
 
-    while (true) {
-        right_arm.moveToKnownPose("hello_start");
-        right_arm.moveToKnownPose("hello_end");
-    }
+    //while (true) {
+    //    right_arm.moveToKnownPose("hello_start");
+    //    right_arm.moveToKnownPose("hello_end");
+    //}
 
     return 0;
 }

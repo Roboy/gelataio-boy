@@ -53,7 +53,7 @@ bool HandController::moveToPose(geometry_msgs::PoseStamped target_pose) {
 }
 
 bool HandController::moveToPose(geometry_msgs::Pose target_pose) {
-    this->m_move_group_arm_ptr->setWorkspace(-.5, -1, .3, .5, 1., 1.);
+    //this->m_move_group_arm_ptr->setWorkspace(-.5, -1, .3, .5, 1., 1.);
 
     this->m_move_group_arm_ptr->setPoseTarget(target_pose);
 
@@ -97,7 +97,7 @@ void HandController::grasp(std::string object_name, geometry_msgs::Pose target_p
 
     // TODO: figure out how to move properly the palm to the cup
     geometry_msgs::Point adjusted_pose = this->getCurrentPose().pose.position;
-    adjusted_pose.x += 0.2;
+    adjusted_pose.x = target_pose.position.x;
     
     this->moveToPosition(adjusted_pose);
 
