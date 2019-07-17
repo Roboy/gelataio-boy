@@ -11,28 +11,32 @@
 
 class HandController {
 public:
+
+    enum class PlanningGroups { ARM, HAND };
     /**
      * Constructor.
-     * @param planning_group   Name of the planning group of the arm
+     * @param planning_group_hand   Name of the planning group of the hand
+     * @param planning_group_arm    Name of the planning group of the arm
+     * @param planning_attempts     Amount of planning attempts that should be performed
      */
-    HandController(std::string planning_group, int planning_attempts = 5);
+    HandController(std::string planning_group_hand, std::string planning_group_arm, int planning_attempts = 5);
 
     /**
      * Destructor.
      */
-    ~HandController() { delete m_move_group_ptr; }
+    ~HandController() { delete m_move_group_arm_ptr; delete m_move_group_hand_ptr; }
 
     /**
      * Getter for current pose of the arm.
      * @return     Position and orientation of the current position.
      */
-    geometry_msgs::PoseStamped getCurrentPose() { return this->m_move_group_ptr->getCurrentPose(); }
+    geometry_msgs::PoseStamped getCurrentPose() { return this->m_move_group_arm_ptr->getCurrentPose(); }
 
     /**
      * Getter for planning group.
      * @return     Position and orientation of the current position.
      */
-    std::string getPlanningGroupName() { return this->m_planning_group; }
+    std::string getPlanningGroupName() { return this->m_planning_group_arm; }
 
     /**
      * Move to a position, while keeping orientation.
@@ -74,7 +78,7 @@ public:
      * @param pose_name   Name of known robot poses
      * @return true if successful
      */
-    bool moveToKnownPose(std::string pose_name);
+    bool moveToKnownPose(std::string pose_name, enum PlanningGroups planning_gr=PlanningGroups::ARM);
 
     /**
      * Grasp object at position
@@ -82,7 +86,7 @@ public:
      * @param object_name   Object name in the scene
      * @return true if successful
      */
-    void grasp(std::string object_name);
+    void grasp(std::string object_name,  geometry_msgs::Pose target_pose);
 
 
 private:
@@ -91,13 +95,17 @@ private:
         moveit::planning_interface::MoveItErrorCode planning_status;
     };
 
-    PlanningResult plan();
+    PlanningResult plan(enum HandController::PlanningGroups planning_gr=PlanningGroups::ARM, double tolerance=0.05);
 
-    bool planAndExecute();
+    bool planAndExecute(enum HandController::PlanningGroups planning_gr=PlanningGroups::ARM);
 
-    moveit::planning_interface::MoveGroupInterface *m_move_group_ptr;
+    moveit::planning_interface::MoveGroupInterface *m_move_group_arm_ptr;
 
-    std::string m_planning_group;
+    moveit::planning_interface::MoveGroupInterface *m_move_group_hand_ptr;
+
+    std::string m_planning_group_arm;
+
+    std::string m_planning_group_hand;
 
     int m_planning_attempts;
 };
