@@ -28,7 +28,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 <param name="marker_size"           type="double" value="$(arg marker_size)" />
                 <param name="max_new_marker_error"  type="double" value="$(arg max_new_marker_error)" />
                 <param name="max_track_error"       type="double" value="$(arg max_track_error)" />
-                <param name="output_frame"          type="string" value="camera_rgb_optical_frame" />
+                <!-- <param name="output_frame"          type="string" value="camera_rgb_optical_frame" /> -->
+                <param name="output_frame"          type="string" value="camera_depth_optical_frame" />
+
 
                 <remap from="camera_image"  to="/camera/color/image_raw" />
                 <remap from="camera_info"   to="/camera/color/camera_info" />

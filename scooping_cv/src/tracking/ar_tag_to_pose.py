@@ -19,6 +19,7 @@ class Republisher():
         self.marker = InteractiveMarkerFeedback()
         self.tf_listener_ = tf.TransformListener()
         self.pose_prev = Pose()
+        self.initialized = False 
         return
 
     def callback(self, data):
@@ -27,13 +28,19 @@ class Republisher():
         self.marker.marker_name = "arm_left_palm"
         self.marker.event_type = 5
 
+        if(self.initialized==False):
+            self.pose_prev.position.x = data.pose.position.x
+            self.pose_prev.position.y = data.pose.position.y
+            self.pose_prev.position.z = data.pose.position.z
+            self.initialized = True
+
         tag_pose = data.pose
 
         if(abs(tag_pose.position.x - self.pose_prev.position.x) < 0.02 or abs(tag_pose.position.x - self.pose_prev.position.x) > 0.9):
             tag_pose.position.x = self.pose_prev.position.x
-        if(abs(tag_pose.position.y - self.pose_prev.position.y) < 0.02 or abs(tag_pose.position.y - self.pose_prev.position.y) > 0.09):
+        if(abs(tag_pose.position.y - self.pose_prev.position.y) < 0.02 or abs(tag_pose.position.y - self.pose_prev.position.y) > 0.9):
             tag_pose.position.y = self.pose_prev.position.y
-        if(abs(tag_pose.position.z - self.pose_prev.position.z) < 0.02 or abs(tag_pose.position.z - self.pose_prev.position.z) > 0.09):
+        if(abs(tag_pose.position.z - self.pose_prev.position.z) < 0.02 or abs(tag_pose.position.z - self.pose_prev.position.z) > 0.9):
             tag_pose.position.z = self.pose_prev.position.z
 
 
@@ -42,14 +49,18 @@ class Republisher():
         world_pose.pose.position.y = -tag_pose.position.z
         world_pose.pose.position.z = -tag_pose.position.y
 
+        # workspace limit filter
+        if(not(-0.9 < world_pose.pose.position.x < 0.9 and -0.7<world_pose.pose.position.y< 0.7 and -0.2<world_pose.pose.position.z< 0.9)):
+            return
+
         world_pose.pose.orientation.x = 0
         world_pose.pose.orientation.y = 0
         world_pose.pose.orientation.z = 0
         world_pose.pose.orientation.w = 1
 
-        self.marker.pose.position.x = world_pose.pose.position.x
+        self.marker.pose.position.x = world_pose.pose.position.x - 0.1 #manually transform camera_link to world
         self.marker.pose.position.y = world_pose.pose.position.y
-        self.marker.pose.position.z = world_pose.pose.position.z + 0.3
+        self.marker.pose.position.z = world_pose.pose.position.z + 0.4 #manually transform camera_link to world
         self.marker.pose.orientation.x = world_pose.pose.orientation.x
         self.marker.pose.orientation.y = world_pose.pose.orientation.y
         self.marker.pose.orientation.z = world_pose.pose.orientation.z
