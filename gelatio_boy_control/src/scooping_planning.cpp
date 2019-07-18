@@ -101,6 +101,23 @@ int main(int argc, char **argv) {
 
     left_arm.moveToKnownPose("ready_to_grab");
 
+    geometry_msgs::PoseStamped receiving_ball_cup_pose = right_arm.getCurrentPose();
+    receiving_ball_cup_pose.pose.position.x += 0.25;
+    receiving_ball_cup_pose.pose.position.z -= 0.1;
+    right_arm.moveToPose(receiving_ball_cup_pose);
+
+    geometry_msgs::PoseStamped drop_ball_pose = left_arm.getCurrentPose();
+    drop_ball_pose.pose.position.x -= 0.15;
+    drop_ball_pose.pose.position.z += 0.1;
+    left_arm.moveToPose(drop_ball_pose);
+
+    drop_ball_pose.pose.position.x -= 0.1;
+    drop_ball_pose.pose.orientation.w = -0.707;
+    drop_ball_pose.pose.orientation.x = 0.0;
+    drop_ball_pose.pose.orientation.y = 0.707;
+    drop_ball_pose.pose.orientation.z = 0;
+    left_arm.moveToPose(drop_ball_pose);
+
     //while (true) {
     //    right_arm.moveToKnownPose("hello_start");
     //    right_arm.moveToKnownPose("hello_end");
