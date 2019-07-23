@@ -50,6 +50,19 @@ def process_transform(device_name, pose ):
     q_tracker = Quaternion(pose[6],pose[3],pose[4],pose[5])                 #*q_init1.inverse
     return q_tracker
 
+def _get_instance_eulers(initial_pose1, initial_pose2, initial_pose3):
+    q_tracker_1 = process_transform("tracker_1", initial_pose1)
+    q_tracker_2 = process_transform("tracker_2", initial_pose2)
+    q_tracker_3 = process_transform("tracker_3", initial_pose3)
+
+    q_tracker_diff_12 = q_tracker_2*q_tracker_1.inverse
+    q_tracker_diff_23 = q_tracker_3*q_tracker_2.inverse
+
+    euler_12 = rotationMatrixToEulerAngles(q_tracker_diff_12.rotation_matrix)
+    euler_23 = rotationMatrixToEulerAngles(q_tracker_diff_23.rotation_matrix)
+
+    return euler_12, euler_23
+
 if __name__ == "__main__":
     # use these to change publishing behaviour
     head = False
@@ -72,10 +85,6 @@ if __name__ == "__main__":
     initial_pose2 = v.devices["tracker_2"].get_pose_quaternion()
     initial_pose3 = v.devices["tracker_3"].get_pose_quaternion()
 
-    q_init1 = Quaternion(initial_pose1[6],initial_pose1[3],initial_pose1[4],initial_pose1[5])
-    q_init2 = Quaternion(initial_pose2[6],initial_pose2[3],initial_pose2[4],initial_pose2[5])
-    q_init3 = Quaternion(initial_pose3[6],initial_pose3[3],initial_pose3[4],initial_pose3[5])
-
     joint_state = rospy.Publisher('/joint_states', sensor_msgs.msg.JointState , queue_size=1)
     shoulder_right_axis0_publisher = rospy.Publisher('/shoulder_right_axis0/shoulder_right_axis0/target', std_msgs.msg.Float32 , queue_size=1)
     shoulder_right_axis1_publisher = rospy.Publisher('/shoulder_right_axis1/shoulder_right_axis1/target', std_msgs.msg.Float32 , queue_size=1)
@@ -84,48 +93,10 @@ if __name__ == "__main__":
     elbow_right_publisher = rospy.Publisher('elbow_right/elbow_right/target', std_msgs.msg.Float32 , queue_size=1)
 
 
-    X0 = np.array([1,0,0])
-    X1 = np.array([0,1,0])
-    X2 = np.array([0,0,1])
-    trans_top = np.array([0,0,0])
-
-    align_to_world = Quaternion([0,0,0,1])
-
-    q_tracker_1 = process_transform("tracker_1", initial_pose1)
-    q_tracker_2 = process_transform("tracker_3", initial_pose2)
-    q_tracker_3 = process_transform("tracker_2", initial_pose3)
-
-    q_tracker_diff_12 = q_tracker_2*q_tracker_1.inverse
-    q_tracker_diff_23 = q_tracker_3*q_tracker_2.inverse
-
-    tracker_diff_12 = q_tracker_diff_12.rotation_matrix
-    tracker_diff_23 = q_tracker_diff_23.rotation_matrix
-
-    Y0_12 = np.array(tracker_diff_12[0][:])
-    Y1_12 = np.array(tracker_diff_12[1][:])
-    Y2_12 = np.array(tracker_diff_12[2][:])
-
-    Y0_23 = np.array(tracker_diff_23[0][:])
-    Y1_23 = np.array(tracker_diff_23[1][:])
-    Y2_23 = np.array(tracker_diff_23[2][:])
-
-    rot_align_12 = np.array([[X0.dot(Y0_12),X0.dot(Y1_12),X0.dot(Y2_12)],[X1.dot(Y0_12),X1.dot(Y1_12),X1.dot(Y2_12)],[X2.dot(Y0_12),X2.dot(Y1_12),X2.dot(Y2_12)]])
-    rot_align_23 = np.array([[X0.dot(Y0_23),X0.dot(Y1_23),X0.dot(Y2_23)],[X1.dot(Y0_23),X1.dot(Y1_23),X1.dot(Y2_23)],[X2.dot(Y0_23),X2.dot(Y1_23),X2.dot(Y2_23)]])
-
     while not rospy.is_shutdown():
         start = time.time()
 
-        q_tracker_1 = process_transform("tracker_1", initial_pose1)
-        q_tracker_2 = process_transform("tracker_3", initial_pose2)
-        q_tracker_3 = process_transform("tracker_2", initial_pose3)
-
-        q_top_estimate = q_tracker_2*q_tracker_1.inverse
-
-        q_tracker_diff_12 = q_tracker_2*q_tracker_1.inverse
-        q_tracker_diff_23 = q_tracker_3*q_tracker_2.inverse
-
-        euler_12 = rotationMatrixToEulerAngles(q_tracker_diff_12.rotation_matrix)
-        euler_23 = rotationMatrixToEulerAngles(q_tracker_diff_23.rotation_matrix)
+        euler_12, euler_23 = _get_instance_eulers(initial_pose1, initial_pose2, initial_pose3)
 
         """
         msg = sensor_msgs.msg.JointState()
