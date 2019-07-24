@@ -105,5 +105,16 @@ if __name__ == "__main__":
     reg_shoulder = linear_model.LinearRegression()
     reg_shoulder.fit([[0,0,0], euler_side_12, euler_front_12], [relaxed_values, side_values, front_values])
 
+      
     reg_elbow = linear_model.LinearRegression()
-    reg_shoulder.fit([euler_front_23, euler_bend_23], [0, 1.57])
+    reg_elbow.fit([euler_front_23, euler_bend_23], [0, 1.57])
+
+    
+    csvfile =  open('calibration.csv', 'w')
+    writer = csv.writer(csvfile)
+
+    writer.writerow (reg_shoulder.coef_[0] + [0,0,0] + [reg_shoulder.intercept_[0]])
+    writer.writerow (reg_shoulder.coef_[1] + [0,0,0] + [reg_shoulder.intercept_[1]])
+    writer.writerow (reg_shoulder.coef_[2] + [0,0,0] + [reg_shoulder.intercept_[2]])
+
+    writer.writerow ([0,0,0] + reg_elbow.coef_ + [reg_elbow.intercept_])
