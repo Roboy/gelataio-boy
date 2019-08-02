@@ -1,7 +1,7 @@
 #include "gelataio_boy_control/hand_controller.hpp"
 
 HandController::HandController(std::string planning_group_hand, std::string planning_group_arm, int planning_attempts,
-        PlanningExecutorMode mode) {
+        PlanningExecutorMode mode, ros::NodeHandle *nh) {
     this->m_planning_group_hand = planning_group_hand;
     this->m_planning_group_arm = planning_group_arm;
 
@@ -14,7 +14,8 @@ HandController::HandController(std::string planning_group_hand, std::string plan
             this->m_plan_executor_ptr = new MoveItPlanExecutor(m_move_group_arm_ptr);
             break;
         case PlanningExecutorMode::CARDSFLOW:
-            this->m_plan_executor_ptr = new CardsflowPlanExecutor(planning_group_arm);
+            assert(nh != nullptr);
+            this->m_plan_executor_ptr = new CardsflowPlanExecutor(planning_group_arm, nh);
             break;
     }
 

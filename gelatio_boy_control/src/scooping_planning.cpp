@@ -77,8 +77,8 @@ int main(int argc, char **argv) {
 
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
     
-    HandController right_arm("right_hand", "right_arm");
-    HandController left_arm("left_hand", "left_arm");
+    HandController right_arm("right_hand", "right_arm", 5, PlanningExecutorMode::CARDSFLOW, &node_handle);
+    HandController left_arm("left_hand", "left_arm", 5, PlanningExecutorMode::CARDSFLOW, &node_handle);
     
     defineEnvironment(planning_scene_interface);
 

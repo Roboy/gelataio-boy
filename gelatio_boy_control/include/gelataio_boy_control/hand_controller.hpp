@@ -21,7 +21,8 @@ public:
      * @param planning_attempts     Amount of planning attempts that should be performed
      */
     HandController(std::string planning_group, std::string planning_group_arm, int planning_attempts = 5,
-                   PlanningExecutorMode mode = PlanningExecutorMode::MOVE_IT);
+                   PlanningExecutorMode mode = PlanningExecutorMode::MOVE_IT,
+                   ros::NodeHandle *nh = nullptr);
 
     /**
      * Destructor.
