@@ -25,14 +25,17 @@ CardsflowPlanExecutor::CardsflowPlanExecutor(std::string &group_name, ros::NodeH
         axis1_prefix = "shoulder_" + lr + "_axis1";
         axis2_prefix = "shoulder_" + lr + "_axis2";
         elbow_prefix = "elbow_" + lr;
-        publishers.insert(std::make_pair(axis0_prefix,
-                nh->advertise<std_msgs::Float32>("/" + axis0_prefix + "/" + axis0_prefix + "/target", 1)));
-        publishers.insert(std::make_pair(axis1_prefix,
-                nh->advertise<std_msgs::Float32>("/" + axis1_prefix + "/" + axis1_prefix + "/target", 1)));
-        publishers.insert(std::make_pair(axis2_prefix,
-                nh->advertise<std_msgs::Float32>("/" + axis2_prefix + "/" + axis2_prefix + "/target", 1)));
-        publishers.insert(std::make_pair(elbow_prefix,
-                nh->advertise<std_msgs::Float32>("/" + elbow_prefix + "/target", 1)));
+        auto create_pub = [&](std::string prefix) {
+            return std::make_pair(prefix,
+                    nh->advertise<std_msgs::Float32>("/" + prefix + "/" + prefix + "/target", 1));
+        };
+        publishers.insert(create_pub("shoulder_" + lr + "_axis0"));
+        publishers.insert(create_pub("shoulder_" + lr + "_axis1"));
+        publishers.insert(create_pub("shoulder_" + lr + "_axis2"));
+        publishers.insert(create_pub("elbow_" + lr));
+        publishers.insert(create_pub("wrist_" + lr + "_axis0"));
+        publishers.insert(create_pub("wrist_" + lr + "_axis1"));
+        publishers.insert(create_pub("wrist_" + lr + "_axis2"));
     }
 
 }
