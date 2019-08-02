@@ -15,7 +15,7 @@ HandController::HandController(std::string planning_group_hand, std::string plan
             break;
         case PlanningExecutorMode::CARDSFLOW:
             assert(nh != nullptr);
-            this->m_plan_executor_ptr = new CardsflowPlanExecutor(planning_group_arm, nh);
+            this->m_plan_executor_ptr = new CardsflowPlanExecutor(planning_group_arm, nh, m_move_group_arm_ptr);
             break;
     }
 

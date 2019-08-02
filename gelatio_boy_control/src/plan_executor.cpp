@@ -11,7 +11,8 @@ bool MoveItPlanExecutor::executePlan(moveit::planning_interface::MoveGroupInterf
     return execution_result == moveit::planning_interface::MoveItErrorCode::SUCCESS;
 }
 
-CardsflowPlanExecutor::CardsflowPlanExecutor(std::string &group_name, ros::NodeHandle *nh) : group_name(group_name) {
+CardsflowPlanExecutor::CardsflowPlanExecutor(std::string &group_name, ros::NodeHandle *nh,
+        moveit::planning_interface::MoveGroupInterface *move_it) : group_name(group_name), mipe(move_it) {
     std::string lr;
     if (group_name.find("left") != std::string::npos) {
         lr = "left";
@@ -57,5 +58,5 @@ bool CardsflowPlanExecutor::executePlan(moveit::planning_interface::MoveGroupInt
             publishers.at(joint_name).publish(value); //TODO
         }
     }
-    return true;
+    return mipe.executePlan(plan);
 }
