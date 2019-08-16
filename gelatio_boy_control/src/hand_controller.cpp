@@ -1,76 +1,60 @@
 #include "gelataio_boy_control/hand_controller.hpp"
 
-HandController::HandController(std::string planning_group_hand, std::string planning_group_arm, int planning_attempts,
-        PlanningExecutorMode mode, ros::NodeHandle *nh) {
-    this->m_planning_group_hand = planning_group_hand;
-    this->m_planning_group_arm = planning_group_arm;
-
-    this->m_move_group_hand_ptr = new moveit::planning_interface::MoveGroupInterface(planning_group_hand);
-    this->m_move_group_arm_ptr = new moveit::planning_interface::MoveGroupInterface(planning_group_arm);
+HandController::HandController(const std::string& group_name, int planning_attempts) : m_plan_executor_ptr(nullptr) {
+    this->m_move_group_ptr = new moveit::planning_interface::MoveGroupInterface(group_name + "_arm");
     this->m_planning_attempts = planning_attempts;
-
-    switch (mode) {
-        case PlanningExecutorMode::MOVE_IT:
-            this->m_plan_executor_ptr = new MoveItPlanExecutor(m_move_group_arm_ptr);
-            break;
-        case PlanningExecutorMode::CARDSFLOW:
-            assert(nh != nullptr);
-            this->m_plan_executor_ptr = new CardsflowPlanExecutor(planning_group_arm, nh, m_move_group_arm_ptr);
-            break;
-    }
 
 }
 
-HandController::PlanningResult HandController::plan(enum HandController::PlanningGroups planning_gr, double tolerance) {
+HandController::PlanningResult HandController::plan(double tolerance) {
     moveit::planning_interface::MoveGroupInterface::Plan plan;
     moveit::planning_interface::MoveItErrorCode planning_result;
 
-    if (planning_gr == HandController::PlanningGroups::ARM) {
-        this->m_move_group_arm_ptr->setStartStateToCurrentState();
-        this->m_move_group_arm_ptr->setGoalTolerance(tolerance);
-        planning_result = this->m_move_group_arm_ptr->plan(plan); 
-    }
-    else if (planning_gr == HandController::PlanningGroups::HAND) {
-        this->m_move_group_hand_ptr->setStartStateToCurrentState();
-        this->m_move_group_hand_ptr->setGoalTolerance(tolerance);
-        planning_result = this->m_move_group_hand_ptr->plan(plan);  
-    }
+    this->m_move_group_ptr->setStartStateToCurrentState();
+    this->m_move_group_ptr->setGoalTolerance(tolerance);
+    planning_result = this->m_move_group_ptr->plan(plan);
 
     return HandController::PlanningResult{plan, planning_result};
 }
 
-bool HandController::planAndExecute(enum HandController::PlanningGroups planning_gr) {
-    HandController::PlanningResult planning_result = this->plan(planning_gr);
+bool HandController::planAndExecute() {
+    HandController::PlanningResult planning_result = this->plan();
 
     int attempts_counter = 0;
     bool path_found = planning_result.planning_status == moveit::planning_interface::MoveItErrorCode::SUCCESS;
-
     while (attempts_counter <= this->m_planning_attempts && !path_found) {
-        planning_result = this->plan(planning_gr);
+        planning_result = this->plan();
 
         path_found = planning_result.planning_status == moveit::planning_interface::MoveItErrorCode::SUCCESS;
         attempts_counter++;
     }
 
-    return this->m_plan_executor_ptr->executePlan(planning_result.plan);
+    if (path_found) {
+        if (this->m_plan_executor_ptr) {
+            this->m_plan_executor_ptr->executePlan(planning_result.plan);
+        }
+        return this->m_move_group_ptr->execute(planning_result.plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS;
+    } else {
+        ROS_ERROR("No plan found");
+        return false;
+    }
 }
 
 bool HandController::moveToPose(geometry_msgs::PoseStamped target_pose) {
-    this->m_move_group_arm_ptr->setPoseTarget(target_pose);
+    this->m_move_group_ptr->setPoseTarget(target_pose);
 
     return this->planAndExecute();
 }
 
 bool HandController::moveToPose(geometry_msgs::Pose target_pose) {
-    //this->m_move_group_arm_ptr->setWorkspace(-.5, -1, .3, .5, 1., 1.);
 
-    this->m_move_group_arm_ptr->setPoseTarget(target_pose);
+    this->m_move_group_ptr->setPoseTarget(target_pose);
 
     return this->planAndExecute();
 }
 
 bool HandController::moveToPoses(std::vector<geometry_msgs::Pose> &targets) {
-    this->m_move_group_arm_ptr->setPoseTargets(targets);
+    this->m_move_group_ptr->setPoseTargets(targets);
 
     return this->planAndExecute();
 }
@@ -89,31 +73,28 @@ bool HandController::moveToOrientation(geometry_msgs::Quaternion target_orientat
     return this->moveToPose(target_pose);
 }
 
-bool HandController::moveToKnownPose(std::string pose_name, enum HandController::PlanningGroups planning_gr) {
-    if (planning_gr == HandController::PlanningGroups::ARM) {
-        this->m_move_group_arm_ptr->setNamedTarget(pose_name);  
-    }
-    else if (planning_gr == HandController::PlanningGroups::HAND) {
-        this->m_move_group_hand_ptr->setNamedTarget(pose_name); 
-    }
+bool HandController::moveToKnownPose(std::string pose_name) {
+    this->m_move_group_ptr->setNamedTarget(pose_name);
 
     return this->planAndExecute();
 }
 
 void HandController::grasp(std::string object_name, geometry_msgs::Pose target_pose) {
-
-    this->moveToKnownPose("ready_to_grab", HandController::PlanningGroups::ARM);
-    //this->moveToKnownPose("ready_to_grab", HandController::PlanningGroups::HAND);
+    this->moveToKnownPose("ready_to_grab");
 
     // TODO: figure out how to move properly the palm to the cup
     geometry_msgs::Point adjusted_pose = this->getCurrentPose().pose.position;
     adjusted_pose.x = target_pose.position.x;
-    
+
     this->moveToPosition(adjusted_pose);
 
-    this->m_move_group_hand_ptr->attachObject(object_name);
+}
 
-    this->moveToKnownPose("ready_to_grab", HandController::PlanningGroups::ARM);
+geometry_msgs::PoseStamped HandController::getCurrentPose() {
+    return this->m_move_group_ptr->getCurrentPose();
+}
 
+void HandController::addPlanExecutor(plan_executor *executor) {
+    this->m_plan_executor_ptr = executor;
 }
 

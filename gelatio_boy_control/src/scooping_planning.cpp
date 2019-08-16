@@ -5,6 +5,7 @@
 #include "gelataio_boy_control/hand_controller.hpp"
 
 void defineEnvironment(moveit::planning_interface::PlanningSceneInterface &planning_scene_interface) {
+    ROS_INFO("SCOOPING PLANNING");
     std::vector<moveit_msgs::CollisionObject> collision_objects;
     collision_objects.resize(3);
 
@@ -77,8 +78,13 @@ int main(int argc, char **argv) {
 
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
     
-    HandController right_arm("right_hand", "right_arm", 5, PlanningExecutorMode::CARDSFLOW, &node_handle);
-    HandController left_arm("left_hand", "left_arm", 5, PlanningExecutorMode::CARDSFLOW, &node_handle);
+    HandController right_arm("right", 5);
+    CardsflowPlanExecutor right_arm_cardsflow("right", &node_handle);
+    right_arm.addPlanExecutor(&right_arm_cardsflow);
+
+    HandController left_arm("left", 5);
+    CardsflowPlanExecutor left_arm_cardsflow("left", &node_handle);
+    left_arm.addPlanExecutor(&left_arm_cardsflow);
     
     defineEnvironment(planning_scene_interface);
 
@@ -117,10 +123,10 @@ int main(int argc, char **argv) {
     drop_ball_pose.pose.orientation.z = 0;
     left_arm.moveToPose(drop_ball_pose);
 
-    //while (true) {
-    //    right_arm.moveToKnownPose("hello_start");
-    //    right_arm.moveToKnownPose("hello_end");
-    //}
+    while (true) {
+        right_arm.moveToKnownPose("hello_start");
+        right_arm.moveToKnownPose("hello_end");
+    }
 
     return 0;
 }
