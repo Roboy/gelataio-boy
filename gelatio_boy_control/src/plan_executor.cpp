@@ -27,7 +27,9 @@ CardsflowPlanExecutor::CardsflowPlanExecutor(std::string group_name, ros::NodeHa
 }
 
 bool CardsflowPlanExecutor::executePlan(moveit::planning_interface::MoveGroupInterface::Plan &plan) {
-    std::cout << "Moving " << group_name << " arm using CARDSflow." << std::endl;
+    std::stringstream ss;
+    ss << "Moving " << group_name << " arm using CARDSflow." << std::endl;
+    ROS_INFO_STREAM(ss.str());
 
     for (int t = 0; t<plan.trajectory_.joint_trajectory.points.size(); t++) {
         if (t > 0) {
