@@ -133,7 +133,7 @@ include_directories(
 ## Declare a C++ library
  add_library(${PROJECT_NAME}
   src/hand_controller.cpp
- )
+         src/plan_executor.cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries

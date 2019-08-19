@@ -8,31 +8,29 @@
 
 #include <moveit/planning_interface/planning_interface.h>
 #include <moveit/move_group_interface/move_group_interface.h>
+#include "plan_executor.h"
 
 class HandController {
 public:
+
     /**
      * Constructor.
-     * @param planning_group   Name of the planning group of the arm
+     * @param planning_group_hand   Name of the planning group of the hand
+     * @param planning_group_arm    Name of the planning group of the arm
+     * @param planning_attempts     Amount of planning attempts that should be performed
      */
-    HandController(std::string planning_group, int planning_attempts = 5);
+    HandController(const std::string& group_name, int planning_attempts = 5);
 
     /**
      * Destructor.
      */
-    ~HandController() { delete m_move_group_ptr; }
+    ~HandController() { }
 
     /**
      * Getter for current pose of the arm.
      * @return     Position and orientation of the current position.
      */
-    geometry_msgs::PoseStamped getCurrentPose() { return this->m_move_group_ptr->getCurrentPose(); }
-
-    /**
-     * Getter for planning group.
-     * @return     Position and orientation of the current position.
-     */
-    std::string getPlanningGroupName() { return this->m_planning_group; }
+    geometry_msgs::PoseStamped getCurrentPose();
 
     /**
      * Move to a position, while keeping orientation.
@@ -82,7 +80,13 @@ public:
      * @param object_name   Object name in the scene
      * @return true if successful
      */
-    void grasp(std::string object_name);
+    void grasp(std::string object_name,  geometry_msgs::Pose target_pose);
+
+    /**
+     * Adds a plan executor for arm motions
+     * @param executor
+     */
+    void addPlanExecutor(plan_executor *executor);
 
 
 private:
@@ -91,13 +95,13 @@ private:
         moveit::planning_interface::MoveItErrorCode planning_status;
     };
 
-    PlanningResult plan();
+    PlanningResult plan(double tolerance=0.05);
 
     bool planAndExecute();
 
     moveit::planning_interface::MoveGroupInterface *m_move_group_ptr;
 
-    std::string m_planning_group;
+    plan_executor *m_plan_executor_ptr;
 
     int m_planning_attempts;
 };
