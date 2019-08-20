@@ -6,15 +6,20 @@
 #include "gelataio_boy_control/hand_controller.hpp"
 
 int main(int argc, char **argv) {
+
     ros::init(argc, argv, "gelataio_arm_controller");
     ros::NodeHandle node_handle;
     ros::AsyncSpinner spinner(1);
     spinner.start();
 
-    ScoopingMain app(&node_handle);
+    ScoopingMain app(&node_handle, true);
 
-    app.scoop_ice();
+    geometry_msgs::Point start, end;
+    start.x = -0.27;
+    start.y = -0.5;
+    start.z = 0.6;
+    end = start;
 
-    app.hello();
+    app.scoop_ice(start, end);
 
 }

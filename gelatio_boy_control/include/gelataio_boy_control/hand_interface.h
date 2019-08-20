@@ -14,7 +14,7 @@ public:
 
     virtual bool release() = 0;
 
-    virtual ~hand_interface() = 0;
+    virtual ~hand_interface() = default;
 };
 
 class DummyHand : public hand_interface {

@@ -11,22 +11,23 @@
 
 class ScoopingMain {
 public:
-    explicit ScoopingMain(ros::NodeHandle *node_handle);
+    explicit ScoopingMain(ros::NodeHandle *node_handle, bool simulation_only = false);
 
     virtual ~ScoopingMain();
 
-    void scoop_ice();
+    void scoop_ice(geometry_msgs::Point &start, geometry_msgs::Point &end);
+    void drop_ice(geometry_msgs::Point &destination);
 
     std::string get_status();
 
 
-    //////////////////////////////////////////////////
-
     void hello();
 
 
-protected:
+//protected:
     virtual void defineEnvironment();
+
+    virtual void createObstacles();
 
 
 private:
@@ -40,6 +41,10 @@ private:
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
 
     std::string status;
+
+
+    //obstacles
+    moveit_msgs::CollisionObject *ice_box;
 };
 
 

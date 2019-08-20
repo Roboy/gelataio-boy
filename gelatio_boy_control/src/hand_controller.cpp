@@ -47,9 +47,11 @@ bool HandController::moveToPose(geometry_msgs::PoseStamped target_pose) {
 }
 
 bool HandController::moveToPose(geometry_msgs::Pose target_pose) {
+    std::stringstream ss;
+    ss << "Target pose for moveIT planning: " << std::endl << target_pose << std::endl;
+    ROS_INFO_STREAM(ss.str());
 
     this->m_move_group_ptr->setPoseTarget(target_pose);
-
     return this->planAndExecute();
 }
 
