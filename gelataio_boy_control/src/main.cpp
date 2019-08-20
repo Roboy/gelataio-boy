@@ -8,7 +8,7 @@
 
 int main(int argc, char **argv) {
 
-    ros::init(argc, argv, "gelataio_arm_controller");
+    ros::init(argc, argv, "scooping_planning");
     ros::NodeHandle node_handle;
 
     ScoopingROS scooping_ros_interface(&node_handle);

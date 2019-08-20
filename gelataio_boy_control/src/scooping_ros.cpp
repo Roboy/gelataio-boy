@@ -9,7 +9,7 @@ using namespace std;
 
 
 ScoopingROS::ScoopingROS(ros::NodeHandle *handle) : nh(handle), app(handle, true) {
-    ros::ServiceServer scooping_srv = nh->advertiseService("scoop", &ScoopingROS::scooping_cb, this);
+    scooping_srv = nh->advertiseService("scooping_planning/scoop", &ScoopingROS::scooping_cb, this);
 }
 
 void ScoopingROS::run() {

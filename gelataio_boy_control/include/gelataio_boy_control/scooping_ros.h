@@ -22,6 +22,8 @@ public:
 private:
     ros::NodeHandle *nh;
     ScoopingMain app;
+
+    ros::ServiceServer scooping_srv;
 };
 
 
