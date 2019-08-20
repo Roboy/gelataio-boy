@@ -80,11 +80,15 @@ int main(int argc, char **argv) {
     
     HandController right_arm("right", 5);
     CardsflowPlanExecutor right_arm_cardsflow("right", &node_handle);
+    DummyHand right_hand("right hand");
     right_arm.addPlanExecutor(&right_arm_cardsflow);
+    right_arm.setHandInterface(&right_hand);
 
     HandController left_arm("left", 5);
     CardsflowPlanExecutor left_arm_cardsflow("left", &node_handle);
+    DummyHand left_hand("left hand");
     left_arm.addPlanExecutor(&left_arm_cardsflow);
+    left_arm.setHandInterface(&left_hand);
     
     defineEnvironment(planning_scene_interface);
 

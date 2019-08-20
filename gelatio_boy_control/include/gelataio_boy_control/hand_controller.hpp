@@ -9,6 +9,7 @@
 #include <moveit/planning_interface/planning_interface.h>
 #include <moveit/move_group_interface/move_group_interface.h>
 #include "plan_executor.h"
+#include "hand_interface.h"
 
 class HandController {
 public:
@@ -88,6 +89,12 @@ public:
      */
     void addPlanExecutor(plan_executor *executor);
 
+    /**
+     * Set the hardware interface to the hand
+     * @param interface
+     */
+    void setHandInterface(hand_interface *interface);
+
 
 private:
     struct PlanningResult {
@@ -102,6 +109,8 @@ private:
     moveit::planning_interface::MoveGroupInterface *m_move_group_ptr;
 
     plan_executor *m_plan_executor_ptr;
+
+    hand_interface *m_hand_interface_ptr;
 
     int m_planning_attempts;
 };

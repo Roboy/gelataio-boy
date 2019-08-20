@@ -87,6 +87,9 @@ void HandController::grasp(std::string object_name, geometry_msgs::Pose target_p
     adjusted_pose.x = target_pose.position.x;
 
     this->moveToPosition(adjusted_pose);
+    if (this->m_hand_interface_ptr) {
+        this->m_hand_interface_ptr->grasp();
+    }
 
 }
 
@@ -96,5 +99,9 @@ geometry_msgs::PoseStamped HandController::getCurrentPose() {
 
 void HandController::addPlanExecutor(plan_executor *executor) {
     this->m_plan_executor_ptr = executor;
+}
+
+void HandController::setHandInterface(hand_interface *interface) {
+    this->m_hand_interface_ptr = interface;
 }
 
