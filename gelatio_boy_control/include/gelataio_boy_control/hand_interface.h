@@ -13,11 +13,15 @@ public:
     virtual bool grasp() = 0;
 
     virtual bool release() = 0;
+
+    virtual ~hand_interface() = 0;
 };
 
 class DummyHand : public hand_interface {
 public:
     DummyHand(std::string hand_name) : hand_name(hand_name) {}
+
+    ~DummyHand() override = default;
 
     bool grasp() override;
 
