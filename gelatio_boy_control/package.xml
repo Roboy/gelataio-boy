@@ -87,6 +87,7 @@
   <exec_depend>moveit_ros_perception</exec_depend>
   <exec_depend>moveit_visual_tools</exec_depend>
   <exec_depend>rviz_visual_tools</exec_depend>
+  <exec_depend>gelataio_messages</exec_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
