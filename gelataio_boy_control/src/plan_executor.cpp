@@ -24,8 +24,6 @@ CardsflowPlanExecutor::CardsflowPlanExecutor(std::string group_name, ros::NodeHa
     publishers.insert(create_pub("wrist_" + group_name + "_axis1"));
     publishers.insert(create_pub("wrist_" + group_name + "_axis2"));
 
-
-
 }
 
 bool CardsflowPlanExecutor::executePlan(moveit::planning_interface::MoveGroupInterface::Plan &plan) {
