@@ -7,9 +7,11 @@
 
 
 #include <string>
+#include <future>
 #include <ros/node_handle.h>
 #include "scooping.h"
 #include <gelataio_msgs/PerformScoop.h>
+
 
 class ScoopingROS {
 public:
@@ -17,13 +19,16 @@ public:
 
     void run();
 
-    bool scooping_cb(gelataio_msgs::PerformScoop::Request &req, gelataio_msgs::PerformScoop::Request &resp);
+    bool scooping_cb(gelataio_msgs::PerformScoop::Request &req, gelataio_msgs::PerformScoop::Response &resp);
+
 
 private:
     ros::NodeHandle *nh;
     ScoopingMain app;
 
     ros::ServiceServer scooping_srv;
+
+    std::thread *todo;
 };
 
 

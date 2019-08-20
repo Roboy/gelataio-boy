@@ -11,7 +11,7 @@ using namespace geometry_msgs;
 using namespace std;
 
 ScoopingMain::ScoopingMain(ros::NodeHandle *handle, bool simulation_only)
-        : left_arm("left", 5), right_arm("right", 5), node_handle(handle), status("") {
+        : left_arm("left", 5), right_arm("right", 5), node_handle(handle), ice_box(nullptr), status("") {
     if (simulation_only) { //Simulation
         left_hand = new DummyHand("left hand");
         left_arm.setHandInterface(left_hand);
@@ -64,32 +64,19 @@ void ScoopingMain::defineEnvironment() {
     planning_scene_interface.applyCollisionObjects(collision_objects);
 }
 
-void ScoopingMain::scoop_ice(Point &start, Point &end) {
+bool ScoopingMain::scoop_ice(Point start, Point end) {
     this->defineEnvironment();
 
-    auto &scooping_arm = right_arm;
-
-    Pose scooping_start, scooping_end;
-
-    scooping_start.position = start;
-    tf2::Quaternion q_start;
-    double roll = -20;
-    double pitch = 40;
-    double yaw = 45 + 90;
-    q_start.setRPY(roll/180*M_PI, pitch/180*M_PI, yaw/180*M_PI);
-    scooping_start.orientation.x = q_start.x();
-    scooping_start.orientation.y = q_start.y();
-    scooping_start.orientation.z = q_start.z();
-    scooping_start.orientation.w = q_start.w();
-
-    scooping_end.position = end;
-    scooping_end.orientation = scooping_start.orientation;
-
-    scooping_arm.moveToPose(scooping_start);
-//    scooping_arm.moveToPose(scooping_end);
-
-
+    ROS_INFO("Mvoing to start point for scooping");
+    bool successful = this->approach_scoop_point(start);
+    if (successful) {
+        ROS_INFO("Movement to the start point was successful :)");
+        ROS_INFO("Performing the scoop");
+        successful &= this->perform_scoop(end);
+    }
     //TODO add the depart motion
+
+    return successful;
 
 }
 
@@ -121,8 +108,32 @@ void ScoopingMain::createObstacles() {
     ice_box->operation = ice_box->ADD;
 }
 
-void ScoopingMain::drop_ice(Point &destination) {
+void ScoopingMain::drop_ice(Point destination) {
     ROS_ERROR("Not implemented.");
 
 }
+
+bool ScoopingMain::approach_scoop_point(geometry_msgs::Point scoop_point) {
+    Pose scooping_start;
+
+    scooping_start.position = scoop_point;
+    tf2::Quaternion q_start;
+    double roll = -20;
+    double pitch = 40;
+    double yaw = 45 + 90;
+    q_start.setRPY(roll/180*M_PI, pitch/180*M_PI, yaw/180*M_PI);
+    scooping_start.orientation.x = q_start.x();
+    scooping_start.orientation.y = q_start.y();
+    scooping_start.orientation.z = q_start.z();
+    scooping_start.orientation.w = q_start.w();
+
+    return right_arm.moveToPose(scooping_start);
+
+}
+
+bool ScoopingMain::perform_scoop(geometry_msgs::Point end_point) {
+    ROS_WARN("Perform scoop not yet implemented");
+    return true;
+}
+
 

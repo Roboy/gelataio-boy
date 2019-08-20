@@ -1,5 +1,7 @@
 #include "gelataio_boy_control/hand_controller.hpp"
 
+using namespace std;
+
 HandController::HandController(const std::string& group_name, int planning_attempts) : m_plan_executor_ptr(nullptr) {
     this->m_move_group_ptr = new moveit::planning_interface::MoveGroupInterface(group_name + "_arm");
     this->m_planning_attempts = planning_attempts;
@@ -7,12 +9,14 @@ HandController::HandController(const std::string& group_name, int planning_attem
 }
 
 HandController::PlanningResult HandController::plan(double tolerance) {
+    ROS_INFO("Start planning.");
     moveit::planning_interface::MoveGroupInterface::Plan plan;
     moveit::planning_interface::MoveItErrorCode planning_result;
 
     this->m_move_group_ptr->setStartStateToCurrentState();
     this->m_move_group_ptr->setGoalTolerance(tolerance);
     planning_result = this->m_move_group_ptr->plan(plan);
+    ROS_INFO("Finished planning.");
 
     return HandController::PlanningResult{plan, planning_result};
 }
@@ -30,6 +34,7 @@ bool HandController::planAndExecute() {
     }
 
     if (path_found) {
+        ROS_INFO("Plan found.");
         if (this->m_plan_executor_ptr) {
             this->m_plan_executor_ptr->executePlan(planning_result.plan);
         }
