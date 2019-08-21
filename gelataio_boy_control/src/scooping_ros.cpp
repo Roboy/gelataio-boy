@@ -19,7 +19,12 @@ void ScoopingROS::run() {
     scooping_srv = nh->advertiseService("scooping_planning/scoop", &ScoopingROS::scooping_cb, this);
 
     ROS_INFO("Scooping planning ready and waiting for service requests...");
-    ros::spin();
+    ros::Rate loop_rate(20.0);
+
+    while (ros::ok()) {
+        ros::spinOnce();
+        loop_rate.sleep();
+    }
 }
 
 bool ScoopingROS::scooping_cb(PerformScoop::Request &req, PerformScoop::Response &resp) {
@@ -40,8 +45,8 @@ bool ScoopingROS::scooping_cb(PerformScoop::Request &req, PerformScoop::Response
         }
         resp.success = true;
         this->busy = true;
-        auto do_this_when_finished = [this](bool success) {this->busy = false;};
-        executor = new std::thread(&ScoopingMain::scoop_ice, &app, req.start_point, req.end_point, do_this_when_finished);
+        executor = new std::thread(&ScoopingMain::scoop_ice, &app, req.start_point, req.end_point,
+                [this](bool success) {this->busy = false;});
     }
 
     return true;
