@@ -16,46 +16,15 @@ hardware_interface:
     - shoulder_left_axis1
     - shoulder_left_axis2
     - elbow_left
-    - wrist_left_axis0
-    - wrist_left_axis1
-    - wrist_left_axis2
-    - hand_left_index_joint0
-    - hand_left_little_joint1
-    - hand_left_little_joint2
-    - hand_left_little_joint0
-    - hand_left_index_joint1
-    - hand_left_index_joint2
-    - hand_left_middle_joint0
-    - hand_left_middle_joint1
-    - hand_left_middle_joint2
-    - hand_left_ring_joint0
-    - hand_left_ring_joint1
-    - hand_left_ring_joint2
-    - hand_left_thumb_joint0
-    - hand_left_thumb_joint1
-    - hand_left_thumb_joint2
+    - wrist_left
     - shoulder_right_axis0
     - shoulder_right_axis1
     - shoulder_right_axis2
     - elbow_right
-    - wrist_right_axis0
-    - wrist_right_axis1
-    - wrist_right_axis2
-    - hand_right_index_joint0
-    - hand_right_index_joint1
-    - hand_right_index_joint2
-    - hand_right_little_joint0
-    - hand_right_little_joint1
-    - hand_right_little_joint2
-    - hand_right_middle_joint0
-    - hand_right_middle_joint1
-    - hand_right_middle_joint2
-    - hand_right_ring_joint0
-    - hand_right_ring_joint1
-    - hand_right_ring_joint2
-    - hand_right_thumb_joint0
-    - hand_right_thumb_joint1
-    - hand_right_thumb_joint2
+    - wrist_right
+    - bike_steering
+    - ice_left_linear
+    - ice_right_linear
   sim_control_mode: 1  # 0: position, 1: velocity
 # Publish all joint states
 # Creates the /joint_states topic necessary in ROS

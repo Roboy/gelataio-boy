@@ -14,7 +14,9 @@ HandController::PlanningResult HandController::plan(double tolerance) {
     moveit::planning_interface::MoveItErrorCode planning_result;
 
     this->m_move_group_ptr->setStartStateToCurrentState();
-    this->m_move_group_ptr->setGoalTolerance(tolerance);
+    this->m_move_group_ptr->setGoalPositionTolerance(tolerance);
+    this->m_move_group_ptr->setGoalOrientationTolerance(1e12);
+
     planning_result = this->m_move_group_ptr->plan(plan);
     ROS_INFO("Finished planning.");
 
