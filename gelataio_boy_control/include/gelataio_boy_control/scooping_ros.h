@@ -28,7 +28,8 @@ private:
 
     ros::ServiceServer scooping_srv;
 
-    std::thread *todo;
+    bool busy;
+    std::thread *executor;
 };
 
 

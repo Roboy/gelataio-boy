@@ -15,7 +15,7 @@ public:
 
     virtual ~ScoopingMain();
 
-    bool scoop_ice(geometry_msgs::Point start, geometry_msgs::Point end);
+    bool scoop_ice(geometry_msgs::Point start, geometry_msgs::Point end, std::function<void(bool)> finish_cb);
     void drop_ice(geometry_msgs::Point destination);
 
     std::string get_status();

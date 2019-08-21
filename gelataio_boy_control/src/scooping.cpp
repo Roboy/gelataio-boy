@@ -64,7 +64,7 @@ void ScoopingMain::defineEnvironment() {
     planning_scene_interface.applyCollisionObjects(collision_objects);
 }
 
-bool ScoopingMain::scoop_ice(Point start, Point end) {
+bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> finish_cb) {
     this->defineEnvironment();
 
     ROS_INFO("Mvoing to start point for scooping");
@@ -76,8 +76,9 @@ bool ScoopingMain::scoop_ice(Point start, Point end) {
     }
     //TODO add the depart motion
 
-    return successful;
+    finish_cb(successful);
 
+    return successful;
 }
 
 void ScoopingMain::createObstacles() {

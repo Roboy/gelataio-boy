@@ -11,7 +11,7 @@ using namespace geometry_msgs;
 using namespace std;
 
 
-ScoopingROS::ScoopingROS(ros::NodeHandle *handle) : nh(handle), app(handle, true) {
+ScoopingROS::ScoopingROS(ros::NodeHandle *handle) : nh(handle), app(handle, true), busy(false), executor(nullptr) {
 
 }
 
@@ -27,16 +27,22 @@ bool ScoopingROS::scooping_cb(PerformScoop::Request &req, PerformScoop::Response
     ss << "Got scooping request: " << req << std::endl;
     ROS_INFO_STREAM(ss.str());
 
-    resp.success = true;
+    resp.success = !this->busy;
 
-    todo = new std::thread(&ScoopingMain::scoop_ice, &app, req.start_point, req.end_point);
-
-    /*
-     * Very important TODO: block creating of further threads before the first one finished.
-     * Also the delete of the thread pointer is missing right now.
-     * This is super ugly and was only a hack to check if everything blocks because of the pending respond.
-     * ...which was indeed the case.
-     */
+    if (this->busy) {
+        resp.success = false;
+        ROS_ERROR("Can't start another scooping action while still running.");
+    } else {
+        if (this->executor != nullptr) {
+            this->executor->join();
+            delete this->executor;
+            this->executor = nullptr;
+        }
+        resp.success = true;
+        this->busy = true;
+        auto do_this_when_finished = [this](bool success) {this->busy = false;};
+        executor = new std::thread(&ScoopingMain::scoop_ice, &app, req.start_point, req.end_point, do_this_when_finished);
+    }
 
     return true;
 }
