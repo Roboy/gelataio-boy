@@ -9,9 +9,11 @@
 #include <moveit/planning_interface/planning_interface.h>
 #include <moveit/move_group_interface/move_group_interface.h>
 #include "plan_executor.h"
+#include "hand_interface.h"
 
 class HandController {
 public:
+    enum Status {IDLE, PLANNING, EXECUTING, ERROR};
 
     /**
      * Constructor.
@@ -88,6 +90,19 @@ public:
      */
     void addPlanExecutor(plan_executor *executor);
 
+    /**
+     * Set the hardware interface to the hand
+     * @param interface
+     */
+    void setHandInterface(hand_interface *interface);
+
+    /**
+     * Get the status of the hand controller
+     * @return one of [IDLE, PLANNING, EXECUTING, ERROR]
+     */
+    enum Status get_status() {return this->status;}
+
+
 
 private:
     struct PlanningResult {
@@ -103,7 +118,11 @@ private:
 
     plan_executor *m_plan_executor_ptr;
 
+    hand_interface *m_hand_interface_ptr;
+
     int m_planning_attempts;
+
+    enum Status status;
 };
 
 #endif

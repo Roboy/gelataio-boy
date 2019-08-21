@@ -21,6 +21,7 @@ find_package(catkin REQUIRED COMPONENTS
   moveit_ros_planning
   moveit_ros_planning_interface
   moveit_ros_perception
+  gelataio_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -115,7 +116,7 @@ find_package(Eigen3 REQUIRED)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES scooping_cv
-  CATKIN_DEPENDS roscpp moveit_core moveit_visual_tools moveit_ros_planning_interface
+  CATKIN_DEPENDS roscpp moveit_core moveit_visual_tools moveit_ros_planning_interface gelataio_msgs
   DEPENDS EIGEN3
 )
 
@@ -133,7 +134,7 @@ include_directories(
 ## Declare a C++ library
  add_library(${PROJECT_NAME}
   src/hand_controller.cpp
-         src/plan_executor.cpp)
+         src/plan_executor.cpp src/hand_interface.cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -143,7 +144,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(scooping_planning src/scooping_planning.cpp)
+add_executable(scooping_planning src/main.cpp src/scooping.cpp src/scooping_ros.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
