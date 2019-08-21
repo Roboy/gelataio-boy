@@ -45,6 +45,7 @@ bool HandController::planAndExecute() {
         return execution_success;
     } else {
         ROS_ERROR("No plan found");
+        this->status = Status::ERROR;
         return false;
     }
 }
