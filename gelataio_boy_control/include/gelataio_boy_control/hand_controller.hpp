@@ -13,6 +13,7 @@
 
 class HandController {
 public:
+    enum Status {IDLE, PLANNING, EXECUTING, ERROR};
 
     /**
      * Constructor.
@@ -95,6 +96,13 @@ public:
      */
     void setHandInterface(hand_interface *interface);
 
+    /**
+     * Get the status of the hand controller
+     * @return one of [IDLE, PLANNING, EXECUTING, ERROR]
+     */
+    enum Status get_status() {return this->status;}
+
+
 
 private:
     struct PlanningResult {
@@ -113,6 +121,8 @@ private:
     hand_interface *m_hand_interface_ptr;
 
     int m_planning_attempts;
+
+    enum Status status;
 };
 
 #endif

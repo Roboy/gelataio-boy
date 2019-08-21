@@ -11,7 +11,7 @@ using namespace geometry_msgs;
 using namespace std;
 
 ScoopingMain::ScoopingMain(ros::NodeHandle *handle, bool simulation_only)
-        : left_arm("left", 5), right_arm("right", 5), node_handle(handle), ice_box(nullptr), status("") {
+        : left_arm("left", 5), right_arm("right", 5), node_handle(handle), ice_box(nullptr), status("idle"), active_arm(&right_arm) {
     if (simulation_only) { //Simulation
         left_hand = new DummyHand("left hand");
         left_arm.setHandInterface(left_hand);
@@ -31,10 +31,13 @@ ScoopingMain::ScoopingMain(ros::NodeHandle *handle, bool simulation_only)
 
     this->createObstacles();
 
+    this->status_watcher = make_shared<thread>(&ScoopingMain::watch_status, this);
+
     this->right_hand->grasp(); // apply force on the scooper
 }
 
 ScoopingMain::~ScoopingMain() {
+    this->status_watcher->join();
     delete left_cardsflow;
     delete right_cardsflow;
     delete left_hand;
@@ -42,6 +45,18 @@ ScoopingMain::~ScoopingMain() {
 
     delete ice_box;
 
+}
+
+void ScoopingMain::watch_status() {
+    ros::Rate r(10.0);
+    while (ros::ok()) {
+        switch(active_arm->get_status()) {
+            case HandController::IDLE: this->status = "IDLE"; break;
+            case HandController::PLANNING: this->status = "PLANNING"; break;
+            case HandController::EXECUTING: this->status = "EXECUTING"; break;
+            case HandController::ERROR: this->status = "ERROR"; break;
+        }
+    }
 }
 
 void ScoopingMain::hello() {
@@ -67,6 +82,7 @@ void ScoopingMain::defineEnvironment() {
 bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> finish_cb) {
     this->defineEnvironment();
 
+    this->active_arm = &right_arm;
     ROS_INFO("Mvoing to start point for scooping");
     bool successful = this->approach_scoop_point(start);
     if (successful) {
@@ -74,10 +90,13 @@ bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> f
         ROS_INFO("Performing the scoop");
         successful &= this->perform_scoop(end);
     }
-    //TODO add the depart motion
+
+    if (successful) {
+        ROS_INFO("Departing from the scoop stage");
+        successful &= this->depart_from_scoop();
+    }
 
     finish_cb(successful);
-
     return successful;
 }
 
@@ -109,8 +128,9 @@ void ScoopingMain::createObstacles() {
     ice_box->operation = ice_box->ADD;
 }
 
-void ScoopingMain::drop_ice(Point destination) {
+void ScoopingMain::drop_ice(Point destination, std::function<void(bool)> finish_cb) {
     ROS_ERROR("Not implemented.");
+    finish_cb(false);
 
 }
 
@@ -137,4 +157,8 @@ bool ScoopingMain::perform_scoop(geometry_msgs::Point end_point) {
     return true;
 }
 
+bool ScoopingMain::depart_from_scoop() {
+    ROS_WARN("Depart from scoop motion not yet implemented");
+    return true;
+}
 

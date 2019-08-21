@@ -5,6 +5,7 @@
 #include "gelataio_boy_control/scooping_ros.h"
 
 #include <thread>
+#include <std_msgs/String.h>
 
 using namespace gelataio_msgs;
 using namespace geometry_msgs;
@@ -17,12 +18,17 @@ ScoopingROS::ScoopingROS(ros::NodeHandle *handle) : nh(handle), app(handle, true
 
 void ScoopingROS::run() {
     scooping_srv = nh->advertiseService("scooping_planning/scoop", &ScoopingROS::scooping_cb, this);
+    status_pub = nh->advertise<std_msgs::String>("scooping_planning/status", 5);
 
     ROS_INFO("Scooping planning ready and waiting for service requests...");
-    ros::Rate loop_rate(20.0);
+    ros::Rate loop_rate(10.0);
+
+    std_msgs::String status_msg;
 
     while (ros::ok()) {
         ros::spinOnce();
+        status_msg.data = app.get_status();
+        status_pub.publish(status_msg);
         loop_rate.sleep();
     }
 }
@@ -31,8 +37,6 @@ bool ScoopingROS::scooping_cb(PerformScoop::Request &req, PerformScoop::Response
     stringstream ss;
     ss << "Got scooping request: " << req << std::endl;
     ROS_INFO_STREAM(ss.str());
-
-    resp.success = !this->busy;
 
     if (this->busy) {
         resp.success = false;

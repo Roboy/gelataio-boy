@@ -2,7 +2,7 @@
 
 using namespace std;
 
-HandController::HandController(const std::string& group_name, int planning_attempts) : m_plan_executor_ptr(nullptr) {
+HandController::HandController(const std::string& group_name, int planning_attempts) : m_plan_executor_ptr(nullptr), status(HandController::Status::IDLE) {
     this->m_move_group_ptr = new moveit::planning_interface::MoveGroupInterface(group_name + "_arm");
     this->m_planning_attempts = planning_attempts;
 
@@ -22,6 +22,7 @@ HandController::PlanningResult HandController::plan(double tolerance) {
 }
 
 bool HandController::planAndExecute() {
+    this->status = Status::PLANNING;
     HandController::PlanningResult planning_result = this->plan();
 
     int attempts_counter = 0;
@@ -35,10 +36,13 @@ bool HandController::planAndExecute() {
 
     if (path_found) {
         ROS_INFO("Plan found.");
+        this->status = Status::EXECUTING;
         if (this->m_plan_executor_ptr) {
             this->m_plan_executor_ptr->executePlan(planning_result.plan);
         }
-        return this->m_move_group_ptr->execute(planning_result.plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS;
+        bool execution_success = this->m_move_group_ptr->execute(planning_result.plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS;
+        this->status = Status::IDLE;
+        return execution_success;
     } else {
         ROS_ERROR("No plan found");
         return false;

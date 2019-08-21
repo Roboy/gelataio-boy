@@ -27,6 +27,7 @@ private:
     ScoopingMain app;
 
     ros::ServiceServer scooping_srv;
+    ros::Publisher status_pub;
 
     bool busy;
     std::thread *executor;
