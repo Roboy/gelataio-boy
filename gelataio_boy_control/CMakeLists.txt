@@ -21,7 +21,7 @@ find_package(catkin REQUIRED COMPONENTS
   moveit_ros_planning
   moveit_ros_planning_interface
   moveit_ros_perception
-  gelataio_msgs
+        roboy_control_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -116,7 +116,7 @@ find_package(Eigen3 REQUIRED)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES scooping_cv
-  CATKIN_DEPENDS roscpp moveit_core moveit_visual_tools moveit_ros_planning_interface gelataio_msgs
+  CATKIN_DEPENDS roscpp moveit_core moveit_visual_tools moveit_ros_planning_interface roboy_control_msgs
   DEPENDS EIGEN3
 )
 
