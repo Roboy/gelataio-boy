@@ -15,6 +15,7 @@ HandController::PlanningResult HandController::plan(double tolerance) {
 
     this->m_move_group_ptr->setStartStateToCurrentState();
     this->m_move_group_ptr->setGoalTolerance(tolerance);
+
     planning_result = this->m_move_group_ptr->plan(plan);
     ROS_INFO("Finished planning.");
 
@@ -36,6 +37,16 @@ bool HandController::planAndExecute() {
 
     if (path_found) {
         ROS_INFO("Plan found.");
+
+        stringstream ss;
+        ss << "Target in joint space:" << endl;
+        ss << "Joint names: [";
+        for (const auto &name : planning_result.plan.trajectory_.joint_trajectory.joint_names) ss << name << ", ";
+        ss << "\b\b" << "]" << endl;
+        long last = planning_result.plan.trajectory_.joint_trajectory.points.size() - 1;
+        for (const auto &angle : planning_result.plan.trajectory_.joint_trajectory.points[last].positions) ss << angle << " ";
+        ROS_INFO_STREAM(ss.str());
+
         this->status = Status::EXECUTING;
         if (this->m_plan_executor_ptr) {
             this->m_plan_executor_ptr->executePlan(planning_result.plan);
@@ -48,6 +59,7 @@ bool HandController::planAndExecute() {
         this->status = Status::ERROR;
         return false;
     }
+
 }
 
 bool HandController::moveToPose(geometry_msgs::PoseStamped target_pose) {
