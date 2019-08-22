@@ -137,7 +137,7 @@ class ScoopServer:
       endPose.orientation.w = 1.0
 
       # TODO: after the scooping service is up uncomment this
-      # scoopingRespose = self.PerformScoopClient(startPose, endPose)
+      scoopingRespose = self.PerformScoopClient(startPose, endPose)
 
 
       # TODO: test that scooping is acctually finished which for now should be just set manually
