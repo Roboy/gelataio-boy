@@ -24,11 +24,14 @@
         <joint name="shoulder_right_axis1" />
         <joint name="wrist_right" />
         <joint name="scooper_palm" />
-        <chain base_link="torso" tip_link="scooper" />
+        <joint name="scooper_dummy_joint0" />
+        <joint name="scooper_dummy_joint1" />
+        <joint name="scooper_dummy_joint2" />
+        <chain base_link="torso" tip_link="scooper_dummy_axis2" />
     </group>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="left_hand_left" parent_link="torso" group="left_arm" />
-    <end_effector name="scooper" parent_link="torso" group="right_arm" />
+    <end_effector name="scooper_dummy_axis2" parent_link="torso" group="right_arm" />
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
     <disable_collisions link1="arm_left_lower" link2="arm_left_upper" reason="Adjacent" />
     <disable_collisions link1="arm_left_lower" link2="bike_back" reason="Never" />
@@ -49,12 +52,6 @@
     <disable_collisions link1="arm_left_lower" link2="hand_left_thumb_link0" reason="Never" />
     <disable_collisions link1="arm_left_lower" link2="hand_left_thumb_link1" reason="Never" />
     <disable_collisions link1="arm_left_lower" link2="hand_left_thumb_link2" reason="Never" />
-    <disable_collisions link1="arm_left_lower" link2="hand_right_index_link1" reason="Never" />
-    <disable_collisions link1="arm_left_lower" link2="hand_right_index_link2" reason="Never" />
-    <disable_collisions link1="arm_left_lower" link2="hand_right_little_link0" reason="Never" />
-    <disable_collisions link1="arm_left_lower" link2="hand_right_little_link2" reason="Never" />
-    <disable_collisions link1="arm_left_lower" link2="hand_right_ring_link1" reason="Never" />
-    <disable_collisions link1="arm_left_lower" link2="hand_right_ring_link2" reason="Never" />
     <disable_collisions link1="arm_left_lower" link2="ice_left" reason="Never" />
     <disable_collisions link1="arm_left_lower" link2="ice_right" reason="Never" />
     <disable_collisions link1="arm_left_lower" link2="shoulder_left_link1" reason="Never" />
@@ -94,11 +91,6 @@
     <disable_collisions link1="arm_right_lower" link2="arm_right_upper" reason="Adjacent" />
     <disable_collisions link1="arm_right_lower" link2="bike_back" reason="Never" />
     <disable_collisions link1="arm_right_lower" link2="bike_front" reason="Never" />
-    <disable_collisions link1="arm_right_lower" link2="hand_left_little_link0" reason="Never" />
-    <disable_collisions link1="arm_right_lower" link2="hand_left_little_link1" reason="Never" />
-    <disable_collisions link1="arm_right_lower" link2="hand_left_little_link2" reason="Never" />
-    <disable_collisions link1="arm_right_lower" link2="hand_left_middle_link2" reason="Never" />
-    <disable_collisions link1="arm_right_lower" link2="hand_left_ring_link2" reason="Never" />
     <disable_collisions link1="arm_right_lower" link2="hand_right_index_link0" reason="Never" />
     <disable_collisions link1="arm_right_lower" link2="hand_right_index_link1" reason="Never" />
     <disable_collisions link1="arm_right_lower" link2="hand_right_index_link2" reason="Never" />
@@ -150,13 +142,10 @@
     <disable_collisions link1="arm_right_upper" link2="shoulder_right_link1" reason="Default" />
     <disable_collisions link1="arm_right_upper" link2="shoulder_right_link2" reason="Adjacent" />
     <disable_collisions link1="arm_right_upper" link2="torso" reason="Default" />
-    <disable_collisions link1="arm_right_upper" link2="zed_camera" reason="Never" />
     <disable_collisions link1="arm_right_upper" link2="zed_camera_left_lense" reason="Never" />
     <disable_collisions link1="arm_right_upper" link2="zed_camera_right_lense" reason="Never" />
     <disable_collisions link1="bike_back" link2="bike_front" reason="Adjacent" />
     <disable_collisions link1="bike_back" link2="hand_left_thumb_link0" reason="Never" />
-    <disable_collisions link1="bike_back" link2="hand_left_thumb_link1" reason="Never" />
-    <disable_collisions link1="bike_back" link2="hand_left_thumb_link2" reason="Never" />
     <disable_collisions link1="bike_back" link2="hand_right_thumb_link0" reason="Never" />
     <disable_collisions link1="bike_back" link2="head" reason="Never" />
     <disable_collisions link1="bike_back" link2="ice_left" reason="Never" />
@@ -176,7 +165,6 @@
     <disable_collisions link1="bike_front" link2="hand_left_thumb_link0" reason="Never" />
     <disable_collisions link1="bike_front" link2="hand_left_thumb_link1" reason="Never" />
     <disable_collisions link1="bike_front" link2="hand_left_thumb_link2" reason="Never" />
-    <disable_collisions link1="bike_front" link2="hand_right_little_link0" reason="Never" />
     <disable_collisions link1="bike_front" link2="hand_right_palm" reason="Never" />
     <disable_collisions link1="bike_front" link2="hand_right_thumb_link0" reason="Never" />
     <disable_collisions link1="bike_front" link2="hand_right_thumb_link1" reason="Never" />
@@ -210,17 +198,8 @@
     <disable_collisions link1="hand_left_index_link0" link2="hand_left_thumb_link0" reason="Never" />
     <disable_collisions link1="hand_left_index_link0" link2="hand_left_thumb_link1" reason="Never" />
     <disable_collisions link1="hand_left_index_link0" link2="hand_left_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_left_index_link0" link2="hand_right_index_link2" reason="Never" />
-    <disable_collisions link1="hand_left_index_link0" link2="hand_right_little_link2" reason="Never" />
-    <disable_collisions link1="hand_left_index_link0" link2="hand_right_ring_link0" reason="Never" />
-    <disable_collisions link1="hand_left_index_link0" link2="hand_right_ring_link1" reason="Never" />
-    <disable_collisions link1="hand_left_index_link0" link2="hand_right_ring_link2" reason="Never" />
-    <disable_collisions link1="hand_left_index_link0" link2="hand_right_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_left_index_link0" link2="neck_link1" reason="Never" />
-    <disable_collisions link1="hand_left_index_link0" link2="neck_link2" reason="Never" />
     <disable_collisions link1="hand_left_index_link0" link2="shoulder_left_link1" reason="Never" />
     <disable_collisions link1="hand_left_index_link0" link2="shoulder_left_link2" reason="Never" />
-    <disable_collisions link1="hand_left_index_link0" link2="zed_camera_right_lense" reason="Never" />
     <disable_collisions link1="hand_left_index_link1" link2="hand_left_index_link2" reason="Adjacent" />
     <disable_collisions link1="hand_left_index_link1" link2="hand_left_little_link0" reason="Never" />
     <disable_collisions link1="hand_left_index_link1" link2="hand_left_little_link1" reason="Never" />
@@ -235,26 +214,10 @@
     <disable_collisions link1="hand_left_index_link1" link2="hand_left_thumb_link0" reason="Never" />
     <disable_collisions link1="hand_left_index_link1" link2="hand_left_thumb_link1" reason="Never" />
     <disable_collisions link1="hand_left_index_link1" link2="hand_left_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_left_index_link1" link2="hand_right_index_link0" reason="Never" />
-    <disable_collisions link1="hand_left_index_link1" link2="hand_right_index_link1" reason="Never" />
-    <disable_collisions link1="hand_left_index_link1" link2="hand_right_index_link2" reason="Never" />
     <disable_collisions link1="hand_left_index_link1" link2="hand_right_little_link0" reason="Never" />
-    <disable_collisions link1="hand_left_index_link1" link2="hand_right_little_link1" reason="Never" />
-    <disable_collisions link1="hand_left_index_link1" link2="hand_right_little_link2" reason="Never" />
-    <disable_collisions link1="hand_left_index_link1" link2="hand_right_ring_link0" reason="Never" />
-    <disable_collisions link1="hand_left_index_link1" link2="hand_right_ring_link1" reason="Never" />
     <disable_collisions link1="hand_left_index_link1" link2="hand_right_ring_link2" reason="Never" />
-    <disable_collisions link1="hand_left_index_link1" link2="hand_right_thumb_link0" reason="Never" />
-    <disable_collisions link1="hand_left_index_link1" link2="hand_right_thumb_link1" reason="Never" />
-    <disable_collisions link1="hand_left_index_link1" link2="hand_right_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_left_index_link1" link2="neck_link1" reason="Never" />
-    <disable_collisions link1="hand_left_index_link1" link2="neck_link2" reason="Never" />
-    <disable_collisions link1="hand_left_index_link1" link2="scooper" reason="Never" />
     <disable_collisions link1="hand_left_index_link1" link2="shoulder_left_link1" reason="Never" />
     <disable_collisions link1="hand_left_index_link1" link2="shoulder_left_link2" reason="Never" />
-    <disable_collisions link1="hand_left_index_link1" link2="shoulder_right_link1" reason="Never" />
-    <disable_collisions link1="hand_left_index_link1" link2="shoulder_right_link2" reason="Never" />
-    <disable_collisions link1="hand_left_index_link1" link2="zed_camera_right_lense" reason="Never" />
     <disable_collisions link1="hand_left_index_link2" link2="hand_left_little_link0" reason="Never" />
     <disable_collisions link1="hand_left_index_link2" link2="hand_left_little_link1" reason="Never" />
     <disable_collisions link1="hand_left_index_link2" link2="hand_left_little_link2" reason="Never" />
@@ -268,26 +231,9 @@
     <disable_collisions link1="hand_left_index_link2" link2="hand_left_thumb_link0" reason="Never" />
     <disable_collisions link1="hand_left_index_link2" link2="hand_left_thumb_link1" reason="Never" />
     <disable_collisions link1="hand_left_index_link2" link2="hand_left_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_left_index_link2" link2="hand_right_index_link0" reason="Never" />
-    <disable_collisions link1="hand_left_index_link2" link2="hand_right_index_link1" reason="Never" />
-    <disable_collisions link1="hand_left_index_link2" link2="hand_right_index_link2" reason="Never" />
-    <disable_collisions link1="hand_left_index_link2" link2="hand_right_little_link0" reason="Never" />
-    <disable_collisions link1="hand_left_index_link2" link2="hand_right_little_link1" reason="Never" />
-    <disable_collisions link1="hand_left_index_link2" link2="hand_right_little_link2" reason="Never" />
-    <disable_collisions link1="hand_left_index_link2" link2="hand_right_middle_link1" reason="Never" />
-    <disable_collisions link1="hand_left_index_link2" link2="hand_right_middle_link2" reason="Never" />
-    <disable_collisions link1="hand_left_index_link2" link2="hand_right_ring_link1" reason="Never" />
-    <disable_collisions link1="hand_left_index_link2" link2="hand_right_ring_link2" reason="Never" />
-    <disable_collisions link1="hand_left_index_link2" link2="hand_right_thumb_link0" reason="Never" />
-    <disable_collisions link1="hand_left_index_link2" link2="hand_right_thumb_link1" reason="Never" />
-    <disable_collisions link1="hand_left_index_link2" link2="hand_right_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_left_index_link2" link2="neck_link1" reason="Never" />
-    <disable_collisions link1="hand_left_index_link2" link2="neck_link2" reason="Never" />
     <disable_collisions link1="hand_left_index_link2" link2="shoulder_left_link1" reason="Never" />
     <disable_collisions link1="hand_left_index_link2" link2="shoulder_left_link2" reason="Never" />
-    <disable_collisions link1="hand_left_index_link2" link2="shoulder_right_link1" reason="Never" />
     <disable_collisions link1="hand_left_index_link2" link2="shoulder_right_link2" reason="Never" />
-    <disable_collisions link1="hand_left_index_link2" link2="zed_camera_right_lense" reason="Never" />
     <disable_collisions link1="hand_left_little_link0" link2="hand_left_little_link1" reason="Adjacent" />
     <disable_collisions link1="hand_left_little_link0" link2="hand_left_little_link2" reason="Never" />
     <disable_collisions link1="hand_left_little_link0" link2="hand_left_middle_link0" reason="Never" />
@@ -306,19 +252,8 @@
     <disable_collisions link1="hand_left_little_link0" link2="hand_right_little_link0" reason="Never" />
     <disable_collisions link1="hand_left_little_link0" link2="hand_right_little_link1" reason="Never" />
     <disable_collisions link1="hand_left_little_link0" link2="hand_right_little_link2" reason="Never" />
-    <disable_collisions link1="hand_left_little_link0" link2="hand_right_middle_link0" reason="Never" />
-    <disable_collisions link1="hand_left_little_link0" link2="hand_right_middle_link1" reason="Never" />
-    <disable_collisions link1="hand_left_little_link0" link2="hand_right_middle_link2" reason="Never" />
-    <disable_collisions link1="hand_left_little_link0" link2="hand_right_ring_link0" reason="Never" />
-    <disable_collisions link1="hand_left_little_link0" link2="hand_right_ring_link1" reason="Never" />
-    <disable_collisions link1="hand_left_little_link0" link2="hand_right_ring_link2" reason="Never" />
-    <disable_collisions link1="hand_left_little_link0" link2="hand_right_thumb_link0" reason="Never" />
-    <disable_collisions link1="hand_left_little_link0" link2="hand_right_thumb_link1" reason="Never" />
-    <disable_collisions link1="hand_left_little_link0" link2="hand_right_thumb_link2" reason="Never" />
     <disable_collisions link1="hand_left_little_link0" link2="shoulder_left_link1" reason="Never" />
     <disable_collisions link1="hand_left_little_link0" link2="shoulder_left_link2" reason="Never" />
-    <disable_collisions link1="hand_left_little_link0" link2="zed_camera_left_lense" reason="Never" />
-    <disable_collisions link1="hand_left_little_link0" link2="zed_camera_right_lense" reason="Never" />
     <disable_collisions link1="hand_left_little_link1" link2="hand_left_little_link2" reason="Adjacent" />
     <disable_collisions link1="hand_left_little_link1" link2="hand_left_middle_link0" reason="Never" />
     <disable_collisions link1="hand_left_little_link1" link2="hand_left_middle_link1" reason="Never" />
@@ -330,24 +265,14 @@
     <disable_collisions link1="hand_left_little_link1" link2="hand_left_thumb_link0" reason="Never" />
     <disable_collisions link1="hand_left_little_link1" link2="hand_left_thumb_link1" reason="Never" />
     <disable_collisions link1="hand_left_little_link1" link2="hand_left_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_left_little_link1" link2="hand_right_index_link0" reason="Never" />
-    <disable_collisions link1="hand_left_little_link1" link2="hand_right_index_link1" reason="Never" />
     <disable_collisions link1="hand_left_little_link1" link2="hand_right_index_link2" reason="Never" />
     <disable_collisions link1="hand_left_little_link1" link2="hand_right_little_link0" reason="Never" />
     <disable_collisions link1="hand_left_little_link1" link2="hand_right_little_link1" reason="Never" />
     <disable_collisions link1="hand_left_little_link1" link2="hand_right_little_link2" reason="Never" />
-    <disable_collisions link1="hand_left_little_link1" link2="hand_right_middle_link0" reason="Never" />
-    <disable_collisions link1="hand_left_little_link1" link2="hand_right_middle_link1" reason="Never" />
-    <disable_collisions link1="hand_left_little_link1" link2="hand_right_middle_link2" reason="Never" />
     <disable_collisions link1="hand_left_little_link1" link2="hand_right_ring_link0" reason="Never" />
-    <disable_collisions link1="hand_left_little_link1" link2="hand_right_ring_link1" reason="Never" />
     <disable_collisions link1="hand_left_little_link1" link2="hand_right_ring_link2" reason="Never" />
-    <disable_collisions link1="hand_left_little_link1" link2="hand_right_thumb_link0" reason="Never" />
-    <disable_collisions link1="hand_left_little_link1" link2="neck_link1" reason="Never" />
-    <disable_collisions link1="hand_left_little_link1" link2="neck_link2" reason="Never" />
     <disable_collisions link1="hand_left_little_link1" link2="shoulder_left_link1" reason="Never" />
     <disable_collisions link1="hand_left_little_link1" link2="shoulder_left_link2" reason="Never" />
-    <disable_collisions link1="hand_left_little_link1" link2="zed_camera_left_lense" reason="Never" />
     <disable_collisions link1="hand_left_little_link2" link2="hand_left_middle_link0" reason="Never" />
     <disable_collisions link1="hand_left_little_link2" link2="hand_left_middle_link1" reason="Never" />
     <disable_collisions link1="hand_left_little_link2" link2="hand_left_middle_link2" reason="Never" />
@@ -358,26 +283,14 @@
     <disable_collisions link1="hand_left_little_link2" link2="hand_left_thumb_link0" reason="Never" />
     <disable_collisions link1="hand_left_little_link2" link2="hand_left_thumb_link1" reason="Never" />
     <disable_collisions link1="hand_left_little_link2" link2="hand_left_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_left_little_link2" link2="hand_right_index_link0" reason="Never" />
-    <disable_collisions link1="hand_left_little_link2" link2="hand_right_index_link1" reason="Never" />
     <disable_collisions link1="hand_left_little_link2" link2="hand_right_index_link2" reason="Never" />
-    <disable_collisions link1="hand_left_little_link2" link2="hand_right_little_link0" reason="Never" />
     <disable_collisions link1="hand_left_little_link2" link2="hand_right_little_link1" reason="Never" />
     <disable_collisions link1="hand_left_little_link2" link2="hand_right_little_link2" reason="Never" />
-    <disable_collisions link1="hand_left_little_link2" link2="hand_right_middle_link0" reason="Never" />
-    <disable_collisions link1="hand_left_little_link2" link2="hand_right_middle_link1" reason="Never" />
-    <disable_collisions link1="hand_left_little_link2" link2="hand_right_middle_link2" reason="Never" />
     <disable_collisions link1="hand_left_little_link2" link2="hand_right_ring_link0" reason="Never" />
-    <disable_collisions link1="hand_left_little_link2" link2="hand_right_ring_link1" reason="Never" />
     <disable_collisions link1="hand_left_little_link2" link2="hand_right_ring_link2" reason="Never" />
-    <disable_collisions link1="hand_left_little_link2" link2="hand_right_thumb_link0" reason="Never" />
-    <disable_collisions link1="hand_left_little_link2" link2="neck_link1" reason="Never" />
-    <disable_collisions link1="hand_left_little_link2" link2="neck_link2" reason="Never" />
+    <disable_collisions link1="hand_left_little_link2" link2="hand_right_thumb_link1" reason="Never" />
     <disable_collisions link1="hand_left_little_link2" link2="shoulder_left_link1" reason="Never" />
     <disable_collisions link1="hand_left_little_link2" link2="shoulder_left_link2" reason="Never" />
-    <disable_collisions link1="hand_left_little_link2" link2="shoulder_right_link1" reason="Never" />
-    <disable_collisions link1="hand_left_little_link2" link2="shoulder_right_link2" reason="Never" />
-    <disable_collisions link1="hand_left_little_link2" link2="zed_camera_left_lense" reason="Never" />
     <disable_collisions link1="hand_left_middle_link0" link2="hand_left_middle_link1" reason="Adjacent" />
     <disable_collisions link1="hand_left_middle_link0" link2="hand_left_middle_link2" reason="Never" />
     <disable_collisions link1="hand_left_middle_link0" link2="hand_left_palm" reason="Adjacent" />
@@ -387,18 +300,8 @@
     <disable_collisions link1="hand_left_middle_link0" link2="hand_left_thumb_link0" reason="Never" />
     <disable_collisions link1="hand_left_middle_link0" link2="hand_left_thumb_link1" reason="Never" />
     <disable_collisions link1="hand_left_middle_link0" link2="hand_left_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link0" link2="hand_right_little_link0" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link0" link2="hand_right_little_link1" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link0" link2="hand_right_little_link2" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link0" link2="hand_right_middle_link0" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link0" link2="hand_right_middle_link1" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link0" link2="hand_right_middle_link2" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link0" link2="hand_right_ring_link0" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link0" link2="hand_right_ring_link1" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link0" link2="hand_right_ring_link2" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link0" link2="hand_right_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link0" link2="neck_link1" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link0" link2="neck_link2" reason="Never" />
+    <disable_collisions link1="hand_left_middle_link0" link2="hand_right_index_link1" reason="Never" />
+    <disable_collisions link1="hand_left_middle_link0" link2="hand_right_index_link2" reason="Never" />
     <disable_collisions link1="hand_left_middle_link0" link2="shoulder_left_link1" reason="Never" />
     <disable_collisions link1="hand_left_middle_link0" link2="shoulder_left_link2" reason="Never" />
     <disable_collisions link1="hand_left_middle_link1" link2="hand_left_middle_link2" reason="Adjacent" />
@@ -409,24 +312,9 @@
     <disable_collisions link1="hand_left_middle_link1" link2="hand_left_thumb_link0" reason="Never" />
     <disable_collisions link1="hand_left_middle_link1" link2="hand_left_thumb_link1" reason="Never" />
     <disable_collisions link1="hand_left_middle_link1" link2="hand_left_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link1" link2="hand_right_index_link0" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link1" link2="hand_right_index_link1" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link1" link2="hand_right_little_link0" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link1" link2="hand_right_little_link1" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link1" link2="hand_right_little_link2" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link1" link2="hand_right_middle_link0" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link1" link2="hand_right_middle_link1" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link1" link2="hand_right_middle_link2" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link1" link2="hand_right_ring_link0" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link1" link2="hand_right_ring_link1" reason="Never" />
     <disable_collisions link1="hand_left_middle_link1" link2="hand_right_ring_link2" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link1" link2="hand_right_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link1" link2="neck_link1" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link1" link2="neck_link2" reason="Never" />
     <disable_collisions link1="hand_left_middle_link1" link2="shoulder_left_link1" reason="Never" />
     <disable_collisions link1="hand_left_middle_link1" link2="shoulder_left_link2" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link1" link2="zed_camera" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link1" link2="zed_camera_left_lense" reason="Never" />
     <disable_collisions link1="hand_left_middle_link2" link2="hand_left_palm" reason="Never" />
     <disable_collisions link1="hand_left_middle_link2" link2="hand_left_ring_link0" reason="Never" />
     <disable_collisions link1="hand_left_middle_link2" link2="hand_left_ring_link1" reason="Never" />
@@ -434,40 +322,20 @@
     <disable_collisions link1="hand_left_middle_link2" link2="hand_left_thumb_link0" reason="Never" />
     <disable_collisions link1="hand_left_middle_link2" link2="hand_left_thumb_link1" reason="Never" />
     <disable_collisions link1="hand_left_middle_link2" link2="hand_left_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link2" link2="hand_right_index_link0" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link2" link2="hand_right_index_link1" reason="Never" />
     <disable_collisions link1="hand_left_middle_link2" link2="hand_right_index_link2" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link2" link2="hand_right_little_link0" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link2" link2="hand_right_little_link1" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link2" link2="hand_right_little_link2" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link2" link2="hand_right_middle_link0" reason="Never" />
     <disable_collisions link1="hand_left_middle_link2" link2="hand_right_middle_link1" reason="Never" />
     <disable_collisions link1="hand_left_middle_link2" link2="hand_right_middle_link2" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link2" link2="hand_right_palm" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link2" link2="hand_right_ring_link0" reason="Never" />
     <disable_collisions link1="hand_left_middle_link2" link2="hand_right_ring_link1" reason="Never" />
     <disable_collisions link1="hand_left_middle_link2" link2="hand_right_ring_link2" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link2" link2="hand_right_thumb_link0" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link2" link2="hand_right_thumb_link1" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link2" link2="neck_link1" reason="Never" />
     <disable_collisions link1="hand_left_middle_link2" link2="neck_link2" reason="Never" />
     <disable_collisions link1="hand_left_middle_link2" link2="shoulder_left_link1" reason="Never" />
     <disable_collisions link1="hand_left_middle_link2" link2="shoulder_left_link2" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link2" link2="shoulder_right_link1" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link2" link2="shoulder_right_link2" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link2" link2="zed_camera" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link2" link2="zed_camera_left_lense" reason="Never" />
-    <disable_collisions link1="hand_left_middle_link2" link2="zed_camera_right_lense" reason="Never" />
     <disable_collisions link1="hand_left_palm" link2="hand_left_ring_link0" reason="Adjacent" />
     <disable_collisions link1="hand_left_palm" link2="hand_left_ring_link1" reason="Never" />
     <disable_collisions link1="hand_left_palm" link2="hand_left_ring_link2" reason="Never" />
     <disable_collisions link1="hand_left_palm" link2="hand_left_thumb_link0" reason="Adjacent" />
     <disable_collisions link1="hand_left_palm" link2="hand_left_thumb_link1" reason="Never" />
     <disable_collisions link1="hand_left_palm" link2="hand_left_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_left_palm" link2="hand_right_little_link2" reason="Never" />
-    <disable_collisions link1="hand_left_palm" link2="hand_right_ring_link0" reason="Never" />
-    <disable_collisions link1="hand_left_palm" link2="hand_right_ring_link1" reason="Never" />
-    <disable_collisions link1="hand_left_palm" link2="ice_left" reason="Never" />
     <disable_collisions link1="hand_left_palm" link2="shoulder_left_link1" reason="Never" />
     <disable_collisions link1="hand_left_palm" link2="shoulder_left_link2" reason="Never" />
     <disable_collisions link1="hand_left_ring_link0" link2="hand_left_ring_link1" reason="Adjacent" />
@@ -476,131 +344,41 @@
     <disable_collisions link1="hand_left_ring_link0" link2="hand_left_thumb_link1" reason="Never" />
     <disable_collisions link1="hand_left_ring_link0" link2="hand_left_thumb_link2" reason="Never" />
     <disable_collisions link1="hand_left_ring_link0" link2="hand_right_index_link2" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link0" link2="hand_right_little_link2" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link0" link2="hand_right_middle_link0" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link0" link2="hand_right_middle_link1" reason="Never" />
     <disable_collisions link1="hand_left_ring_link0" link2="hand_right_middle_link2" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link0" link2="hand_right_ring_link0" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link0" link2="hand_right_ring_link1" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link0" link2="hand_right_ring_link2" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link0" link2="hand_right_thumb_link1" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link0" link2="hand_right_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link0" link2="neck_link1" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link0" link2="neck_link2" reason="Never" />
     <disable_collisions link1="hand_left_ring_link0" link2="shoulder_left_link1" reason="Never" />
     <disable_collisions link1="hand_left_ring_link0" link2="shoulder_left_link2" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link0" link2="shoulder_right_link1" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link0" link2="shoulder_right_link2" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link0" link2="zed_camera_right_lense" reason="Never" />
     <disable_collisions link1="hand_left_ring_link1" link2="hand_left_ring_link2" reason="Adjacent" />
     <disable_collisions link1="hand_left_ring_link1" link2="hand_left_thumb_link0" reason="Never" />
     <disable_collisions link1="hand_left_ring_link1" link2="hand_left_thumb_link1" reason="Never" />
     <disable_collisions link1="hand_left_ring_link1" link2="hand_left_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link1" link2="hand_right_index_link0" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link1" link2="hand_right_index_link1" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link1" link2="hand_right_index_link2" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link1" link2="hand_right_little_link0" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link1" link2="hand_right_little_link1" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link1" link2="hand_right_little_link2" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link1" link2="hand_right_middle_link0" reason="Never" />
     <disable_collisions link1="hand_left_ring_link1" link2="hand_right_middle_link1" reason="Never" />
     <disable_collisions link1="hand_left_ring_link1" link2="hand_right_middle_link2" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link1" link2="hand_right_ring_link0" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link1" link2="hand_right_ring_link1" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link1" link2="hand_right_ring_link2" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link1" link2="hand_right_thumb_link1" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link1" link2="neck_link1" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link1" link2="neck_link2" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link1" link2="scooper" reason="Never" />
     <disable_collisions link1="hand_left_ring_link1" link2="shoulder_left_link1" reason="Never" />
     <disable_collisions link1="hand_left_ring_link1" link2="shoulder_left_link2" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link1" link2="shoulder_right_link1" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link1" link2="shoulder_right_link2" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link1" link2="zed_camera" reason="Never" />
     <disable_collisions link1="hand_left_ring_link2" link2="hand_left_thumb_link0" reason="Never" />
     <disable_collisions link1="hand_left_ring_link2" link2="hand_left_thumb_link1" reason="Never" />
     <disable_collisions link1="hand_left_ring_link2" link2="hand_left_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link2" link2="hand_right_index_link0" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link2" link2="hand_right_index_link1" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link2" link2="hand_right_index_link2" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link2" link2="hand_right_little_link0" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link2" link2="hand_right_little_link1" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link2" link2="hand_right_little_link2" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link2" link2="hand_right_middle_link0" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link2" link2="hand_right_middle_link1" reason="Never" />
     <disable_collisions link1="hand_left_ring_link2" link2="hand_right_middle_link2" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link2" link2="hand_right_ring_link0" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link2" link2="hand_right_ring_link1" reason="Never" />
     <disable_collisions link1="hand_left_ring_link2" link2="hand_right_ring_link2" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link2" link2="hand_right_thumb_link0" reason="Never" />
     <disable_collisions link1="hand_left_ring_link2" link2="hand_right_thumb_link1" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link2" link2="neck_link1" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link2" link2="neck_link2" reason="Never" />
     <disable_collisions link1="hand_left_ring_link2" link2="shoulder_left_link1" reason="Never" />
     <disable_collisions link1="hand_left_ring_link2" link2="shoulder_left_link2" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link2" link2="shoulder_right_link1" reason="Never" />
     <disable_collisions link1="hand_left_ring_link2" link2="shoulder_right_link2" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link2" link2="zed_camera" reason="Never" />
-    <disable_collisions link1="hand_left_ring_link2" link2="zed_camera_left_lense" reason="Never" />
     <disable_collisions link1="hand_left_thumb_link0" link2="hand_left_thumb_link1" reason="Adjacent" />
     <disable_collisions link1="hand_left_thumb_link0" link2="hand_left_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link0" link2="hand_right_index_link1" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link0" link2="hand_right_index_link2" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link0" link2="hand_right_little_link0" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link0" link2="hand_right_little_link1" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link0" link2="hand_right_little_link2" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link0" link2="hand_right_middle_link0" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link0" link2="hand_right_ring_link1" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link0" link2="hand_right_ring_link2" reason="Never" />
     <disable_collisions link1="hand_left_thumb_link0" link2="ice_left" reason="Never" />
     <disable_collisions link1="hand_left_thumb_link0" link2="ice_right" reason="Never" />
     <disable_collisions link1="hand_left_thumb_link0" link2="shoulder_left_link1" reason="Never" />
     <disable_collisions link1="hand_left_thumb_link0" link2="shoulder_left_link2" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link0" link2="zed_camera_left_lense" reason="Never" />
     <disable_collisions link1="hand_left_thumb_link1" link2="hand_left_thumb_link2" reason="Adjacent" />
-    <disable_collisions link1="hand_left_thumb_link1" link2="hand_right_index_link0" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link1" link2="hand_right_little_link0" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link1" link2="hand_right_little_link1" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link1" link2="hand_right_little_link2" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link1" link2="hand_right_middle_link0" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link1" link2="hand_right_middle_link1" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link1" link2="hand_right_middle_link2" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link1" link2="hand_right_palm" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link1" link2="hand_right_ring_link0" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link1" link2="hand_right_ring_link1" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link1" link2="hand_right_ring_link2" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link1" link2="hand_right_thumb_link0" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link1" link2="hand_right_thumb_link2" reason="Never" />
     <disable_collisions link1="hand_left_thumb_link1" link2="ice_left" reason="Never" />
     <disable_collisions link1="hand_left_thumb_link1" link2="ice_right" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link1" link2="neck_link1" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link1" link2="neck_link2" reason="Never" />
     <disable_collisions link1="hand_left_thumb_link1" link2="shoulder_left_link1" reason="Never" />
     <disable_collisions link1="hand_left_thumb_link1" link2="shoulder_left_link2" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link1" link2="shoulder_right_link2" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link1" link2="zed_camera_left_lense" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link2" link2="hand_right_index_link0" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link2" link2="hand_right_little_link0" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link2" link2="hand_right_little_link1" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link2" link2="hand_right_little_link2" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link2" link2="hand_right_middle_link0" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link2" link2="hand_right_middle_link1" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link2" link2="hand_right_middle_link2" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link2" link2="hand_right_palm" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link2" link2="hand_right_ring_link0" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link2" link2="hand_right_ring_link1" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link2" link2="hand_right_ring_link2" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link2" link2="hand_right_thumb_link0" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link2" link2="hand_right_thumb_link1" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link2" link2="hand_right_thumb_link2" reason="Never" />
     <disable_collisions link1="hand_left_thumb_link2" link2="ice_left" reason="Never" />
     <disable_collisions link1="hand_left_thumb_link2" link2="ice_right" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link2" link2="neck_link1" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link2" link2="neck_link2" reason="Never" />
     <disable_collisions link1="hand_left_thumb_link2" link2="shoulder_left_link1" reason="Never" />
     <disable_collisions link1="hand_left_thumb_link2" link2="shoulder_left_link2" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link2" link2="shoulder_right_link2" reason="Never" />
-    <disable_collisions link1="hand_left_thumb_link2" link2="zed_camera_left_lense" reason="Never" />
     <disable_collisions link1="hand_right_index_link0" link2="hand_right_index_link1" reason="Adjacent" />
     <disable_collisions link1="hand_right_index_link0" link2="hand_right_index_link2" reason="Never" />
     <disable_collisions link1="hand_right_index_link0" link2="hand_right_little_link0" reason="Never" />
@@ -616,12 +394,9 @@
     <disable_collisions link1="hand_right_index_link0" link2="hand_right_thumb_link0" reason="Never" />
     <disable_collisions link1="hand_right_index_link0" link2="hand_right_thumb_link1" reason="Never" />
     <disable_collisions link1="hand_right_index_link0" link2="hand_right_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_right_index_link0" link2="neck_link1" reason="Never" />
-    <disable_collisions link1="hand_right_index_link0" link2="neck_link2" reason="Never" />
     <disable_collisions link1="hand_right_index_link0" link2="scooper" reason="Never" />
     <disable_collisions link1="hand_right_index_link0" link2="shoulder_right_link1" reason="Never" />
     <disable_collisions link1="hand_right_index_link0" link2="shoulder_right_link2" reason="Never" />
-    <disable_collisions link1="hand_right_index_link0" link2="zed_camera_left_lense" reason="Never" />
     <disable_collisions link1="hand_right_index_link1" link2="hand_right_index_link2" reason="Adjacent" />
     <disable_collisions link1="hand_right_index_link1" link2="hand_right_little_link0" reason="Never" />
     <disable_collisions link1="hand_right_index_link1" link2="hand_right_little_link1" reason="Never" />
@@ -636,12 +411,10 @@
     <disable_collisions link1="hand_right_index_link1" link2="hand_right_thumb_link0" reason="Never" />
     <disable_collisions link1="hand_right_index_link1" link2="hand_right_thumb_link1" reason="Never" />
     <disable_collisions link1="hand_right_index_link1" link2="hand_right_thumb_link2" reason="Never" />
+    <disable_collisions link1="hand_right_index_link1" link2="neck_link2" reason="Never" />
     <disable_collisions link1="hand_right_index_link1" link2="scooper" reason="Never" />
-    <disable_collisions link1="hand_right_index_link1" link2="shoulder_left_link1" reason="Never" />
-    <disable_collisions link1="hand_right_index_link1" link2="shoulder_left_link2" reason="Never" />
     <disable_collisions link1="hand_right_index_link1" link2="shoulder_right_link1" reason="Never" />
     <disable_collisions link1="hand_right_index_link1" link2="shoulder_right_link2" reason="Never" />
-    <disable_collisions link1="hand_right_index_link1" link2="zed_camera_left_lense" reason="Never" />
     <disable_collisions link1="hand_right_index_link2" link2="hand_right_little_link0" reason="Never" />
     <disable_collisions link1="hand_right_index_link2" link2="hand_right_little_link1" reason="Never" />
     <disable_collisions link1="hand_right_index_link2" link2="hand_right_little_link2" reason="Never" />
@@ -656,11 +429,9 @@
     <disable_collisions link1="hand_right_index_link2" link2="hand_right_thumb_link1" reason="Never" />
     <disable_collisions link1="hand_right_index_link2" link2="hand_right_thumb_link2" reason="Never" />
     <disable_collisions link1="hand_right_index_link2" link2="scooper" reason="Never" />
-    <disable_collisions link1="hand_right_index_link2" link2="shoulder_left_link1" reason="Never" />
     <disable_collisions link1="hand_right_index_link2" link2="shoulder_left_link2" reason="Never" />
     <disable_collisions link1="hand_right_index_link2" link2="shoulder_right_link1" reason="Never" />
     <disable_collisions link1="hand_right_index_link2" link2="shoulder_right_link2" reason="Never" />
-    <disable_collisions link1="hand_right_index_link2" link2="zed_camera_left_lense" reason="Never" />
     <disable_collisions link1="hand_right_little_link0" link2="hand_right_little_link1" reason="Adjacent" />
     <disable_collisions link1="hand_right_little_link0" link2="hand_right_little_link2" reason="Never" />
     <disable_collisions link1="hand_right_little_link0" link2="hand_right_middle_link0" reason="Never" />
@@ -673,12 +444,9 @@
     <disable_collisions link1="hand_right_little_link0" link2="hand_right_thumb_link0" reason="Never" />
     <disable_collisions link1="hand_right_little_link0" link2="hand_right_thumb_link1" reason="Never" />
     <disable_collisions link1="hand_right_little_link0" link2="hand_right_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_right_little_link0" link2="neck_link1" reason="Never" />
-    <disable_collisions link1="hand_right_little_link0" link2="neck_link2" reason="Never" />
     <disable_collisions link1="hand_right_little_link0" link2="scooper" reason="Never" />
     <disable_collisions link1="hand_right_little_link0" link2="shoulder_right_link1" reason="Never" />
     <disable_collisions link1="hand_right_little_link0" link2="shoulder_right_link2" reason="Never" />
-    <disable_collisions link1="hand_right_little_link0" link2="zed_camera" reason="Never" />
     <disable_collisions link1="hand_right_little_link1" link2="hand_right_little_link2" reason="Adjacent" />
     <disable_collisions link1="hand_right_little_link1" link2="hand_right_middle_link0" reason="Never" />
     <disable_collisions link1="hand_right_little_link1" link2="hand_right_middle_link1" reason="Never" />
@@ -690,10 +458,7 @@
     <disable_collisions link1="hand_right_little_link1" link2="hand_right_thumb_link0" reason="Never" />
     <disable_collisions link1="hand_right_little_link1" link2="hand_right_thumb_link1" reason="Never" />
     <disable_collisions link1="hand_right_little_link1" link2="hand_right_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_right_little_link1" link2="neck_link1" reason="Never" />
-    <disable_collisions link1="hand_right_little_link1" link2="neck_link2" reason="Never" />
     <disable_collisions link1="hand_right_little_link1" link2="scooper" reason="Never" />
-    <disable_collisions link1="hand_right_little_link1" link2="shoulder_left_link1" reason="Never" />
     <disable_collisions link1="hand_right_little_link1" link2="shoulder_left_link2" reason="Never" />
     <disable_collisions link1="hand_right_little_link1" link2="shoulder_right_link1" reason="Never" />
     <disable_collisions link1="hand_right_little_link1" link2="shoulder_right_link2" reason="Never" />
@@ -707,15 +472,10 @@
     <disable_collisions link1="hand_right_little_link2" link2="hand_right_thumb_link0" reason="Never" />
     <disable_collisions link1="hand_right_little_link2" link2="hand_right_thumb_link1" reason="Never" />
     <disable_collisions link1="hand_right_little_link2" link2="hand_right_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_right_little_link2" link2="neck_link1" reason="Never" />
-    <disable_collisions link1="hand_right_little_link2" link2="neck_link2" reason="Never" />
     <disable_collisions link1="hand_right_little_link2" link2="scooper" reason="Never" />
-    <disable_collisions link1="hand_right_little_link2" link2="shoulder_left_link1" reason="Never" />
     <disable_collisions link1="hand_right_little_link2" link2="shoulder_left_link2" reason="Never" />
     <disable_collisions link1="hand_right_little_link2" link2="shoulder_right_link1" reason="Never" />
     <disable_collisions link1="hand_right_little_link2" link2="shoulder_right_link2" reason="Never" />
-    <disable_collisions link1="hand_right_little_link2" link2="zed_camera" reason="Never" />
-    <disable_collisions link1="hand_right_little_link2" link2="zed_camera_left_lense" reason="Never" />
     <disable_collisions link1="hand_right_middle_link0" link2="hand_right_middle_link1" reason="Adjacent" />
     <disable_collisions link1="hand_right_middle_link0" link2="hand_right_middle_link2" reason="Never" />
     <disable_collisions link1="hand_right_middle_link0" link2="hand_right_palm" reason="Adjacent" />
@@ -725,12 +485,10 @@
     <disable_collisions link1="hand_right_middle_link0" link2="hand_right_thumb_link0" reason="Never" />
     <disable_collisions link1="hand_right_middle_link0" link2="hand_right_thumb_link1" reason="Never" />
     <disable_collisions link1="hand_right_middle_link0" link2="hand_right_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_right_middle_link0" link2="neck_link1" reason="Never" />
-    <disable_collisions link1="hand_right_middle_link0" link2="neck_link2" reason="Never" />
     <disable_collisions link1="hand_right_middle_link0" link2="scooper" reason="Never" />
+    <disable_collisions link1="hand_right_middle_link0" link2="shoulder_left_link2" reason="Never" />
     <disable_collisions link1="hand_right_middle_link0" link2="shoulder_right_link1" reason="Never" />
     <disable_collisions link1="hand_right_middle_link0" link2="shoulder_right_link2" reason="Never" />
-    <disable_collisions link1="hand_right_middle_link0" link2="zed_camera_left_lense" reason="Never" />
     <disable_collisions link1="hand_right_middle_link1" link2="hand_right_middle_link2" reason="Adjacent" />
     <disable_collisions link1="hand_right_middle_link1" link2="hand_right_palm" reason="Never" />
     <disable_collisions link1="hand_right_middle_link1" link2="hand_right_ring_link0" reason="Never" />
@@ -739,14 +497,9 @@
     <disable_collisions link1="hand_right_middle_link1" link2="hand_right_thumb_link0" reason="Never" />
     <disable_collisions link1="hand_right_middle_link1" link2="hand_right_thumb_link1" reason="Never" />
     <disable_collisions link1="hand_right_middle_link1" link2="hand_right_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_right_middle_link1" link2="neck_link1" reason="Never" />
-    <disable_collisions link1="hand_right_middle_link1" link2="neck_link2" reason="Never" />
     <disable_collisions link1="hand_right_middle_link1" link2="scooper" reason="Never" />
-    <disable_collisions link1="hand_right_middle_link1" link2="shoulder_left_link1" reason="Never" />
-    <disable_collisions link1="hand_right_middle_link1" link2="shoulder_left_link2" reason="Never" />
     <disable_collisions link1="hand_right_middle_link1" link2="shoulder_right_link1" reason="Never" />
     <disable_collisions link1="hand_right_middle_link1" link2="shoulder_right_link2" reason="Never" />
-    <disable_collisions link1="hand_right_middle_link1" link2="zed_camera_right_lense" reason="Never" />
     <disable_collisions link1="hand_right_middle_link2" link2="hand_right_palm" reason="Never" />
     <disable_collisions link1="hand_right_middle_link2" link2="hand_right_ring_link0" reason="Never" />
     <disable_collisions link1="hand_right_middle_link2" link2="hand_right_ring_link1" reason="Never" />
@@ -754,14 +507,9 @@
     <disable_collisions link1="hand_right_middle_link2" link2="hand_right_thumb_link0" reason="Never" />
     <disable_collisions link1="hand_right_middle_link2" link2="hand_right_thumb_link1" reason="Never" />
     <disable_collisions link1="hand_right_middle_link2" link2="hand_right_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_right_middle_link2" link2="neck_link1" reason="Never" />
-    <disable_collisions link1="hand_right_middle_link2" link2="neck_link2" reason="Never" />
     <disable_collisions link1="hand_right_middle_link2" link2="scooper" reason="Never" />
-    <disable_collisions link1="hand_right_middle_link2" link2="shoulder_left_link1" reason="Never" />
-    <disable_collisions link1="hand_right_middle_link2" link2="shoulder_left_link2" reason="Never" />
     <disable_collisions link1="hand_right_middle_link2" link2="shoulder_right_link1" reason="Never" />
     <disable_collisions link1="hand_right_middle_link2" link2="shoulder_right_link2" reason="Never" />
-    <disable_collisions link1="hand_right_middle_link2" link2="zed_camera_right_lense" reason="Never" />
     <disable_collisions link1="hand_right_palm" link2="hand_right_ring_link0" reason="Adjacent" />
     <disable_collisions link1="hand_right_palm" link2="hand_right_ring_link1" reason="Never" />
     <disable_collisions link1="hand_right_palm" link2="hand_right_ring_link2" reason="Never" />
@@ -776,40 +524,24 @@
     <disable_collisions link1="hand_right_ring_link0" link2="hand_right_thumb_link0" reason="Never" />
     <disable_collisions link1="hand_right_ring_link0" link2="hand_right_thumb_link1" reason="Never" />
     <disable_collisions link1="hand_right_ring_link0" link2="hand_right_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_right_ring_link0" link2="neck_link1" reason="Never" />
-    <disable_collisions link1="hand_right_ring_link0" link2="neck_link2" reason="Never" />
     <disable_collisions link1="hand_right_ring_link0" link2="scooper" reason="Never" />
-    <disable_collisions link1="hand_right_ring_link0" link2="shoulder_left_link2" reason="Never" />
     <disable_collisions link1="hand_right_ring_link0" link2="shoulder_right_link1" reason="Never" />
     <disable_collisions link1="hand_right_ring_link0" link2="shoulder_right_link2" reason="Never" />
-    <disable_collisions link1="hand_right_ring_link0" link2="zed_camera_left_lense" reason="Never" />
     <disable_collisions link1="hand_right_ring_link1" link2="hand_right_ring_link2" reason="Adjacent" />
     <disable_collisions link1="hand_right_ring_link1" link2="hand_right_thumb_link0" reason="Never" />
     <disable_collisions link1="hand_right_ring_link1" link2="hand_right_thumb_link1" reason="Never" />
     <disable_collisions link1="hand_right_ring_link1" link2="hand_right_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_right_ring_link1" link2="neck_link1" reason="Never" />
-    <disable_collisions link1="hand_right_ring_link1" link2="neck_link2" reason="Never" />
     <disable_collisions link1="hand_right_ring_link1" link2="scooper" reason="Never" />
-    <disable_collisions link1="hand_right_ring_link1" link2="shoulder_left_link1" reason="Never" />
     <disable_collisions link1="hand_right_ring_link1" link2="shoulder_left_link2" reason="Never" />
     <disable_collisions link1="hand_right_ring_link1" link2="shoulder_right_link1" reason="Never" />
     <disable_collisions link1="hand_right_ring_link1" link2="shoulder_right_link2" reason="Never" />
-    <disable_collisions link1="hand_right_ring_link1" link2="zed_camera" reason="Never" />
-    <disable_collisions link1="hand_right_ring_link1" link2="zed_camera_left_lense" reason="Never" />
-    <disable_collisions link1="hand_right_ring_link1" link2="zed_camera_right_lense" reason="Never" />
     <disable_collisions link1="hand_right_ring_link2" link2="hand_right_thumb_link0" reason="Never" />
     <disable_collisions link1="hand_right_ring_link2" link2="hand_right_thumb_link1" reason="Never" />
     <disable_collisions link1="hand_right_ring_link2" link2="hand_right_thumb_link2" reason="Never" />
-    <disable_collisions link1="hand_right_ring_link2" link2="neck_link1" reason="Never" />
-    <disable_collisions link1="hand_right_ring_link2" link2="neck_link2" reason="Never" />
     <disable_collisions link1="hand_right_ring_link2" link2="scooper" reason="Never" />
-    <disable_collisions link1="hand_right_ring_link2" link2="shoulder_left_link1" reason="Never" />
     <disable_collisions link1="hand_right_ring_link2" link2="shoulder_left_link2" reason="Never" />
     <disable_collisions link1="hand_right_ring_link2" link2="shoulder_right_link1" reason="Never" />
     <disable_collisions link1="hand_right_ring_link2" link2="shoulder_right_link2" reason="Never" />
-    <disable_collisions link1="hand_right_ring_link2" link2="zed_camera" reason="Never" />
-    <disable_collisions link1="hand_right_ring_link2" link2="zed_camera_left_lense" reason="Never" />
-    <disable_collisions link1="hand_right_ring_link2" link2="zed_camera_right_lense" reason="Never" />
     <disable_collisions link1="hand_right_thumb_link0" link2="hand_right_thumb_link1" reason="Adjacent" />
     <disable_collisions link1="hand_right_thumb_link0" link2="hand_right_thumb_link2" reason="Never" />
     <disable_collisions link1="hand_right_thumb_link0" link2="ice_left" reason="Never" />
@@ -817,25 +549,17 @@
     <disable_collisions link1="hand_right_thumb_link0" link2="scooper" reason="Default" />
     <disable_collisions link1="hand_right_thumb_link0" link2="shoulder_right_link1" reason="Never" />
     <disable_collisions link1="hand_right_thumb_link0" link2="shoulder_right_link2" reason="Never" />
-    <disable_collisions link1="hand_right_thumb_link0" link2="zed_camera_left_lense" reason="Never" />
     <disable_collisions link1="hand_right_thumb_link1" link2="hand_right_thumb_link2" reason="Adjacent" />
     <disable_collisions link1="hand_right_thumb_link1" link2="ice_left" reason="Never" />
     <disable_collisions link1="hand_right_thumb_link1" link2="ice_right" reason="Never" />
     <disable_collisions link1="hand_right_thumb_link1" link2="scooper" reason="Default" />
-    <disable_collisions link1="hand_right_thumb_link1" link2="shoulder_left_link2" reason="Never" />
     <disable_collisions link1="hand_right_thumb_link1" link2="shoulder_right_link1" reason="Never" />
     <disable_collisions link1="hand_right_thumb_link1" link2="shoulder_right_link2" reason="Never" />
-    <disable_collisions link1="hand_right_thumb_link1" link2="zed_camera" reason="Never" />
-    <disable_collisions link1="hand_right_thumb_link1" link2="zed_camera_left_lense" reason="Never" />
-    <disable_collisions link1="hand_right_thumb_link1" link2="zed_camera_right_lense" reason="Never" />
     <disable_collisions link1="hand_right_thumb_link2" link2="ice_left" reason="Never" />
     <disable_collisions link1="hand_right_thumb_link2" link2="ice_right" reason="Never" />
     <disable_collisions link1="hand_right_thumb_link2" link2="scooper" reason="Default" />
-    <disable_collisions link1="hand_right_thumb_link2" link2="shoulder_left_link2" reason="Never" />
     <disable_collisions link1="hand_right_thumb_link2" link2="shoulder_right_link1" reason="Never" />
     <disable_collisions link1="hand_right_thumb_link2" link2="shoulder_right_link2" reason="Never" />
-    <disable_collisions link1="hand_right_thumb_link2" link2="zed_camera_left_lense" reason="Never" />
-    <disable_collisions link1="hand_right_thumb_link2" link2="zed_camera_right_lense" reason="Never" />
     <disable_collisions link1="head" link2="ice_left" reason="Never" />
     <disable_collisions link1="head" link2="ice_right" reason="Never" />
     <disable_collisions link1="head" link2="neck_link1" reason="Default" />
@@ -851,7 +575,6 @@
     <disable_collisions link1="ice_left" link2="ice_right" reason="Default" />
     <disable_collisions link1="ice_left" link2="neck_link1" reason="Never" />
     <disable_collisions link1="ice_left" link2="neck_link2" reason="Never" />
-    <disable_collisions link1="ice_left" link2="scooper" reason="Never" />
     <disable_collisions link1="ice_left" link2="shoulder_left_link1" reason="Never" />
     <disable_collisions link1="ice_left" link2="shoulder_left_link2" reason="Never" />
     <disable_collisions link1="ice_left" link2="shoulder_right_link1" reason="Never" />
@@ -862,7 +585,6 @@
     <disable_collisions link1="ice_left" link2="zed_camera_right_lense" reason="Never" />
     <disable_collisions link1="ice_right" link2="neck_link1" reason="Never" />
     <disable_collisions link1="ice_right" link2="neck_link2" reason="Never" />
-    <disable_collisions link1="ice_right" link2="scooper" reason="Never" />
     <disable_collisions link1="ice_right" link2="shoulder_left_link1" reason="Never" />
     <disable_collisions link1="ice_right" link2="shoulder_left_link2" reason="Never" />
     <disable_collisions link1="ice_right" link2="shoulder_right_link1" reason="Never" />
@@ -884,12 +606,12 @@
     <disable_collisions link1="neck_link2" link2="shoulder_left_link2" reason="Never" />
     <disable_collisions link1="neck_link2" link2="shoulder_right_link1" reason="Never" />
     <disable_collisions link1="neck_link2" link2="shoulder_right_link2" reason="Never" />
+    <disable_collisions link1="neck_link2" link2="torso" reason="Default" />
     <disable_collisions link1="neck_link2" link2="zed_camera" reason="Never" />
     <disable_collisions link1="neck_link2" link2="zed_camera_left_lense" reason="Never" />
     <disable_collisions link1="neck_link2" link2="zed_camera_right_lense" reason="Never" />
     <disable_collisions link1="scooper" link2="shoulder_right_link1" reason="Never" />
     <disable_collisions link1="scooper" link2="shoulder_right_link2" reason="Never" />
-    <disable_collisions link1="scooper" link2="zed_camera_right_lense" reason="Never" />
     <disable_collisions link1="shoulder_left_link1" link2="shoulder_left_link2" reason="Adjacent" />
     <disable_collisions link1="shoulder_left_link1" link2="shoulder_right_link1" reason="Never" />
     <disable_collisions link1="shoulder_left_link1" link2="shoulder_right_link2" reason="Never" />

@@ -13,3 +13,6 @@ controller_list:
       - shoulder_right_axis2
       - elbow_right
       - wrist_right
+      - scooper_dummy_joint0
+      - scooper_dummy_joint1
+      - scooper_dummy_joint2

@@ -22,6 +22,9 @@ hardware_interface:
     - shoulder_right_axis2
     - elbow_right
     - wrist_right
+    - scooper_dummy_joint0
+    - scooper_dummy_joint1
+    - scooper_dummy_joint2
     - bike_steering
     - ice_left_linear
     - ice_right_linear

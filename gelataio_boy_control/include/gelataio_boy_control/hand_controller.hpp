@@ -110,12 +110,11 @@ private:
         moveit::planning_interface::MoveItErrorCode planning_status;
     };
 
-    PlanningResult plan(double tolerance=0.05);
+    PlanningResult plan(double tolerance=0.1);
 
     bool planAndExecute();
 
     moveit::planning_interface::MoveGroupInterface *m_move_group_ptr;
-
     plan_executor *m_plan_executor_ptr;
 
     hand_interface *m_hand_interface_ptr;
