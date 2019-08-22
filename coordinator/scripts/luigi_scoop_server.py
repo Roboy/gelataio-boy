@@ -35,11 +35,11 @@ class ScoopServer:
     print(scooping_status)
 
   # Arguments are of Pose type
-  def PerformScoopClient(self, startPose, endPose):
+  def PerformScoopClient(self, startPosition, endPosition):
     rospy.wait_for_service('scooping_planning/scoop')
     try:
       PerformScoopServClient = rospy.ServiceProxy('scooping_planning/scoop', PerformScoop)
-      resp = PerformScoopServClient(x, y)
+      resp = PerformScoopServClient(startPosition, endPosition)
       return resp.sum
     except rospy.ServiceException, e:
       print "Service call failed: %s"%e
