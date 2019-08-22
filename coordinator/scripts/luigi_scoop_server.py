@@ -117,9 +117,9 @@ class ScoopServer:
       # call scooping service with the points
       #
       startPose = Pose()
-      startPose.position.x = 0.5
-      startPose.position.y = -0.1
-      startPose.position.z = 1.0
+      startPose.position.x = 0.0
+      startPose.position.y = 0.0
+      startPose.position.z = 0.2
       # Make sure the quaternion is valid and normalized
       startPose.orientation.x = 0.0
       startPose.orientation.x = 0.0
@@ -127,9 +127,9 @@ class ScoopServer:
       startPose.orientation.w = 1.0
 
       endPose = Pose()
-      endPose.position.x = 0.5
-      endPose.position.y = -0.1
-      endPose.position.z = 1.0
+      endPose.position.x = 0.0
+      endPose.position.y = 0.0
+      endPose.position.z = 0.4
       # Make sure the quaternion is valid and normalized
       endPose.orientation.x = 0.0
       endPose.orientation.x = 0.0
