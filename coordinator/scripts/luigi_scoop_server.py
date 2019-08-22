@@ -12,7 +12,7 @@ from std_msgs.msg import *
 from roboy_cognition_msgs.msg import *
 
 from gelataio_msgs.srv import PerformScoop
-from geometry_msgs.msg import Pose
+from geometry_msgs.msg import Point
 
 import numpy as np
 
@@ -21,8 +21,6 @@ class ScoopServer:
   _result = OrderIceCreamResult()
 
   def __init__(self):
-    # scoops = []
-    # flavors = []
     self._action_name = 'luigi_scoop'
     self.doneScooping_ = False
     self.scooping_status_ = 'Did not recieve any ice cream order yet!'
@@ -36,7 +34,6 @@ class ScoopServer:
     self.scooping_status_ = scooping_status
     print(scooping_status)
 
-
   # Arguments are of Pose type
   def PerformScoopClient(self, startPose, endPose):
     rospy.wait_for_service('scooping_planning/scoop')
@@ -48,7 +45,6 @@ class ScoopServer:
       print "Service call failed: %s"%e
 
 
-  # string[], int32[]
   def RecieveIceCreamOrder_(self, data):
 
     self.scooping_status_ = 'Recived a new ice cream order'
@@ -74,9 +70,9 @@ class ScoopServer:
     for i in scoops:
       self._feedback.finished_scoops.append(0)
     self._feedback.status_message = self.scooping_status_
-    # publish the feedback
- 
+    # publish the feedback 
     self.server_.publish_feedback(self._feedback)
+
 
     # We don't want all surfaces, just the flavour that we want to scoop for now
 
@@ -116,28 +112,20 @@ class ScoopServer:
  
       # call scooping service with the points
       #
-      startPose = Pose()
-      startPose.position.x = 0.0
-      startPose.position.y = 0.0
-      startPose.position.z = 0.2
-      # Make sure the quaternion is valid and normalized
-      startPose.orientation.x = 0.0
-      startPose.orientation.x = 0.0
-      startPose.orientation.x = 0.0
-      startPose.orientation.w = 1.0
+      startPoint = Point()
+      startPoint.x = 0.0
+      startPoint.y = 0.0
+      startPoint.z = 0.2
 
-      endPose = Pose()
-      endPose.position.x = 0.0
-      endPose.position.y = 0.0
-      endPose.position.z = 0.4
-      # Make sure the quaternion is valid and normalized
-      endPose.orientation.x = 0.0
-      endPose.orientation.x = 0.0
-      endPose.orientation.x = 0.0
-      endPose.orientation.w = 1.0
+
+      endPoint = Point()
+      endPoint.x = 0.0
+      endPoint.y = 0.0
+      endPoint.z = 0.4
+
 
       # TODO: after the scooping service is up uncomment this
-      scoopingRespose = self.PerformScoopClient(startPose, endPose)
+      scoopingResponse = self.PerformScoopClient(startPoint, endPoint)
 
 
       # TODO: test that scooping is acctually finished which for now should be just set manually
