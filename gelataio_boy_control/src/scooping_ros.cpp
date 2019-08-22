@@ -7,8 +7,8 @@
 #include <thread>
 #include <std_msgs/String.h>
 
-using namespace gelataio_msgs;
 using namespace geometry_msgs;
+using namespace roboy_control_msgs;
 using namespace std;
 
 
@@ -33,7 +33,7 @@ void ScoopingROS::run() {
     }
 }
 
-bool ScoopingROS::scooping_cb(PerformScoop::Request &req, PerformScoop::Response &resp) {
+bool ScoopingROS::scooping_cb(TranslationalPTPMotion::Request &req, TranslationalPTPMotion::Response &resp) {
     stringstream ss;
     ss << "Got scooping request: " << req << std::endl;
     ROS_INFO_STREAM(ss.str());

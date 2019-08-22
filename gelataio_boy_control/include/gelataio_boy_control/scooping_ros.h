@@ -10,7 +10,7 @@
 #include <future>
 #include <ros/node_handle.h>
 #include "scooping.h"
-#include <gelataio_msgs/PerformScoop.h>
+#include <roboy_control_msgs/TranslationalPTPMotion.h>
 
 
 class ScoopingROS {
@@ -19,7 +19,7 @@ public:
 
     void run();
 
-    bool scooping_cb(gelataio_msgs::PerformScoop::Request &req, gelataio_msgs::PerformScoop::Response &resp);
+    bool scooping_cb(roboy_control_msgs::TranslationalPTPMotion::Request &req, roboy_control_msgs::TranslationalPTPMotion::Response &resp);
 
 
 private:
