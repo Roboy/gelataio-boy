@@ -15,5 +15,6 @@ catkin_install_python(PROGRAMS
 )
 install(FILES
   launch/start.launch
+  launch/fake_luigi.launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
 )
