@@ -23,7 +23,7 @@ class ScoopServer:
   def __init__(self):
     self._action_name = 'luigi_scoop'
     self.doneScooping_ = False
-    self.scooping_status_ = 'Did not recieve any ice cream order yet!'
+    self.scooping_status_ = 'Did not receive any ice cream order yet!'
 
     callback_lambda = lambda x: self.RecieveIceCreamOrder_(x)
     self.server_ = actionlib.SimpleActionServer('luigi_scoop', OrderIceCreamAction, execute_cb=callback_lambda , auto_start=False)
@@ -38,9 +38,10 @@ class ScoopServer:
   def PerformScoopClient(self, startPosition, endPosition):
     rospy.wait_for_service('scooping_planning/scoop')
     try:
+      # TODO: Only call this when status is IDLE
       PerformScoopServClient = rospy.ServiceProxy('scooping_planning/scoop', PerformScoop)
       resp = PerformScoopServClient(startPosition, endPosition)
-      return resp.sum
+      return resp.success
     except rospy.ServiceException, e:
       print "Service call failed: %s"%e
 
@@ -113,15 +114,15 @@ class ScoopServer:
       # call scooping service with the points
       #
       startPoint = Point()
-      startPoint.x = 0.0
-      startPoint.y = 0.0
-      startPoint.z = 0.2
+      startPoint.x = -0.1
+      startPoint.y = -0.4
+      startPoint.z = 0.25
 
 
       endPoint = Point()
-      endPoint.x = 0.0
-      endPoint.y = 0.0
-      endPoint.z = 0.4
+      endPoint.x = -0.1
+      endPoint.y = -0.4
+      endPoint.z = 0.25
 
 
       # TODO: after the scooping service is up uncomment this
@@ -149,8 +150,8 @@ class ScoopServer:
 if __name__ == '__main__':
   rospy.init_node('luigi_scoop_server')
   server = ScoopServer()
-  rospy.spin()
   try:
     rospy.Subscriber("scooping_planning/status", String, server.ScoopStatusCallback, 1)
   except KeyboardInterrupt, e:
     pass
+  rospy.spin()
