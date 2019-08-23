@@ -59,14 +59,6 @@ class ScoopServer:
     except rospy.ServiceException, e:
       print "Service call failed: %s"%e
 
-  def SendFeedbackLuigi(self, feedback):
-    for i in scoops:
-      self._feedback.finished_scoops.append(0)
-    self._feedback.status_message = 'This is feedback'
-    # publish the feedback 
-    self.server_.publish_feedback(self._feedback)
-
-
   # For now we set which flavor is where by hand (manually), unless vision can provide us with an api
   def GetFlavorStartingPoint(self, flavor):
     leftStartPoint = Point(x=-0.1, y=-0.4, z=0.25)
@@ -119,13 +111,15 @@ class ScoopServer:
     # success of the total scoping operation
     success = True
     # We try to scoop in just five points sequence
+    # scoops like [2, 4, 5]
     for scoop in range(len(scoops)):
 
       # Go to the start point of the box, depending on the flavor
       startingPoint = self.GetFlavorStartingPoint(flavors[scoop])
 
       # Loop for how many scoops of this flavor, really luigi??
-      for scoopPerFlavor in range(scoops[scoop]):
+      # e.g. loop over 2 scoops
+      for scoopPerFlavor in scoops[scoop]:
 
         # Go to start point depending on the flavor
         scoopingResponse = self.TranslationalPTPMotionClient(startingPoint, startingPoint)
@@ -145,7 +139,7 @@ class ScoopServer:
             rospy.sleep(1.)
 
           # If not IDLE, update scooping status
-          self.scooping_human_status_ = self.scooping_status_ + ' in step ' + str(i) + ' out of 5'
+          self.scooping_human_status_ = self.scooping_status_ + ' scooping process of ' + flavors[scoop] + ' in step ' + str(i) + ' out of 5'
 
 
           # Now for step 2 and 3
@@ -154,6 +148,9 @@ class ScoopServer:
           if not scoopingResponse:
             self.scooping_human_status_ = 'Failed to come up with a plan for step ' + str(i) + ' out of 5'
             success = False
+
+
+        scoopsScooped[scoop] += 1
 
           # Fill up self._feedback.scoops[] with 1s for every scoop scooped
 
@@ -185,6 +182,7 @@ class ScoopServer:
 
   # This function is called every _feedback_delay seconds
   def SendFeedbackLuigi(self, sc): 
+    self._feedback.finished_scoops = scoopsScooped
     self._feedback.status_message = self.scooping_human_status_
     self.server_.publish_feedback(self._feedback)
     s.enter(self._feedback_delay, 1, self.SendFeedbackLuigi, (sc,))
