@@ -29,6 +29,7 @@ def luigi_scoop_client(x, y):
 
     # Sends the goal to the action server.
     client.send_goal(goal, feedback_cb=scoopingFeeback)
+    # client.send_goal(goal)
 
     # Waits for the server to finish performing the action.
     client.wait_for_result()
