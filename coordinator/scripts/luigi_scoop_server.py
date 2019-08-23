@@ -39,8 +39,8 @@ class ScoopServer:
     # Status as recived from scooping_planning/scoop
     self.scooping_status_ = 'NULL'
 
-    callback_lambda = lambda x: self.RecieveIceCreamOrder_(x)
-    self.server_ = actionlib.SimpleActionServer('luigi_scoop', OrderIceCreamAction, self.RecieveIceCreamOrder_, auto_start=False)
+    callback_lambda = lambda x: self.ReceiveIceCreamOrder_(x)
+    self.server_ = actionlib.SimpleActionServer('luigi_scoop', OrderIceCreamAction, self.ReceiveIceCreamOrder_, auto_start=False)
     self.server_.start()
 
   # Callback for sub of topic "scooping_planning/status"
@@ -68,7 +68,7 @@ class ScoopServer:
 
 
   # For now we set which flavor is where by hand (manually), unless vision can provide us with an api
-  def GoToFlavor(self, flavor):
+  def GetFlavorStartingPoint(self, flavor):
     leftStartPoint = Point(x=-0.1, y=-0.4, z=0.25)
     rightStartPoint = Point(x=-0.1, y=-0.4, z=0.25)
     startingPoint = Point()
@@ -85,7 +85,7 @@ class ScoopServer:
     return startingPoint
 
     
-  def RecieveIceCreamOrder_(self, data):
+  def ReceiveIceCreamOrder_(self, data):
 
     # success of the total scoping operation
     success = False
@@ -116,23 +116,23 @@ class ScoopServer:
       self.server_.set_preempted()
       success = False
 
-    # Go to the start point, Arne should give this point from simulation
-    startPoint = Point(x=-0.1, y=-0.4, z=0.25)
-
-    # TODO: Check the successs of the return
-    scoopingResponse = self.TranslationalPTPMotionClient(startPoint, startPoint)
-
     # success of the total scoping operation
     success = True
     # We try to scoop in just five points sequence
     for scoop in range(len(scoops)):
 
       # Go to the start point of the box, depending on the flavor
-      self.GoToFlavor(flavors[scoop])
+      startingPoint = self.GetFlavorStartingPoint(flavors[scoop])
 
       # Loop for how many scoops of this flavor, really luigi??
       for scoopPerFlavor in range(scoops[scoop]):
-        
+
+        # Go to start point depending on the flavor
+        scoopingResponse = self.TranslationalPTPMotionClient(startingPoint, startingPoint)
+        if not scoopingResponse:
+          self.scooping_human_status_ = 'Failed to come up with a plan for step ' + str(i) + ' out of 5'
+          success = False
+
         # Each scoop is done in scoopingSteps
         for i in range(scoopingSteps):
           # Wait for scooping_planning/status to be idle

@@ -12,7 +12,7 @@ from std_msgs.msg import *
 from roboy_cognition_msgs.msg import *
 
 def scoopingFeeback(feedback):
-  print('Recived some feed back:')
+  print('Received some feed back:')
   print(feedback)
 
 def luigi_scoop_client(x, y):
