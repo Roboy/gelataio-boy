@@ -11,6 +11,10 @@ from std_msgs.msg import *
 # OrderIceCreamGoal, OrderIceCreamResult
 from roboy_cognition_msgs.msg import *
 
+def scoopingFeeback(feedback):
+  print('Recived some feed back:')
+  print(feedback)
+
 def luigi_scoop_client(x, y):
     # Creates the SimpleActionClient, passing the type of the action
     # (FibonacciAction) to the constructor.
@@ -24,7 +28,7 @@ def luigi_scoop_client(x, y):
     goal = OrderIceCreamGoal(flavors=x, scoops=y)
 
     # Sends the goal to the action server.
-    client.send_goal(goal)
+    client.send_goal(goal, feedback_cb=scoopingFeeback)
 
     # Waits for the server to finish performing the action.
     client.wait_for_result()
