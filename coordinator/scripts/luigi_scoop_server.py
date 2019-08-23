@@ -62,6 +62,9 @@ class ScoopServer:
 
   def RecieveIceCreamOrder_(self, data):
 
+    # success of the total scoping operation
+    success = False
+
     scoops = data.scoops
     flavors = data.flavors
 
@@ -74,7 +77,6 @@ class ScoopServer:
     flavors = data.flavors
 
     r = rospy.Rate(1)
-    success = True
 
     # start executing the action
     # check that preempt has not been requested by the client
@@ -88,12 +90,15 @@ class ScoopServer:
     # TODO: Check the successs of the return
     scoopingResponse = self.PerformScoopClient(startPoint, startPoint)
 
+    # success of the total scoping operation
+    success = True
     # We try to scoop in just five points sequence
     for i in range(5):
       # Wait for scooping_planning/status to be idle
       # Calculate new point
       # Send point to scooping_planning/scoop
 
+      # Wait for scooping_planning/status to be idle
       while not self.scooping_status_ == 'IDLE':
         self.scooping_human_status_ = self.scooping_status_ + ' need more time'
         rospy.sleep(1.) 
@@ -105,6 +110,9 @@ class ScoopServer:
       # Now for step 2 and 3
       # Move along the y-z plane (ice cream surface)     
       scoopingResponse = self.PerformScoopClient(Point(x=-0.1, y=-0.4, z=0.25), Point(x=-0.1, y=-0.3, z=0.25))
+      if not scoopingResponse:
+        self.scooping_human_status_ = 'Failed to come up with a plan for step ' + str(i) + ' out of 5'
+        success = False
 
       # Fill up self._feedback.scoops[] with 1s for every scoop scooped
 
@@ -129,9 +137,9 @@ class ScoopServer:
       #
 
     # Send result
-    if success:
-      self._result.success = True
-      self._result.error_message = 'Failed to come up with a plan'
+    if not success:
+      self._result.success = False
+      self._result.error_message = self.scooping_human_status_
       self.server_.set_succeeded(self._result)
 
   # This function is called every _feedback_delay seconds
