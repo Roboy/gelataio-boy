@@ -68,12 +68,14 @@ bool HandController::moveToPose(geometry_msgs::PoseStamped target_pose) {
     return this->planAndExecute();
 }
 
-bool HandController::moveToPose(geometry_msgs::Pose target_pose) {
+bool HandController::moveToPose(geometry_msgs::Pose target_pose, moveit_msgs::Constraints &constraints) {
     std::stringstream ss;
     ss << "Target pose for moveIT planning: " << std::endl << target_pose << std::endl;
     ROS_INFO_STREAM(ss.str());
 
     this->m_move_group_ptr->setPoseTarget(target_pose);
+    this->m_move_group_ptr->setPathConstraints(constraints);
+    this->m_move_group_ptr->setPlanningTime(15.0);
     return this->planAndExecute();
 }
 
@@ -127,5 +129,10 @@ void HandController::addPlanExecutor(plan_executor *executor) {
 
 void HandController::setHandInterface(hand_interface *interface) {
     this->m_hand_interface_ptr = interface;
+}
+
+bool HandController::moveToPose(geometry_msgs::Pose target_pose) {
+    moveit_msgs::Constraints constraints;
+    this->moveToPose(target_pose, constraints);
 }
 

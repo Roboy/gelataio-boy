@@ -131,10 +131,8 @@ void ScoopingMain::createObstacles() {
     ice_box->operation = ice_box->ADD;
 }
 
-void ScoopingMain::drop_ice(Point destination, std::function<void(bool)> finish_cb) {
+bool ScoopingMain::drop_ice(Point destination) {
     ROS_ERROR("Not implemented.");
-    finish_cb(false);
-
 }
 
 bool ScoopingMain::approach_scoop_point(geometry_msgs::Point scoop_point) {
@@ -146,12 +144,21 @@ bool ScoopingMain::approach_scoop_point(geometry_msgs::Point scoop_point) {
     double pitch = 40;
     double yaw = 45 + 90;
     q_start.setRPY(roll/180*M_PI, pitch/180*M_PI, yaw/180*M_PI);
-//    scooping_start.orientation.x = q_start.x();
-//    scooping_start.orientation.y = q_start.y();
-//    scooping_start.orientation.z = q_start.z();
-//    scooping_start.orientation.w = q_start.w();
+    scooping_start.orientation.x = q_start.x();
+    scooping_start.orientation.y = q_start.y();
+    scooping_start.orientation.z = q_start.z();
+    scooping_start.orientation.w = q_start.w();
 
-    return right_arm.moveToPose(scooping_start);
+    moveit_msgs::Constraints constraints;
+    moveit_msgs::JointConstraint wristConstraint;
+    wristConstraint.joint_name = "wrist_right";
+    wristConstraint.position = 0.8;
+    wristConstraint.tolerance_below = .1;
+    wristConstraint.tolerance_above = 3.14/2;
+    wristConstraint.weight = 1.0;
+    constraints.joint_constraints.push_back(wristConstraint);
+
+    return right_arm.moveToPose(scooping_start, constraints);
 
 }
 
