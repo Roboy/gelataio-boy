@@ -55,6 +55,8 @@ public:
      */
     bool moveToPose(geometry_msgs::Pose target_pose);
 
+    bool moveToPose(geometry_msgs::Pose target_pose, moveit_msgs::Constraints &contraints);
+
     /**
      * Move to pose.
      * @param target_pose   Target pose with frame id

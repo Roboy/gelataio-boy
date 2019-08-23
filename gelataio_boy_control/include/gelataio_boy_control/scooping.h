@@ -17,8 +17,6 @@ public:
     virtual ~ScoopingMain();
 
     bool scoop_ice(geometry_msgs::Point start, geometry_msgs::Point end, std::function<void(bool)> finish_cb);
-    void drop_ice(geometry_msgs::Point destination, std::function<void(bool)> finish_cb);
-
     std::string get_status() {return status;}
 
 
@@ -29,6 +27,8 @@ protected:
     bool approach_scoop_point(geometry_msgs::Point scoop_point);
     bool perform_scoop(geometry_msgs::Point end_point);
     bool depart_from_scoop();
+    bool drop_ice(geometry_msgs::Point destination);
+
     virtual void defineEnvironment();
 
     virtual void createObstacles();
