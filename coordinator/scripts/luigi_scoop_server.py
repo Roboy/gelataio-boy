@@ -12,7 +12,7 @@ import sched, time
 # OrderIceCreamGoal, OrderIceCreamResult
 from roboy_cognition_msgs.msg import *
 
-from gelataio_msgs.srv import PerformScoop
+from roboy_control_msgs.srv import TranslationalPTPMotion
 from geometry_msgs.msg import Point
 
 import numpy as np
@@ -49,12 +49,12 @@ class ScoopServer:
     print(scooping_status)
 
   # Arguments are of Pose type
-  def PerformScoopClient(self, startPosition, endPosition):
+  def TranslationalPTPMotionClient(self, startPosition, endPosition):
     rospy.wait_for_service('scooping_planning/scoop')
     try:
       # TODO: Only call this when status is IDLE
-      PerformScoopServClient = rospy.ServiceProxy('scooping_planning/scoop', PerformScoop)
-      resp = PerformScoopServClient(startPosition, endPosition)
+      TranslationalPTPMotionServClient = rospy.ServiceProxy('scooping_planning/scoop', TranslationalPTPMotion)
+      resp = TranslationalPTPMotionServClient(startPosition, endPosition)
       return resp.success
     except rospy.ServiceException, e:
       print "Service call failed: %s"%e
@@ -120,7 +120,7 @@ class ScoopServer:
     startPoint = Point(x=-0.1, y=-0.4, z=0.25)
 
     # TODO: Check the successs of the return
-    scoopingResponse = self.PerformScoopClient(startPoint, startPoint)
+    scoopingResponse = self.TranslationalPTPMotionClient(startPoint, startPoint)
 
     # success of the total scoping operation
     success = True
@@ -150,7 +150,7 @@ class ScoopServer:
 
           # Now for step 2 and 3
           # Move along the y-z plane (ice cream surface)     
-          scoopingResponse = self.PerformScoopClient(Point(x=-0.1, y=-0.4, z=0.25), Point(x=-0.1, y=-0.3, z=0.25))
+          scoopingResponse = self.TranslationalPTPMotionClient(Point(x=-0.1, y=-0.4, z=0.25), Point(x=-0.1, y=-0.3, z=0.25))
           if not scoopingResponse:
             self.scooping_human_status_ = 'Failed to come up with a plan for step ' + str(i) + ' out of 5'
             success = False

@@ -50,29 +50,29 @@
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>gelataio_msgs</build_depend>
-  <!-- <build_depend>roboy_cognition_msgs</build_depend> -->
+  <build_depend>roboy_cognition_msgs</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>rospy</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>message_runtime</build_depend>
   <build_depend>gelataio_messages</build_depend>
-  <!-- <build_depend>gelataio_boy_control</build_depend> -->
+  <build_depend>roboy_control_msgs</build_depend>
 
   <build_export_depend>gelataio_msgs</build_export_depend>
-  <!-- <build_export_depend>roboy_cognition_msgs</build_export_depend> -->
+  <build_export_depend>roboy_cognition_msgs</build_export_depend>
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>rospy</build_export_depend>
   <build_export_depend>std_msgs</build_export_depend>
   <build_export_depend>message_runtime</build_export_depend>
   <build_export_depend>gelataio_messages</build_export_depend>
-  <!-- <build_export_depend>gelataio_boy_control</build_export_depend> -->
+  <build_export_depend>roboy_control_msgs</build_export_depend>
 
   <!-- <exec_depend>gelataio_boy_control</exec_depend> -->
   <exec_depend>message_runtime</exec_depend>
 
   <exec_depend>gelataio_messages</exec_depend>
-  <!-- <exec_depend>gelataio_msgs</exec_depend> -->
-  <!-- <exec_depend>roboy_cognition_msgs</exec_depend> -->
+  <exec_depend>roboy_cognition_msgs</exec_depend>
+  <exec_depend>roboy_control_msgs</exec_depend>
   <exec_depend>roscpp</exec_depend>
   <exec_depend>rospy</exec_depend>
   <exec_depend>std_msgs</exec_depend>
