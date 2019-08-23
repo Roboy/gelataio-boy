@@ -44,7 +44,6 @@ ScoopingMain::~ScoopingMain() {
     delete right_hand;
 
     delete ice_box;
-
 }
 
 void ScoopingMain::watch_status() {
@@ -91,7 +90,7 @@ bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> f
     if (successful) {
         ROS_INFO("Movement to the start point was successful :)");
         ROS_INFO("Performing the scoop");
-        successful &= this->perform_scoop(end);
+        successful &= this->perform_scoop();
     }
 
     if (successful) {
@@ -159,12 +158,10 @@ bool ScoopingMain::approach_scoop_point(geometry_msgs::Point scoop_point) {
     constraints.joint_constraints.push_back(wristConstraint);
 
     return right_arm.moveToPose(scooping_start, constraints);
-
 }
 
-bool ScoopingMain::perform_scoop(geometry_msgs::Point end_point) {
-    ROS_WARN("Perform scoop not yet implemented");
-    return true;
+bool ScoopingMain::perform_scoop() {
+    return right_arm.moveJoint("wrist_right", -0.5);
 }
 
 bool ScoopingMain::depart_from_scoop() {

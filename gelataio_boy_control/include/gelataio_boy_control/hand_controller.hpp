@@ -98,6 +98,8 @@ public:
      */
     void setHandInterface(hand_interface *interface);
 
+    bool moveJoint(std::string joint_name, double target_angle);
+
     /**
      * Get the status of the hand controller
      * @return one of [IDLE, PLANNING, EXECUTING, ERROR]

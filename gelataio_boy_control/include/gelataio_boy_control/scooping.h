@@ -25,7 +25,7 @@ public:
 
 protected:
     bool approach_scoop_point(geometry_msgs::Point scoop_point);
-    bool perform_scoop(geometry_msgs::Point end_point);
+    bool perform_scoop();
     bool depart_from_scoop();
     bool drop_ice(geometry_msgs::Point destination);
 

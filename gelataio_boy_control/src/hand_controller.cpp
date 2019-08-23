@@ -2,7 +2,8 @@
 
 using namespace std;
 
-HandController::HandController(const std::string& group_name, int planning_attempts) : m_plan_executor_ptr(nullptr), status(HandController::Status::IDLE) {
+HandController::HandController(const std::string &group_name, int planning_attempts) : m_plan_executor_ptr(nullptr),
+                                                                                       status(HandController::Status::IDLE) {
     this->m_move_group_ptr = new moveit::planning_interface::MoveGroupInterface(group_name + "_arm");
     this->m_planning_attempts = planning_attempts;
 
@@ -38,20 +39,12 @@ bool HandController::planAndExecute() {
     if (path_found) {
         ROS_INFO("Plan found.");
 
-        stringstream ss;
-        ss << "Target in joint space:" << endl;
-        ss << "Joint names: [";
-        for (const auto &name : planning_result.plan.trajectory_.joint_trajectory.joint_names) ss << name << ", ";
-        ss << "\b\b" << "]" << endl;
-        long last = planning_result.plan.trajectory_.joint_trajectory.points.size() - 1;
-        for (const auto &angle : planning_result.plan.trajectory_.joint_trajectory.points[last].positions) ss << angle << " ";
-        ROS_INFO_STREAM(ss.str());
-
         this->status = Status::EXECUTING;
         if (this->m_plan_executor_ptr) {
             this->m_plan_executor_ptr->executePlan(planning_result.plan);
         }
-        bool execution_success = this->m_move_group_ptr->execute(planning_result.plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS;
+        bool execution_success = this->m_move_group_ptr->execute(planning_result.plan) ==
+                                 moveit::planning_interface::MoveItErrorCode::SUCCESS;
         this->status = Status::IDLE;
         return execution_success;
     } else {
@@ -134,5 +127,56 @@ void HandController::setHandInterface(hand_interface *interface) {
 bool HandController::moveToPose(geometry_msgs::Pose target_pose) {
     moveit_msgs::Constraints constraints;
     this->moveToPose(target_pose, constraints);
+}
+
+template<typename T>
+std::pair<bool, int> findInVector(const std::vector<T> &vecOfElements, const T &element) {
+    std::pair<bool, int> result;
+
+    // Find given element in vector
+    auto it = std::find(vecOfElements.begin(), vecOfElements.end(), element);
+
+    if (it != vecOfElements.end()) {
+        result.second = distance(vecOfElements.begin(), it);
+        result.first = true;
+    } else {
+        result.first = false;
+        result.second = -1;
+    }
+
+    return result;
+}
+
+bool HandController::moveJoint(std::string joint_name, double target_angle) {
+    moveit_msgs::Constraints c;
+    this->m_move_group_ptr->setPathConstraints(c);
+    //Create map of jointName -> currentJointValue
+    map<std::string, double> jointAngles;
+    vector<double> jointAnglesVec = this->m_move_group_ptr->getCurrentJointValues();
+    vector<string> jointNames = this->m_move_group_ptr->getJointNames();
+
+    std::transform(jointNames.begin(), jointNames.end(), std::inserter(jointAngles, jointAngles.end()),
+                   [jointAnglesVec, jointNames](std::string &jointName) {
+                       return std::make_pair(jointName, jointAnglesVec.at(findInVector(jointNames, jointName).second));
+                   });
+
+    stringstream ss1, ss2;
+    ss1 << "Current joint positions: " << endl;
+    for (const auto &m : jointAngles) {
+        ss1 << "\t" << m.first << "\t" << m.second << endl;
+    }
+
+    //Update the target joint
+    jointAngles[joint_name] = target_angle;
+
+    ss2 << "Desired joint positions: " << endl;
+    for (const auto &m : jointAngles) {
+        ss2 << "\t" << m.first << "\t" << m.second << endl;
+    }
+    ROS_INFO_STREAM(ss1.str());
+    ROS_INFO_STREAM(ss2.str());
+
+    this->m_move_group_ptr->setJointValueTarget(jointAngles);
+    return this->planAndExecute();
 }
 
