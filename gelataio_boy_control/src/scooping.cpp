@@ -85,7 +85,7 @@ bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> f
     ROS_INFO_STREAM(ss.str());
 
     this->active_arm = &right_arm;
-    ROS_INFO("Mvoing to start point for scooping");
+    ROS_INFO("Moving to start point for scooping");
     bool successful = this->approach_scoop_point(start);
     if (successful) {
         ROS_INFO("Movement to the start point was successful :)");
