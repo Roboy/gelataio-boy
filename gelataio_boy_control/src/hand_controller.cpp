@@ -17,6 +17,12 @@ HandController::PlanningResult HandController::plan(double tolerance) {
     this->m_move_group_ptr->setStartStateToCurrentState();
     this->m_move_group_ptr->setGoalTolerance(tolerance);
 
+    stringstream ss; ss << "Current joint state:" << endl;
+    for (const auto &m : this->jointStatus()) {
+        ss << "\t" << m.first << ":\t" << m.second << endl;
+    }
+    ROS_INFO_STREAM(ss.str());
+
     planning_result = this->m_move_group_ptr->plan(plan);
     ROS_INFO("Finished planning.");
 
@@ -68,7 +74,7 @@ bool HandController::moveToPose(geometry_msgs::Pose target_pose, moveit_msgs::Co
 
     this->m_move_group_ptr->setPoseTarget(target_pose);
     this->m_move_group_ptr->setPathConstraints(constraints);
-    this->m_move_group_ptr->setPlanningTime(15.0);
+    this->m_move_group_ptr->setPlanningTime(10.0);
     return this->planAndExecute();
 }
 
@@ -151,14 +157,7 @@ bool HandController::moveJoint(std::string joint_name, double target_angle) {
     moveit_msgs::Constraints c;
     this->m_move_group_ptr->setPathConstraints(c);
     //Create map of jointName -> currentJointValue
-    map<std::string, double> jointAngles;
-    vector<double> jointAnglesVec = this->m_move_group_ptr->getCurrentJointValues();
-    vector<string> jointNames = this->m_move_group_ptr->getJointNames();
-
-    std::transform(jointNames.begin(), jointNames.end(), std::inserter(jointAngles, jointAngles.end()),
-                   [jointAnglesVec, jointNames](std::string &jointName) {
-                       return std::make_pair(jointName, jointAnglesVec.at(findInVector(jointNames, jointName).second));
-                   });
+    map<std::string, double> jointAngles = this->jointStatus();
 
     stringstream ss1, ss2;
     ss1 << "Current joint positions: " << endl;
@@ -178,5 +177,18 @@ bool HandController::moveJoint(std::string joint_name, double target_angle) {
 
     this->m_move_group_ptr->setJointValueTarget(jointAngles);
     return this->planAndExecute();
+}
+
+std::map<std::string, double> HandController::jointStatus() {
+    map<std::string, double> jointAngles;
+    vector<double> jointAnglesVec = this->m_move_group_ptr->getCurrentJointValues();
+    vector<string> jointNames = this->m_move_group_ptr->getJointNames();
+
+    std::transform(jointNames.begin(), jointNames.end(), std::inserter(jointAngles, jointAngles.end()),
+                   [jointAnglesVec, jointNames](std::string &jointName) {
+                       return std::make_pair(jointName, jointAnglesVec.at(findInVector(jointNames, jointName).second));
+                   });
+
+    return jointAngles;
 }
 

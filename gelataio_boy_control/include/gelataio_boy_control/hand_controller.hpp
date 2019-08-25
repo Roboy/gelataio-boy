@@ -114,6 +114,8 @@ private:
         moveit::planning_interface::MoveItErrorCode planning_status;
     };
 
+    std::map<std::string, double> jointStatus();
+
     PlanningResult plan(double tolerance=0.1);
 
     bool planAndExecute();
