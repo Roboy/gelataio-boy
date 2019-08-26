@@ -19,5 +19,7 @@ void JointInfoCollector::steering_angle_cb(const std_msgs::Float32 &data) {
     s.position.push_back(data.data);
     s.velocity.push_back(0.0);
 
+    // TODO add the wrist angle here
+
     joint_states_pub.publish(s);
 }
