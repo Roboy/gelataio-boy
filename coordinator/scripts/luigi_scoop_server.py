@@ -61,8 +61,8 @@ class ScoopServer:
 
   # For now we set which flavor is where by hand (manually), unless vision can provide us with an api
   def GetFlavorStartingPoint(self, flavor):
-    leftStartPoint = Point(x=-0.1, y=-0.4, z=0.25)
-    rightStartPoint = Point(x=-0.1, y=-0.4, z=0.25)
+    leftStartPoint = Point(x=-0.1, y=-0.4, z=0.35)
+    rightStartPoint = Point(x=-0.1, y=-0.4, z=0.35)
     startingPoint = Point()
 
     # Left ice cream box
