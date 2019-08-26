@@ -19,7 +19,7 @@ public:
 
 private:
     std::string group_name;
-    std::map<std::string, ros::Publisher> publishers;
+    ros::Publisher joint_target_pub;
 };
 
 #endif //SRC_PLAN_EXECUTOR_H
