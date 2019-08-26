@@ -10,7 +10,7 @@
 using namespace std;
 
 static ros::Publisher pub;
-const static vector<int> joint_ids = {7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+const static vector<int> joint_ids = {0, 1, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
 static vector<string> joint_names;
 
 void jointStateCallback(const roboy_simulation_msgs::JointState &state) {
@@ -19,7 +19,6 @@ void jointStateCallback(const roboy_simulation_msgs::JointState &state) {
         s.name.push_back(joint_names[index]);
         s.position.push_back(state.q[index]);
         s.velocity.push_back(state.qd[index]);
-
     }
     pub.publish(s);
     ROS_INFO_THROTTLE(10.0, "I'm alive.");
