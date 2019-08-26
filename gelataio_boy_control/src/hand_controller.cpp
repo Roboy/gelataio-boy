@@ -2,9 +2,10 @@
 
 using namespace std;
 
-HandController::HandController(const std::string &group_name, int planning_attempts) : m_plan_executor_ptr(nullptr),
-                                                                                       status(HandController::Status::IDLE),
-                                                                                       planning_time(10.0) {
+HandController::HandController(const std::string &group_name, int planning_attempts)
+        : m_plan_executor_ptr(nullptr),
+          status(HandController::Status::IDLE),
+          planning_time(10.0) {
     this->m_move_group_ptr = new moveit::planning_interface::MoveGroupInterface(group_name + "_arm");
     this->m_planning_attempts = planning_attempts;
 
@@ -18,7 +19,8 @@ HandController::PlanningResult HandController::plan(double tolerance) {
     this->m_move_group_ptr->setStartStateToCurrentState();
     this->m_move_group_ptr->setGoalTolerance(tolerance);
 
-    stringstream ss; ss << "Current joint state:" << endl;
+    stringstream ss;
+    ss << "Current joint state:" << endl;
     for (const auto &m : this->jointStatus()) {
         ss << "\t" << m.first << ":\t" << m.second << endl;
     }
@@ -47,11 +49,13 @@ bool HandController::planAndExecute() {
         ROS_INFO("Plan found.");
 
         this->status = Status::EXECUTING;
+        bool execution_success = true;
         if (this->m_plan_executor_ptr) {
-            this->m_plan_executor_ptr->executePlan(planning_result.plan);
-        }
-        bool execution_success = this->m_move_group_ptr->execute(planning_result.plan) ==
+            execution_success &= this->m_plan_executor_ptr->executePlan(planning_result.plan);
+        } else {
+            execution_success &= this->m_move_group_ptr->execute(planning_result.plan) ==
                                  moveit::planning_interface::MoveItErrorCode::SUCCESS;
+        }
         this->status = Status::IDLE;
         return execution_success;
     } else {
@@ -204,4 +208,5 @@ bool HandController::goHome() {
     this->m_move_group_ptr->setJointValueTarget(desiredState);
     return this->planAndExecute();
 }
+
 
