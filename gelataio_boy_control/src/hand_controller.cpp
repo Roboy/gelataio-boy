@@ -3,7 +3,8 @@
 using namespace std;
 
 HandController::HandController(const std::string &group_name, int planning_attempts) : m_plan_executor_ptr(nullptr),
-                                                                                       status(HandController::Status::IDLE) {
+                                                                                       status(HandController::Status::IDLE),
+                                                                                       planning_time(10.0) {
     this->m_move_group_ptr = new moveit::planning_interface::MoveGroupInterface(group_name + "_arm");
     this->m_planning_attempts = planning_attempts;
 
@@ -74,7 +75,7 @@ bool HandController::moveToPose(geometry_msgs::Pose target_pose, moveit_msgs::Co
 
     this->m_move_group_ptr->setPoseTarget(target_pose);
     this->m_move_group_ptr->setPathConstraints(constraints);
-    this->m_move_group_ptr->setPlanningTime(10.0);
+    this->m_move_group_ptr->setPlanningTime(planning_time);
     return this->planAndExecute();
 }
 
@@ -190,5 +191,17 @@ std::map<std::string, double> HandController::jointStatus() {
                    });
 
     return jointAngles;
+}
+
+bool HandController::goHome() {
+    auto currentState = this->jointStatus();
+    map<std::string, double> desiredState;
+
+    for (const auto &name : currentState) {
+        desiredState[name.first] = 0.0;
+    }
+
+    this->m_move_group_ptr->setJointValueTarget(desiredState);
+    return this->planAndExecute();
 }
 

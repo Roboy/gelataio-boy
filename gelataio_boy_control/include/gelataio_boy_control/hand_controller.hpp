@@ -100,6 +100,10 @@ public:
 
     bool moveJoint(std::string joint_name, double target_angle);
 
+    bool goHome();
+
+    void setPlanningTime(double time) {this->planning_time = time;}
+
     /**
      * Get the status of the hand controller
      * @return one of [IDLE, PLANNING, EXECUTING, ERROR]
@@ -126,6 +130,8 @@ private:
     hand_interface *m_hand_interface_ptr;
 
     int m_planning_attempts;
+
+    double planning_time;
 
     enum Status status;
 };

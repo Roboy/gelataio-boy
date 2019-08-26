@@ -98,6 +98,14 @@ bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> f
         successful &= this->depart_from_scoop();
     }
 
+    ROS_INFO("Going home");
+    successful &= right_arm.goHome();
+
+    if (successful) {
+        ROS_INFO("Scooping done without error");
+    } else {
+        ROS_ERROR("Scooping finished with error");
+    }
     finish_cb(successful);
     return successful;
 }
@@ -156,15 +164,17 @@ bool ScoopingMain::approach_scoop_point(geometry_msgs::Point scoop_point) {
     wristConstraint.tolerance_above = 3.14/2;
     wristConstraint.weight = 1.0;
     constraints.joint_constraints.push_back(wristConstraint);
-
+    right_arm.setPlanningTime(10.0);
     return right_arm.moveToPose(scooping_start, constraints);
 }
 
 bool ScoopingMain::perform_scoop() {
+    right_arm.setPlanningTime(1.0);
     return right_arm.moveJoint("wrist_right", -0.5);
 }
 
 bool ScoopingMain::depart_from_scoop() {
+    right_arm.setPlanningTime(5.0);
     ROS_WARN("Depart from scoop motion not yet implemented");
     return true;
 }
