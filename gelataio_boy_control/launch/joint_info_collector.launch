@@ -1,6 +1,6 @@
 <launch>
 
-  <node name="sim_joint_state_converter" pkg="gelataio_boy_control" type="sim_joint_state_converter" respawn="false" output="screen">
+  <node name="joint_info_collector" pkg="gelataio_boy_control" type="joint_info_collector" respawn="false" output="screen">
   </node>
 
 </launch>
