@@ -2,9 +2,10 @@
 
   <arg name="rviz" default="true" />
   <arg name="debug" default="false" />
+  <arg name="luigi_is_fake" default="true" />
 
 <!-- without this the action server will give you an exception because it is sending the feedback to no where -->
-  <node name="fake_luigi_client" pkg="coordinator" type="fake_luigi_client.py" respawn="false" output="screen">
+  <node if="$(arg luigi_is_fake)" name="fake_luigi_client" pkg="coordinator" type="fake_luigi_client.py" respawn="false" output="screen">
   </node>
   
   <!-- recives the orderes from the lugig and send point to scooping -->
