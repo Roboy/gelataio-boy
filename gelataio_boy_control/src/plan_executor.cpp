@@ -6,14 +6,12 @@
 #include <gelataio_boy_control/plan_executor.h>
 #include <std_msgs/Float32.h>
 
-CardsflowPlanExecutor::CardsflowPlanExecutor(std::string group_name, ros::NodeHandle *nh) : group_name(group_name) {
+CardsflowPlanExecutor::CardsflowPlanExecutor(ros::NodeHandle *nh) {
     joint_target_pub = nh->advertise<sensor_msgs::JointState>("/joint_targets", 1);
 }
 
 bool CardsflowPlanExecutor::executePlan(moveit::planning_interface::MoveGroupInterface::Plan &plan) {
-    std::stringstream ss;
-    ss << "Moving " << group_name << " arm using CARDSflow." << std::endl;
-    ROS_INFO_STREAM(ss.str());
+    ROS_INFO("Moving robot using CARDSflow");
 
     sensor_msgs::JointState targets;
     targets.name = plan.trajectory_.joint_trajectory.joint_names;

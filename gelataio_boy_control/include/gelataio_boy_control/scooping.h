@@ -40,7 +40,7 @@ private:
     HandController right_arm, left_arm;
     ros::NodeHandle *node_handle;
 
-    CardsflowPlanExecutor *right_cardsflow, *left_cardsflow;
+    CardsflowPlanExecutor *cardsflow;
 
     HandController* active_arm;
 
