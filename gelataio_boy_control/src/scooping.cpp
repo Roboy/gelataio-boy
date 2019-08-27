@@ -18,14 +18,13 @@ ScoopingMain::ScoopingMain(ros::NodeHandle *handle, bool simulation_only)
         right_hand = new DummyHand("right hand");
         right_arm.setHandInterface(right_hand);
     } else { // Execution on Hardware
-        left_cardsflow = new CardsflowPlanExecutor("left", handle);
+        cardsflow = new CardsflowPlanExecutor(handle);
         left_hand = new DummyHand("left hand");
-        left_arm.addPlanExecutor(left_cardsflow);
+        left_arm.addPlanExecutor(cardsflow);
         left_arm.setHandInterface(left_hand);
 
-        right_cardsflow = new CardsflowPlanExecutor("right", handle);
         right_hand = new DummyHand("right hand");
-        right_arm.addPlanExecutor(right_cardsflow);
+        right_arm.addPlanExecutor(cardsflow);
         right_arm.setHandInterface(right_hand);
     }
 
@@ -38,13 +37,11 @@ ScoopingMain::ScoopingMain(ros::NodeHandle *handle, bool simulation_only)
 
 ScoopingMain::~ScoopingMain() {
     this->status_watcher->join();
-    delete left_cardsflow;
-    delete right_cardsflow;
+    delete cardsflow;
     delete left_hand;
     delete right_hand;
 
     delete ice_box;
-
 }
 
 void ScoopingMain::watch_status() {
@@ -86,12 +83,12 @@ bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> f
     ROS_INFO_STREAM(ss.str());
 
     this->active_arm = &right_arm;
-    ROS_INFO("Mvoing to start point for scooping");
+    ROS_INFO("Moving to start point for scooping");
     bool successful = this->approach_scoop_point(start);
     if (successful) {
         ROS_INFO("Movement to the start point was successful :)");
         ROS_INFO("Performing the scoop");
-        successful &= this->perform_scoop(end);
+        successful &= this->perform_scoop();
     }
 
     if (successful) {
@@ -99,6 +96,14 @@ bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> f
         successful &= this->depart_from_scoop();
     }
 
+    ROS_INFO("Going home");
+    successful &= right_arm.goHome();
+
+    if (successful) {
+        ROS_INFO("Scooping done without error");
+    } else {
+        ROS_ERROR("Scooping finished with error");
+    }
     finish_cb(successful);
     return successful;
 }
@@ -157,18 +162,36 @@ bool ScoopingMain::approach_scoop_point(geometry_msgs::Point scoop_point) {
     wristConstraint.tolerance_above = 3.14/2;
     wristConstraint.weight = 1.0;
     constraints.joint_constraints.push_back(wristConstraint);
-
+    right_arm.setPlanningTime(10.0);
     return right_arm.moveToPose(scooping_start, constraints);
-
 }
 
-bool ScoopingMain::perform_scoop(geometry_msgs::Point end_point) {
-    ROS_WARN("Perform scoop not yet implemented");
-    return true;
+bool ScoopingMain::perform_scoop() {
+    right_arm.setPlanningTime(1.0);
+    return right_arm.moveJoint("wrist_right", -0.5);
 }
 
-bool ScoopingMain::depart_from_scoop() {
-    ROS_WARN("Depart from scoop motion not yet implemented");
+bool ScoopingMain::depart_from_scoop(geometry_msgs::Point point_above_cup) {
+    right_arm.setPlanningTime(5.0);
+    Pose hold_scoop_pose;
+    moveit_msgs::JointConstraint wristConstraint;  
+    bool correct_scooper = false;
+
+    wristConstraint.joint_name = "wrist_right";
+    wristConstraint.position = 0.;
+    wristConstraint.tolerance_below = .1;
+    wristConstraint.tolerance_above = .1;
+    wristConstraint.weight = 1.0;
+    
+    // Wrist right go to zero and then it should nevere move again
+    // We should add the box as a constrain
+    correct_scooper = right_arm.moveToPose(hold_scoop_pose, wristConstraint);
+
+    if (!correct_scooper){
+        ROS_INFO("Scooper could spill icecream");
+    }
+
+    ROS_INFO("Making sure the wrest is has the correct oriantation");
     return true;
 }
 
