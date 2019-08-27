@@ -17,5 +17,7 @@ RUN cd CARDSflow/robots && git checkout hackathon
 RUN cd CARDSflow/iDynTree && mkdir build && cd build && cmake .. && make -j9 && make install
 RUN cd CARDSflow/qpOASES && mkdir build && cd build && cmake .. && make -j9 install
 
-RUN apt install -y ros-melodic-moveit
+RUN apt install --yes --force-yes ros-melodic-moveit
+RUN apt install --yes --force-yes ros-$ROS_DISTRO-moveit-visual-tools ros-$ROS_DISTRO-gazebo-pugins
+
 RUN cd .. && catkin_make
