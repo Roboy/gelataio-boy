@@ -14,7 +14,6 @@ from roboy_cognition_msgs.msg import *
 
 from roboy_control_msgs.srv import TranslationalPTPMotion
 from geometry_msgs.msg import Point
-
 import numpy as np
 
 # First one is left box, second one is right box
@@ -37,16 +36,17 @@ class ScoopServer:
     self.scooping_human_status_ = 'Did not receive any ice cream order yet!'
     
     # Status as recived from scooping_planning/scoop
-    self.scooping_status_ = 'NULL'
+    self.scooping_status_ = String
 
     callback_lambda = lambda x: self.ReceiveIceCreamOrder_(x)
-    self.server_ = actionlib.SimpleActionServer('luigi_scoop', OrderIceCreamAction, self.ReceiveIceCreamOrder_, auto_start=False)
+    self.server_ = actionlib.SimpleActionServer('luigi_scoop', OrderIceCreamAction, callback_lambda, auto_start=False)
     self.server_.start()
 
-  # Callback for sub of topic "scooping_planning/status"
+    # Scooping callback lamda
+    self.scooping_callback_lambda_ = lambda x: self.ScoopStatusCallback(x)
+
   def ScoopStatusCallback(self, scooping_status):
     self.scooping_status_ = scooping_status
-    print(scooping_status)
 
   # Arguments are of Pose type
   def TranslationalPTPMotionClient(self, startPosition, endPosition):
@@ -99,7 +99,7 @@ class ScoopServer:
     # flavors for each "scoops" ordered, not scoop :D
     flavors = data.flavors
 
-    self.scooping_human_status_ = 'Recived a new ice cream order'
+    self.scooping_human_status_ = 'Received a new ice cream order'
     # intially no scoops has been scooped
     for i in scoops:
       self._feedback.finished_scoops.append(0)
@@ -177,6 +177,11 @@ class ScoopServer:
         #   # call scooping service with the points
         #   #
 
+    if success:
+      self._result.success = True
+      self._result.error_message = self.scooping_human_status_
+      self.server_.set_succeeded(self._result)      
+
     # Send result
     if not success:
       self._result.success = False
@@ -197,7 +202,7 @@ if __name__ == '__main__':
   rospy.init_node('luigi_scoop_server')
   server = ScoopServer()
   try:
-    rospy.Subscriber("scooping_planning/status", String, server.ScoopStatusCallback, 1)
+    rospy.Subscriber("scooping_planning/status", String, server.ScoopStatusCallback)
   except KeyboardInterrupt, e:
     pass
 
