@@ -29,9 +29,6 @@
   </include>
 
   <!-- Run Rviz and load the default config to see the state of the move_group node -->
-  <include if="$(arg rviz)" file="$(find moveit_icecream_roboy)/launch/moveit_rviz.launch">
-    <arg name="config" value="true"/>
-    <arg name="debug" value="$(arg debug)"/>
-  </include>
+  <node type="rviz" name="rviz" pkg="rviz" />
 
 </launch>

@@ -141,11 +141,11 @@ class ScoopServer:
 
           # Wait for scooping_planning/status to be idle
           while not self.scooping_status_ == 'IDLE':
-            self.scooping_human_status_ = self.scooping_status_ + ' need more time'
+            self.scooping_human_status_ = self.scooping_status_.data + ' need more time'
             rospy.sleep(1.)
 
           # If not IDLE, update scooping status
-          self.scooping_human_status_ = self.scooping_status_ + ' in step ' + str(i) + ' out of 5'
+          self.scooping_human_status_ = self.scooping_status_.data + ' in step ' + str(i) + ' out of 5'
 
 
           # Now for step 2 and 3
