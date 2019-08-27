@@ -47,7 +47,6 @@ class ScoopServer:
 
   def ScoopStatusCallback(self, scooping_status):
     self.scooping_status_ = scooping_status
-    print(scooping_status)
 
   # Arguments are of Pose type
   def TranslationalPTPMotionClient(self, startPosition, endPosition):
