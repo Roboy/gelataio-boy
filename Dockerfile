@@ -24,4 +24,3 @@ RUN apt install --yes --force-yes ros-melodic-moveit
 RUN apt install --yes --force-yes ros-$ROS_DISTRO-moveit-visual-tools ros-$ROS_DISTRO-gazebo-plugins
 
 RUN source /opt/ros/melodic/setup.bash && cd .. && catkin_make
-RUN source 
