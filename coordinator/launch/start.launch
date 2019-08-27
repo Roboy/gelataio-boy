@@ -1,5 +1,7 @@
 <launch>
 
+  <arg name="rviz" default="true" />
+  <arg name="debug" default="false" />
 
 <!-- without this the action server will give you an exception because it is sending the feedback to no where -->
   <node name="fake_luigi_client" pkg="coordinator" type="fake_luigi_client.py" respawn="false" output="screen">
@@ -23,6 +25,12 @@
   </include>
 
   <include file="$(find moveit_icecream_roboy)/launch/move_group.launch">
+  </include>
+
+  <!-- Run Rviz and load the default config to see the state of the move_group node -->
+  <include if="$(arg rviz)" file="$(find moveit_icecream_roboy)/launch/moveit_rviz.launch">
+    <arg name="config" value="true"/>
+    <arg name="debug" value="$(arg debug)"/>
   </include>
 
 </launch>
