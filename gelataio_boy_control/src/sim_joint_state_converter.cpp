@@ -4,7 +4,6 @@
 
 #include <iostream>
 #include <ros/ros.h>
-#include <roboy_simulation_msgs/JointState.h>
 #include <sensor_msgs/JointState.h>
 
 using namespace std;
@@ -12,13 +11,8 @@ using namespace std;
 static ros::Publisher pub;
 static vector<string> joint_names;
 
-void jointStateCallback(const roboy_simulation_msgs::JointState &state) {
-    sensor_msgs::JointState s;
-    for (int i = 0; i < state.names.size(); i++) {
-        s.name.push_back(state.names[i]);
-        s.position.push_back(state.q[i]);
-        s.velocity.push_back(state.qd[i]);
-    }
+void jointStateCallback(const sensor_msgs::JointState &state) {
+    sensor_msgs::JointState s = state;
     for (int i = 0; i < 3; i++) {
         stringstream ss; ss << "scooper_dummy_joint" << i;
         s.name.push_back(ss.str());
@@ -36,7 +30,7 @@ int main(int argc, char **argv) {
     ros::NodeHandle nh;
 
     if (ros::param::has("joint_names")) {
-        auto sub = nh.subscribe("/joint_state", 10, jointStateCallback);
+        auto sub = nh.subscribe("/cardsflow_joint_states", 10, jointStateCallback);
         pub = nh.advertise<sensor_msgs::JointState>("/joint_states", 10);
 
         ros::param::get("joint_names", joint_names);
