@@ -40,7 +40,7 @@ class ScoopServer:
     self.scooping_status_ = 'NULL'
 
     callback_lambda = lambda x: self.ReceiveIceCreamOrder_(x)
-    self.server_ = actionlib.SimpleActionServer('luigi_scoop', OrderIceCreamAction, self.ReceiveIceCreamOrder_, auto_start=False)
+    self.server_ = actionlib.SimpleActionServer('luigi_scoop', OrderIceCreamAction, callback_lambda, auto_start=False)
     self.server_.start()
 
   # Callback for sub of topic "scooping_planning/status"
@@ -176,6 +176,11 @@ class ScoopServer:
      
         #   # call scooping service with the points
         #   #
+
+    if success:
+      self._result.success = True
+      self._result.error_message = self.scooping_human_status_
+      self.server_.set_succeeded(self._result)      
 
     # Send result
     if not success:
