@@ -136,10 +136,6 @@ void ScoopingMain::createObstacles() {
     ice_box->operation = ice_box->ADD;
 }
 
-bool ScoopingMain::drop_ice(Point destination) {
-    ROS_ERROR("Not implemented.");
-}
-
 bool ScoopingMain::approach_scoop_point(geometry_msgs::Point scoop_point) {
     Pose scooping_start;
 
@@ -171,9 +167,39 @@ bool ScoopingMain::perform_scoop() {
     return right_arm.moveJoint("wrist_right", -0.5);
 }
 
-bool ScoopingMain::depart_from_scoop() {
-    right_arm.setPlanningTime(5.0);
-    ROS_WARN("Depart from scoop motion not yet implemented");
-    return true;
+bool ScoopingMain::drop_ice() {
+    return right_arm.moveJoint("wrist_right", 1.0);
 }
 
+bool ScoopingMain::depart_from_scoop(geometry_msgs::Point point_above_cup) {
+    right_arm.setPlanningTime(5.0);
+    Pose hold_scoop_pose;
+    hold_scoop_pose.position = point_above_cup;
+    moveit_msgs::JointConstraint wristConstraint;
+    bool scooper_hold = false;
+    bool drop_success = false;
+
+    wristConstraint.joint_name = "wrist_right";
+    wristConstraint.position = 0.;
+    wristConstraint.tolerance_below = .1;
+    wristConstraint.tolerance_above = .1;
+    wristConstraint.weight = 1.0;
+    
+    // Wrist right go to zero and then it should nevere move again
+    // We should add the box as a constrain
+    scooper_hold = right_arm.moveToPose(hold_scoop_pose, wristConstraint);
+
+    if (!scooper_hold){
+        ROS_ERROR("Scooper could spill icecream");
+        return false;
+    }
+
+    drop_success = drop_ice();
+
+    if (!drop_success){
+        ROS_ERROR("Could not frop icecream");
+        return false;
+    }
+
+    return true;
+}
