@@ -4,7 +4,7 @@ import numpy as np
 CHOCOLATE_MIN = np.array([10,0,0])
 CHOCOLATE_MAX = np.array([20,200,150])
 
-LEMON_MIN = np.array([22,60,0])
+LEMON_MIN = np.array([20,0,0])
 LEMON_MAX = np.array([37,255,255])
 
 class ColorFilter:
