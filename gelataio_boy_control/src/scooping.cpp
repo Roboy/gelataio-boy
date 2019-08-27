@@ -18,14 +18,13 @@ ScoopingMain::ScoopingMain(ros::NodeHandle *handle, bool simulation_only)
         right_hand = new DummyHand("right hand");
         right_arm.setHandInterface(right_hand);
     } else { // Execution on Hardware
-        left_cardsflow = new CardsflowPlanExecutor("left", handle);
+        cardsflow = new CardsflowPlanExecutor(handle);
         left_hand = new DummyHand("left hand");
-        left_arm.addPlanExecutor(left_cardsflow);
+        left_arm.addPlanExecutor(cardsflow);
         left_arm.setHandInterface(left_hand);
 
-        right_cardsflow = new CardsflowPlanExecutor("right", handle);
         right_hand = new DummyHand("right hand");
-        right_arm.addPlanExecutor(right_cardsflow);
+        right_arm.addPlanExecutor(cardsflow);
         right_arm.setHandInterface(right_hand);
     }
 
@@ -38,8 +37,7 @@ ScoopingMain::ScoopingMain(ros::NodeHandle *handle, bool simulation_only)
 
 ScoopingMain::~ScoopingMain() {
     this->status_watcher->join();
-    delete left_cardsflow;
-    delete right_cardsflow;
+    delete cardsflow;
     delete left_hand;
     delete right_hand;
 
