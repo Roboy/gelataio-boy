@@ -93,7 +93,9 @@ bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> f
 
     if (successful) {
         ROS_INFO("Departing from the scoop stage");
-        successful &= this->depart_from_scoop();
+        geometry_msgs::Point point_above_cup;
+        ROS_WARN("Right now, we were supposed to get this from the Rufan CV code");
+        successful &= this->depart_from_scoop(point_above_cup);
     }
 
     ROS_INFO("Going home");
@@ -168,7 +170,7 @@ bool ScoopingMain::perform_scoop() {
 }
 
 bool ScoopingMain::drop_ice() {
-    return right_arm.moveJoint("wrist_right", 1.0);
+    return right_arm.moveJoint("wrist_right", 0.87);
 }
 
 bool ScoopingMain::depart_from_scoop(geometry_msgs::Point point_above_cup) {
@@ -176,28 +178,31 @@ bool ScoopingMain::depart_from_scoop(geometry_msgs::Point point_above_cup) {
     Pose hold_scoop_pose;
     hold_scoop_pose.position = point_above_cup;
     moveit_msgs::JointConstraint wristConstraint;
+    moveit_msgs::Constraints constraints;
     bool scooper_hold = false;
     bool drop_success = false;
 
     wristConstraint.joint_name = "wrist_right";
-    wristConstraint.position = 0.;
+    wristConstraint.position = 0.01;
     wristConstraint.tolerance_below = .1;
     wristConstraint.tolerance_above = .1;
     wristConstraint.weight = 1.0;
+
+    constraints.joint_constraints.push_back(wristConstraint);
     
     // Wrist right go to zero and then it should nevere move again
     // We should add the box as a constrain
-    scooper_hold = right_arm.moveToPose(hold_scoop_pose, wristConstraint);
+    scooper_hold = right_arm.moveToPose(hold_scoop_pose, constraints);
 
     if (!scooper_hold){
         ROS_ERROR("Scooper could spill icecream");
         return false;
     }
 
-    drop_success = drop_ice();
+    drop_success = this->drop_ice();
 
     if (!drop_success){
-        ROS_ERROR("Could not frop icecream");
+        ROS_ERROR("Could not drop icecream");
         return false;
     }
 
