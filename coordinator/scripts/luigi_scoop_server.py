@@ -99,7 +99,7 @@ class ScoopServer:
     # flavors for each "scoops" ordered, not scoop :D
     flavors = data.flavors
 
-    self.scooping_human_status_ = 'Recived a new ice cream order'
+    self.scooping_human_status_ = 'Received a new ice cream order'
     # intially no scoops has been scooped
     for i in scoops:
       self._feedback.finished_scoops.append(0)
