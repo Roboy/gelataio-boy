@@ -9,14 +9,13 @@
   </node>
   <node name="scooping_planning" pkg="gelataio_boy_control" type="scooping_planning" respawn="false" output="screen">
   </node>
-  <node name="sim_joint_state_converter" pkg="gelataio_boy_control" type="sim_joint_state_converter" respawn="false" output="screen">
-  </node>
 
   <!-- Load the URDF, SRDF and other .yaml configuration files on the param server -->
   <include file="$(find kindyn)/launch/robot.launch">
     <arg name="robot_name" value="roboy_icecream"/>
     <arg name="urdf_file_name" value="model.urdf"/>
     <arg name="simulated" value="false"/>
+    <arg name="external_robot_state" value="true"/>
   </include>
 
   <include file="$(find moveit_icecream_roboy)/launch/move_group.launch">
