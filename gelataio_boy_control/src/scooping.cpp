@@ -98,8 +98,8 @@ bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> f
         successful &= this->depart_from_scoop(point_above_cup);
     }
 
-    ROS_INFO("Going home");
-    successful &= right_arm.goHome();
+    // ROS_INFO("Going home");
+    // successful &= right_arm.goHome();
 
     if (successful) {
         ROS_INFO("Scooping done without error");
@@ -174,7 +174,7 @@ bool ScoopingMain::drop_ice() {
 }
 
 bool ScoopingMain::depart_from_scoop(geometry_msgs::Point point_above_cup) {
-    right_arm.setPlanningTime(5.0);
+    right_arm.setPlanningTime(15.0);
     Pose hold_scoop_pose;
     hold_scoop_pose.position = point_above_cup;
     moveit_msgs::JointConstraint wristConstraint;
