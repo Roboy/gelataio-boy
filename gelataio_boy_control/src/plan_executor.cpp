@@ -16,7 +16,6 @@ CardsflowPlanExecutor::CardsflowPlanExecutor(ros::NodeHandle *nh) {
 bool CardsflowPlanExecutor::executePlan(moveit::planning_interface::MoveGroupInterface::Plan &plan) {
     ROS_INFO("Moving robot using CARDSflow");
 
-    sensor_msgs::JointState targets;
 
     ros::Duration lastTime(0);
 
@@ -25,10 +24,12 @@ bool CardsflowPlanExecutor::executePlan(moveit::planning_interface::MoveGroupInt
         dt.sleep();
         lastTime = state.time_from_start;
 
+        sensor_msgs::JointState targets;
         for (int i = 0; i<plan.trajectory_.joint_trajectory.joint_names.size(); i++) {
             std::string name = plan.trajectory_.joint_trajectory.joint_names[i];
             if (std::find(ignored_joints.begin(), ignored_joints.end(), name) != ignored_joints.end()) continue;
 
+            targets.name.push_back(name);
             targets.position.push_back(state.positions[i]);
             targets.velocity.push_back(state.velocities[i]);
         }
