@@ -3,7 +3,6 @@
 import triad_openvr
 import time
 import rospy
-import tf
 import numpy as np
 import math
 from pyquaternion import Quaternion
