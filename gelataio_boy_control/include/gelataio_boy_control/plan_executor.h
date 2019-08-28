@@ -19,6 +19,7 @@ public:
 
 private:
     ros::Publisher joint_target_pub;
+    std::vector<std::string> ignored_joints;
 };
 
 #endif //SRC_PLAN_EXECUTOR_H
