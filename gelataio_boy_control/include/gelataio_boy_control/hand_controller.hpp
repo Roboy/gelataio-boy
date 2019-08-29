@@ -105,6 +105,23 @@ public:
     void setPlanningTime(double time) {this->planning_time = time;}
 
     /**
+     * Set the Pose reference frame to which the hand moves in refrence to
+     * @param pose reference frame
+     */
+    void setPoseReferenceFrame(const std::string& reference_frame){
+        this->m_move_group_ptr->setPoseReferenceFrame(reference_frame);}
+
+    /**
+     * Resets the pose reference frame to the torso frame
+     */
+    void resetPoseReferenceFrame(){this->m_move_group_ptr->setPoseReferenceFrame("torso");}
+
+    /**
+     * Gets the current pose reference frame
+     */
+    std::string getPoseReferenceFrame(){return this->m_move_group_ptr->getPoseReferenceFrame();}
+
+    /**
      * Get the status of the hand controller
      * @return one of [IDLE, PLANNING, EXECUTING, ERROR]
      */

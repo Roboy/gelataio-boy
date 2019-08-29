@@ -97,11 +97,18 @@ bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> f
         this->point_above_cup.z = 0.25;
         ROS_INFO("Departing from the scoop stage");
 
+        // Change reference frame
+        ROS_WARN("Changing refrence pose frame!");
+        right_arm.setPoseReferenceFrame("bike_front");
+
         // TODO add a sub that will get this point from tracking (Rufan code)
+        // https://github.com/Roboy/gelataio-boy/issues/43
         ROS_WARN("Right now, we were supposed to get this from the Rufan CV code");
         successful &= this->depart_from_scoop(this->point_above_cup);
-    }
 
+        ROS_WARN("Reseting refrence pose frame!");
+        right_arm.resetPoseReferenceFrame();
+    }
 
     successful &= this->drop_ice();
 
