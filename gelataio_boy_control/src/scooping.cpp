@@ -116,7 +116,8 @@ bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> f
         ROS_INFO("Dropping Icecream scoop");
     }
 
-    // ROS_INFO("Going home");
+    // TODO
+    // https://github.com/Roboy/gelataio-boy/issues/41
     // successful &= right_arm.goHome();
 
     if (successful) {
