@@ -5,14 +5,12 @@
   <arg name="luigi_is_fake" default="true" />
 
 <!-- without this the action server will give you an exception because it is sending the feedback to no where -->
-  <node if="$(arg luigi_is_fake)" name="fake_luigi_client" pkg="coordinator" type="fake_luigi_client.py" respawn="false" output="screen">
-  </node>
+  <node if="$(arg luigi_is_fake)" name="fake_luigi_client" pkg="coordinator" type="fake_luigi_client.py" respawn="false" output="screen"/>
 
   <!-- recives the orderes from the lugig and send point to scooping -->
-  <node name="luigi_scoop_server" pkg="coordinator" type="luigi_scoop_server.py" respawn="false" output="screen">
-  </node>
-  <node name="scooping_planning" pkg="gelataio_boy_control" type="scooping_planning" respawn="false" output="screen">
-  </node>
+  <node name="luigi_scoop_server" pkg="coordinator" type="luigi_scoop_server.py" respawn="false" output="screen"/>
+  <node name="scooping_planning" pkg="gelataio_boy_control" type="scooping_planning" respawn="false" output="screen"/>
+  <node name="joint_info_collector" pkg="gelataio_boy_control" type="joint_info_collector" respawn="false" output="screen"/>
 
   <!-- Load the URDF, SRDF and other .yaml configuration files on the param server -->
   <include file="$(find kindyn)/launch/robot.launch">
@@ -23,12 +21,6 @@
   </include>
 
   <include file="$(find moveit_icecream_roboy)/launch/move_group.launch">
-  </include>
-
-  <!-- Run Rviz and load the default config to see the state of the move_group node -->
-  <include file="$(find moveit_icecream_roboy)/launch/moveit_rviz.launch">
-    <arg name="config" value="true"/>
-    <arg name="debug" value="$(arg debug)"/>
   </include>
 
   <!-- Run Rviz and load the default config to see the state of the move_group node -->
