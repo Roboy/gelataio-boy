@@ -26,7 +26,7 @@ def segment(orig, K=4, ret_labels=True):
 	img = np.reshape(img, (nrow,ncol,nchannel))
 	return img
 
-class PointsDetector:
+class PointDetector:
 	
 	def __init__(self):
 		
@@ -87,7 +87,7 @@ class PointsDetector:
 
 		return np.array(points)
 
-	def pixcnt2pc(self, mask):
+	def pixcnt2pc(self, mask, point_cloud):
 
 		cimg = np.zeros_like(mask)
 		contours, hieararchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
@@ -96,7 +96,7 @@ class PointsDetector:
 			c = max(contours, key=cv2.contourArea)
 			cv2.drawContours(cimg,[c],0,color=255,thickness=-1)
 			box = np.int0(cv2.boxPoints(cv2.minAreaRect(c)))
-			return self.pixel2pc(cimg)
+			return self.pixel2pc(cimg, point_cloud)
 		else:
 			return np.array(list())
 
@@ -118,7 +118,7 @@ class PointsDetector:
 			c = Counter(centers)
 			centroid = c.most_common(1)[0][0]
 			new_mask = np.uint8(255*(labels == centroid))
-			pts, new_img, box = ic.pixcnt2pc(new_mask)
+			pts = ic.pixcnt2pc(new_mask, royale_pc)
 			return {success: True, message: pts}
 		else:
 			return {success: False, message: "No pixel survived filtering"}
