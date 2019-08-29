@@ -60,9 +60,6 @@ class ScoopServer:
       print "Service call failed: %s"%e
 
   def SendFeedbackLuigi(self, feedback):
-    for i in scoops:
-      self._feedback.finished_scoops.append(0)
-    self._feedback.status_message = 'This is feedback'
     # publish the feedback 
     self.server_.publish_feedback(self._feedback)
 
@@ -93,9 +90,6 @@ class ScoopServer:
     # Scoops required
     scoops = data.scoops
 
-    # Scoops done
-    scoopsScooped = np.zeros(len(scoops))
-
     # flavors for each "scoops" ordered, not scoop :D
     flavors = data.flavors
 
@@ -107,8 +101,6 @@ class ScoopServer:
     scoops = data.scoops
     flavors = data.flavors
 
-    r = rospy.Rate(1)
-
     # start executing the action
     # check that preempt has not been requested by the client
     if self.server_.is_preempt_requested():
@@ -118,6 +110,10 @@ class ScoopServer:
 
     # success of the total scoping operation
     success = True
+
+    # The rate by which we check the scooping status change
+    r = rospy.Rate(3) # 3hz
+
     # We try to scoop in just five points sequence
     for scoop in range(len(scoops)):
 
@@ -139,13 +135,14 @@ class ScoopServer:
           # Calculate new point
           # Send point to scooping_planning/scoop
 
+
           # Wait for scooping_planning/status to be idle
-          while not self.scooping_status_ == 'IDLE':
-            self.scooping_human_status_ = self.scooping_status_.data + ' need more time'
+          while not str(self.scooping_status_.data) == 'IDLE' and not rospy.is_shutdown():
+            self.scooping_human_status_ = str(self.scooping_status_.data) + ' need more time'
             rospy.sleep(1.)
 
           # If not IDLE, update scooping status
-          self.scooping_human_status_ = self.scooping_status_.data + ' in step ' + str(i) + ' out of 5'
+          self.scooping_human_status_ = str(self.scooping_status_.data) + ' in step ' + str(i) + ' out of 5'
 
 
           # Now for step 2 and 3
@@ -155,14 +152,18 @@ class ScoopServer:
             self.scooping_human_status_ = 'Failed to come up with a plan for step ' + str(i) + ' out of 5'
             success = False
 
+
+          # Has to sleep here because the rate we check for the scooping status is faster than
+          # the scooping status publish rate, now sleep rate is 3hz, scoop publish rate is 5hz
+          r.sleep()
+
           # Fill up self._feedback.scoops[] with 1s for every scoop scooped
 
-          # For now sdoneScooping_ is set manually by trial and error
+          # For now doneScooping_ is set manually by trial and error
           # Can vision confirm if the scoop has been filled? for now, No
           # while not self.doneScooping_:
           
-          # TODO: The scooper is on the top of the icecream box
-          # TODO: The scooper always starts at the top of the icecream box
+          # The scooper always starts at the top of the icecream box
 
           # Use a dummy matrix for now
           # Go to the highest point near the corner
@@ -174,8 +175,9 @@ class ScoopServer:
           #   for j in surface.shape[1]:
           #     print(surface[i][j])
      
-        #   # call scooping service with the points
-        #   #
+          #   # call scooping service with the points
+          #   #
+      self._feedback.finished_scoops[scoop] = 1
 
     if success:
       self._result.success = True
