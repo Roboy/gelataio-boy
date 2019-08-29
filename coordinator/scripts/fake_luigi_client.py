@@ -43,7 +43,7 @@ if __name__ == '__main__':
         # publish and subscribe over ROS.
         rospy.init_node('luigi_scoop_client')
         flavors = ['blue', 'red', 'spagitti lemon'] 
-        scoops = [1, 1, 8]
+        scoops = [1, 2, 1]
         result = luigi_scoop_client(flavors, scoops)
         print(result)
         # print("Result:", ', '.join([str(n) for n in result]))
