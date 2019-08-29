@@ -96,10 +96,6 @@ bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> f
         this->point_above_cup.y = -0.4;
         this->point_above_cup.z = 0.25;
         ROS_WARN("Before rotating the wrist_right");
-        ROS_WARN("Before rotating the wrist_right");
-        ROS_WARN("Before rotating the wrist_right");
-        ROS_WARN("Before rotating the wrist_right");
-        ROS_WARN("Before rotating the wrist_right");
         ROS_INFO("Departing from the scoop stage");
         ROS_WARN("Right now, we were supposed to get this from the Rufan CV code");
         successful &= this->depart_from_scoop(this->point_above_cup);
@@ -177,10 +173,6 @@ bool ScoopingMain::perform_scoop() {
 }
 
 bool ScoopingMain::drop_ice() {
-    ROS_WARN("Rotating the wrist_right");
-    ROS_WARN("Rotating the wrist_right");
-    ROS_WARN("Rotating the wrist_right");
-    ROS_WARN("Rotating the wrist_right");
     ROS_WARN("Rotating the wrist_right");
 
     return right_arm.moveJoint("wrist_right", 0.87);
