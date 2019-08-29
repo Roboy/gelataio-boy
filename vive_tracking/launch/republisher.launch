@@ -1,0 +1,6 @@
+<launch>
+
+  <node name="robot_state_republisher" pkg="vive_tracking" type="vr_puppet_republisher.py" respawn="false" output="screen">
+  </node>
+
+</launch>
