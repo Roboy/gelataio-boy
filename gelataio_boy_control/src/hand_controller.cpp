@@ -72,6 +72,14 @@ bool HandController::moveToPose(geometry_msgs::PoseStamped target_pose) {
     return this->planAndExecute();
 }
 
+bool HandController::moveToPose(geometry_msgs::Pose target_pose, const std::string &reference_frame) {
+    this->m_move_group_ptr->setPoseReferenceFrame(reference_frame);
+    this->m_move_group_ptr->setPoseTarget(target_pose);
+    this->m_move_group_ptr->setPoseReferenceFrame("torso");
+    
+    return this->planAndExecute();
+}
+
 bool HandController::moveToPose(geometry_msgs::Pose target_pose, moveit_msgs::Constraints &constraints) {
     std::stringstream ss;
     ss << "Target pose for moveIT planning: " << std::endl << target_pose << std::endl;
@@ -81,6 +89,24 @@ bool HandController::moveToPose(geometry_msgs::Pose target_pose, moveit_msgs::Co
     this->m_move_group_ptr->setPathConstraints(constraints);
     this->m_move_group_ptr->setPlanningTime(planning_time);
     return this->planAndExecute();
+}
+
+bool HandController::moveToPose(geometry_msgs::Pose target_pose, moveit_msgs::Constraints &constraints, 
+    const std::string &reference_frame) {
+    
+    bool result = false;
+    std::stringstream ss;
+    ss << "Target pose for moveIT planning: " << std::endl << target_pose << std::endl;
+    ROS_INFO_STREAM(ss.str());
+
+    this->m_move_group_ptr->setPoseReferenceFrame(reference_frame);
+    this->m_move_group_ptr->setPoseTarget(target_pose);
+    this->m_move_group_ptr->setPathConstraints(constraints);
+    this->m_move_group_ptr->setPlanningTime(planning_time);
+    result = this->planAndExecute();
+    this->m_move_group_ptr->setPoseReferenceFrame("torso");
+
+    return result;
 }
 
 bool HandController::moveToPoses(std::vector<geometry_msgs::Pose> &targets) {

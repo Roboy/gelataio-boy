@@ -92,22 +92,22 @@ bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> f
     }
 
     if (successful) {
-        this->point_above_cup.x = -0.1;
-        this->point_above_cup.y = -0.4;
-        this->point_above_cup.z = 0.25;
-        ROS_INFO("Departing from the scoop stage");
 
-        // Change reference frame
-        ROS_WARN("Changing refrence pose frame!");
-        right_arm.setPoseReferenceFrame("bike_front");
+        // Point in torso frame
+        this->point_above_cup.x = -0.1;
+        this->point_above_cup.y = -0.5;
+        this->point_above_cup.z = 0.4;
+
+        // from blender in bike frame
+        // this->point_above_cup.x = -0.5;
+        // this->point_above_cup.y = 0.4;
+        // this->point_above_cup.z = 0.2;
+        ROS_INFO("Departing from the scoop stage");
 
         // TODO add a sub that will get this point from tracking (Rufan code)
         // https://github.com/Roboy/gelataio-boy/issues/43
         ROS_WARN("Right now, we were supposed to get this from the Rufan CV code");
         successful &= this->depart_from_scoop(this->point_above_cup);
-
-        ROS_WARN("Reseting refrence pose frame!");
-        right_arm.resetPoseReferenceFrame();
     }
 
     successful &= this->drop_ice();
@@ -195,15 +195,15 @@ bool ScoopingMain::drop_ice() {
 }
 
 bool ScoopingMain::depart_from_scoop(geometry_msgs::Point point_above_cup) {
-    right_arm.setPlanningTime(15.0);
+    right_arm.setPlanningTime(25.0);
     Pose hold_scoop_pose;
     hold_scoop_pose.position = point_above_cup;
     moveit_msgs::JointConstraint wristConstraint;
     moveit_msgs::Constraints constraints;
     tf2::Quaternion q_start;
-    double roll = -20;
-    double pitch = 40;
-    double yaw = 45 + 90;
+    double roll = 0;
+    double pitch = 0;
+    double yaw = 90;
     bool scooper_hold = false;
 
     q_start.setRPY(roll/180*M_PI, pitch/180*M_PI, yaw/180*M_PI);
@@ -213,7 +213,7 @@ bool ScoopingMain::depart_from_scoop(geometry_msgs::Point point_above_cup) {
     hold_scoop_pose.orientation.w = q_start.w();
 
     wristConstraint.joint_name = "wrist_right";
-    wristConstraint.position = 0.01;
+    wristConstraint.position = -0.5;
     wristConstraint.tolerance_below = .1;
     wristConstraint.tolerance_above = .1;
     wristConstraint.weight = 1.0;
@@ -222,9 +222,13 @@ bool ScoopingMain::depart_from_scoop(geometry_msgs::Point point_above_cup) {
     
     ROS_INFO("Before departing");
 
+    // bike_front is used as the refrence frame for cup motion
     // Wrist right go to zero and then it should never move again
     // We should add the box as a constrain
+    // TODO: Move to the cup in the bikr front frame
+    // scooper_hold = right_arm.moveToPose(hold_scoop_pose, constraints, "bike_front");
     scooper_hold = right_arm.moveToPose(hold_scoop_pose, constraints);
+
 
     ROS_INFO("After departing");
 

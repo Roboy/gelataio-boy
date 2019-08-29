@@ -12,7 +12,7 @@ using namespace roboy_control_msgs;
 using namespace std;
 
 
-ScoopingROS::ScoopingROS(ros::NodeHandle *handle) : nh(handle), app(handle, false), busy(false), executor(nullptr) {
+ScoopingROS::ScoopingROS(ros::NodeHandle *handle) : nh(handle), app(handle, true), busy(false), executor(nullptr) {
 
 }
 

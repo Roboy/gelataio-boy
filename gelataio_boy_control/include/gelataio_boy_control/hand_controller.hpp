@@ -47,7 +47,7 @@ public:
      * @return true if successful
      */
     bool moveToOrientation(geometry_msgs::Quaternion target_orientation);
-
+    
     /**
      * Move to a pose.
      * @param target_pose   Target pose
@@ -55,7 +55,18 @@ public:
      */
     bool moveToPose(geometry_msgs::Pose target_pose);
 
+    /**
+     * Move to a pose.
+     * @param target_pose   Target pose
+     * @param pose reference frame
+     * @return true if successful
+     */
+    bool moveToPose(geometry_msgs::Pose target_pose, const std::string &reference_frame);
+
     bool moveToPose(geometry_msgs::Pose target_pose, moveit_msgs::Constraints &contraints);
+
+    bool moveToPose(geometry_msgs::Pose target_pose, moveit_msgs::Constraints &contraints,
+        const std::string &reference_frame);
 
     /**
      * Move to pose.
@@ -103,23 +114,6 @@ public:
     bool goHome();
 
     void setPlanningTime(double time) {this->planning_time = time;}
-
-    /**
-     * Set the Pose reference frame to which the hand moves in refrence to
-     * @param pose reference frame
-     */
-    void setPoseReferenceFrame(const std::string& reference_frame){
-        this->m_move_group_ptr->setPoseReferenceFrame(reference_frame);}
-
-    /**
-     * Resets the pose reference frame to the torso frame
-     */
-    void resetPoseReferenceFrame(){this->m_move_group_ptr->setPoseReferenceFrame("torso");}
-
-    /**
-     * Gets the current pose reference frame
-     */
-    std::string getPoseReferenceFrame(){return this->m_move_group_ptr->getPoseReferenceFrame();}
 
     /**
      * Get the status of the hand controller
