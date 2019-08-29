@@ -77,7 +77,7 @@ void ScoopingMain::defineEnvironment() {
 }
 
 bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> finish_cb) {
-//    this->defineEnvironment();
+    // this->defineEnvironment();
 
     stringstream ss; ss << "Current pose of right arm: " << endl << right_arm.getCurrentPose() << endl;
     ROS_INFO_STREAM(ss.str());
@@ -92,10 +92,17 @@ bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> f
     }
 
     if (successful) {
+        this->point_above_cup.x = -0.1;
+        this->point_above_cup.y = -0.4;
+        this->point_above_cup.z = 0.25;
+        ROS_WARN("Before rotating the wrist_right");
+        ROS_WARN("Before rotating the wrist_right");
+        ROS_WARN("Before rotating the wrist_right");
+        ROS_WARN("Before rotating the wrist_right");
+        ROS_WARN("Before rotating the wrist_right");
         ROS_INFO("Departing from the scoop stage");
-        geometry_msgs::Point point_above_cup;
         ROS_WARN("Right now, we were supposed to get this from the Rufan CV code");
-        successful &= this->depart_from_scoop(point_above_cup);
+        successful &= this->depart_from_scoop(this->point_above_cup);
     }
 
     // ROS_INFO("Going home");
@@ -170,6 +177,12 @@ bool ScoopingMain::perform_scoop() {
 }
 
 bool ScoopingMain::drop_ice() {
+    ROS_WARN("Rotating the wrist_right");
+    ROS_WARN("Rotating the wrist_right");
+    ROS_WARN("Rotating the wrist_right");
+    ROS_WARN("Rotating the wrist_right");
+    ROS_WARN("Rotating the wrist_right");
+
     return right_arm.moveJoint("wrist_right", 0.87);
 }
 
@@ -179,8 +192,18 @@ bool ScoopingMain::depart_from_scoop(geometry_msgs::Point point_above_cup) {
     hold_scoop_pose.position = point_above_cup;
     moveit_msgs::JointConstraint wristConstraint;
     moveit_msgs::Constraints constraints;
+    tf2::Quaternion q_start;
+    double roll = -20;
+    double pitch = 40;
+    double yaw = 45 + 90;
     bool scooper_hold = false;
     bool drop_success = false;
+
+    q_start.setRPY(roll/180*M_PI, pitch/180*M_PI, yaw/180*M_PI);
+    hold_scoop_pose.orientation.x = q_start.x();
+    hold_scoop_pose.orientation.y = q_start.y();
+    hold_scoop_pose.orientation.z = q_start.z();
+    hold_scoop_pose.orientation.w = q_start.w();
 
     wristConstraint.joint_name = "wrist_right";
     wristConstraint.position = 0.01;
@@ -190,9 +213,13 @@ bool ScoopingMain::depart_from_scoop(geometry_msgs::Point point_above_cup) {
 
     constraints.joint_constraints.push_back(wristConstraint);
     
+    ROS_ERROR("Before departing");
+
     // Wrist right go to zero and then it should nevere move again
     // We should add the box as a constrain
     scooper_hold = right_arm.moveToPose(hold_scoop_pose, constraints);
+
+    ROS_ERROR("After departing");
 
     if (!scooper_hold){
         ROS_ERROR("Scooper could spill icecream");

@@ -52,6 +52,7 @@ private:
 
     std::shared_ptr<std::thread> status_watcher;
 
+    geometry_msgs::Point point_above_cup;    
 
     //obstacles
     moveit_msgs::CollisionObject *ice_box;
