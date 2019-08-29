@@ -95,10 +95,18 @@ bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> f
         this->point_above_cup.x = -0.1;
         this->point_above_cup.y = -0.4;
         this->point_above_cup.z = 0.25;
-        ROS_WARN("Before rotating the wrist_right");
         ROS_INFO("Departing from the scoop stage");
+
+        // TODO add a sub that will get this point from tracking (Rufan code)
         ROS_WARN("Right now, we were supposed to get this from the Rufan CV code");
         successful &= this->depart_from_scoop(this->point_above_cup);
+    }
+
+
+    successful &= this->drop_ice();
+
+    if(successful){
+        ROS_INFO("Dropping Icecream scoop");
     }
 
     // ROS_INFO("Going home");
@@ -189,7 +197,6 @@ bool ScoopingMain::depart_from_scoop(geometry_msgs::Point point_above_cup) {
     double pitch = 40;
     double yaw = 45 + 90;
     bool scooper_hold = false;
-    bool drop_success = false;
 
     q_start.setRPY(roll/180*M_PI, pitch/180*M_PI, yaw/180*M_PI);
     hold_scoop_pose.orientation.x = q_start.x();
@@ -205,23 +212,16 @@ bool ScoopingMain::depart_from_scoop(geometry_msgs::Point point_above_cup) {
 
     constraints.joint_constraints.push_back(wristConstraint);
     
-    ROS_ERROR("Before departing");
+    ROS_INFO("Before departing");
 
-    // Wrist right go to zero and then it should nevere move again
+    // Wrist right go to zero and then it should never move again
     // We should add the box as a constrain
     scooper_hold = right_arm.moveToPose(hold_scoop_pose, constraints);
 
-    ROS_ERROR("After departing");
+    ROS_INFO("After departing");
 
     if (!scooper_hold){
-        ROS_ERROR("Scooper could spill icecream");
-        return false;
-    }
-
-    drop_success = this->drop_ice();
-
-    if (!drop_success){
-        ROS_ERROR("Could not drop icecream");
+        ROS_ERROR("Coudln't go to hold position");
         return false;
     }
 
