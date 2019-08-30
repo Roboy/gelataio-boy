@@ -1,4 +1,4 @@
-#!/usr/bin/env
+#!/usr/bin/env python3
 
 import triad_openvr
 import rospy
@@ -40,7 +40,8 @@ def rotationMatrixToEulerAngles(R) :
     return np.array([x, y, z])
 
 
-def process_transform(device_name, pose ):
+
+def get_quarterion(device_name, pose):
     try:
         pose = v.devices[device_name].get_pose_quaternion()
     except:
@@ -49,18 +50,15 @@ def process_transform(device_name, pose ):
     q_tracker = Quaternion(pose[6],pose[3],pose[4],pose[5])                 #*q_init1.inverse
     return q_tracker
 
-def _get_instance_eulers(initial_pose1, initial_pose2):
-    q_tracker_1 = process_transform("tracker_2", initial_pose1)
-    q_tracker_2 = process_transform("tracker_3", initial_pose2)
-    #q_tracker_3 = process_transform("tracker_3", initial_pose3)
+def _get_euler_angles_difference(tracker_1_name, tracker_2_name, tracker_1_pose, tracker_2_pose):
+    q_tracker_1 = get_quarterion(tracker_1_name, tracker_1_pose)
+    q_tracker_2 = get_quarterion(tracker_2_name, tracker_2_pose)
 
-    q_tracker_diff_12 = q_tracker_2*q_tracker_1.inverse
-    #q_tracker_diff_23 = q_tracker_3*q_tracker_2.inverse
+    q_tracker_diff = q_tracker_2*q_tracker_1.inverse
 
-    euler_12 = rotationMatrixToEulerAngles(q_tracker_diff_12.rotation_matrix)
-    #euler_23 = rotationMatrixToEulerAngles(q_tracker_diff_23.rotation_matrix)
+    euler_angles = rotationMatrixToEulerAngles(q_tracker_diff.rotation_matrix)
 
-    return euler_12#, euler_23
+    return euler_angles
 
 
 if __name__ == "__main__":
@@ -68,40 +66,50 @@ if __name__ == "__main__":
     head = False
     shoulder_left = True
 
+    torso_tracker_name = "tracker_2"
+    shoulder_tracker_name = "tracker_3"
+
     v = triad_openvr.triad_openvr()
     v.print_discovered_objects()
 
 
     #values for cardsflow
-
     relaxed_values = [0, 0, 0]
     side_values = [0.0, -1.57, 0.0]
     front_values = [-1.57, 0, -1.57]
     fist_up_values = [0.0, -1.57, 1.57]
-    arm_up_values =
+    arm_up_values = [0.0, -3.14, 1.57]
 
     input("Relax your arm, put it down parallel to your torso with the palm facing towards you")
 
-    initial_pose1 = v.devices["tracker_2"].get_pose_quaternion()
-    initial_pose2 = v.devices["tracker_3"].get_pose_quaternion()
+    initial_pose_torso = v.devices["tracker_2"].get_pose_quaternion()
+    initial_pose_shoulder = v.devices["tracker_3"].get_pose_quaternion()
     #initial_pose3 = v.devices["tracker_3"].get_pose_quaternion()
 
     input("Point your right arm to the right, orthogonal to your body and bend your elbow so your hand points in front of you")
 
-    euler_side_12 = _get_instance_eulers(initial_pose1, initial_pose2)
+    euler_side_12 = _get_euler_angles_difference(torso_tracker_name, shoulder_tracker_name, initial_pose_torso, initial_pose_shoulder)
 
     input("Point your right arm to the right, orthogonal to your body and bend your elbow so your hand points up")
 
-    euler_fist_up_12 = _get_instance_eulers(initial_pose1, initial_pose2)
+    euler_fist_up_12 = _get_euler_angles_difference(torso_tracker_name, shoulder_tracker_name, initial_pose_torso, initial_pose_shoulder)
+
+    input("Point your right arm upwards, parallel to your body and bend your elbow so your hand points left")
+
+    euler_arm_up_12 = _get_euler_angles_difference(torso_tracker_name, shoulder_tracker_name, initial_pose_torso, initial_pose_shoulder)
 
     input("Point your right arm infront of you, orthogonal to your body and parallel to the ground, and bend your elbow so your hand points left")
 
-    euler_front_12 = _get_instance_eulers(initial_pose1, initial_pose2)
+    euler_front_12 = _get_euler_angles_difference(torso_tracker_name, shoulder_tracker_name, initial_pose_torso, initial_pose_shoulder)
+    
+    input("Relax your arm, put it down parallel to your torso with the palm facing towards you")
+
+    euler_relaxed_12 = _get_euler_angles_difference(torso_tracker_name, shoulder_tracker_name, initial_pose_torso, initial_pose_shoulder)
 
     reg_shoulder = linear_model.LinearRegression()
-    reg_shoulder.fit([[0,0,0], euler_side_12, euler_fist_up_12, euler_front_12], [relaxed_values, side_values, fist_up_values, front_values])
+    reg_shoulder.fit([euler_relaxed_12, euler_side_12, euler_fist_up_12, euler_front_12, euler_arm_up_12], [relaxed_values, side_values, fist_up_values, front_values, arm_up_values])
 
-      
+
     #reg_elbow = linear_model.LinearRegression()
     #eg_elbow.fit([euler_front_23, euler_bend_23], [0, 1.57])
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env
+#!/usr/bin/env python3
 
 import triad_openvr
 import time
@@ -41,7 +41,8 @@ def rotationMatrixToEulerAngles(R) :
     return np.array([x, y, z])
 
 
-def process_transform(device_name, pose ):
+
+def get_quarterion(device_name, pose):
     try:
         pose = v.devices[device_name].get_pose_quaternion()
     except:
@@ -50,23 +51,21 @@ def process_transform(device_name, pose ):
     q_tracker = Quaternion(pose[6],pose[3],pose[4],pose[5])                 #*q_init1.inverse
     return q_tracker
 
-def _get_instance_eulers(initial_pose1, initial_pose2):
-    q_tracker_1 = process_transform("tracker_2", initial_pose1)
-    q_tracker_2 = process_transform("tracker_3", initial_pose2)
-    #q_tracker_3 = process_transform("tracker_3", initial_pose3)
+def _get_euler_angles_difference(tracker_1_name, tracker_2_name, tracker_1_pose, tracker_2_pose):
+    q_tracker_1 = get_quarterion(tracker_1_name, tracker_1_pose)
+    q_tracker_2 = get_quarterion(tracker_2_name, tracker_2_pose)
 
-    q_tracker_diff_12 = q_tracker_2*q_tracker_1.inverse
-    #q_tracker_diff_23 = q_tracker_3*q_tracker_2.inverse
+    q_tracker_diff = q_tracker_2*q_tracker_1.inverse
 
-    euler_12 = rotationMatrixToEulerAngles(q_tracker_diff_12.rotation_matrix)
-    #euler_23 = rotationMatrixToEulerAngles(q_tracker_diff_23.rotation_matrix)
+    euler_angles = rotationMatrixToEulerAngles(q_tracker_diff.rotation_matrix)
 
-    return euler_12#, euler_23
+    return euler_angles
 
 if __name__ == "__main__":
     # use these to change publishing behaviour
-    head = False
-    shoulder_left = True
+    torso_tracker_name = "tracker_2"
+    shoulder_tracker_name = "tracker_3"
+
 
     coefficients = []
     csvfile =  open('calibration.csv', 'r')
@@ -80,34 +79,21 @@ if __name__ == "__main__":
     v = triad_openvr.triad_openvr()
     v.print_discovered_objects()
 
-    interval = 1/10
 
-    initial_pose1 = v.devices["tracker_2"].get_pose_quaternion()
-    initial_pose2 = v.devices["tracker_3"].get_pose_quaternion()
-    #initial_pose3 = v.devices["tracker_3"].get_pose_quaternion()
+    initial_pose_torso = v.devices[torso_tracker_name].get_pose_quaternion()
+    initial_pose_shoulder = v.devices[shoulder_tracker_name].get_pose_quaternion()
 
-
-
-    shoulder_right_axis0_publisher = rospy.Publisher('/shoulder_right_axis0/shoulder_right_axis0/target', std_msgs.msg.Float32 , queue_size=1)
-    shoulder_right_axis1_publisher = rospy.Publisher('/shoulder_right_axis1/shoulder_right_axis1/target', std_msgs.msg.Float32 , queue_size=1)
-    shoulder_right_axis2_publisher = rospy.Publisher('/shoulder_right_axis2/shoulder_right_axis2/target', std_msgs.msg.Float32 , queue_size=1)
     joint_target_publisher = rospy.Publisher('/joint_targets', JointState, queue_size=1)
 
 
-#elbow_right_publisher = rospy.Publisher('elbow_right/elbow_right/target', std_msgs.msg.Float32 , queue_size=1)
+    #elbow_right_publisher = rospy.Publisher('elbow_right/elbow_right/target', std_msgs.msg.Float32 , queue_size=1)
 
 
     while not rospy.is_shutdown():
         start = time.time()
 
-        euler_12 = _get_instance_eulers(initial_pose1, initial_pose2)
+        euler_12 = _get_euler_angles_difference(torso_tracker_name, shoulder_tracker_name, initial_pose_torso, initial_pose_shoulder)
 
-        """
-        msg = sensor_msgs.msg.JointState()
-        msg.header = std_msgs.msg.Header()
-        msg.header.stamp = rospy.Time.now()
-        msg.name = ['sphere_axis0', 'sphere_axis1', 'sphere_axis2']
-        """
 
 
         print ("Shoulder angles: ", euler_12)
