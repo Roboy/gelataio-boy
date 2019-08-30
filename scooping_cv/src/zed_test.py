@@ -4,18 +4,12 @@ import rospy
 import math
 import cv2
 import numpy as np
-from std_msgs.msg import String, Float32
+
 from sensor_msgs.msg import Image, PointCloud2
 from cv_bridge import CvBridge, CvBridgeError
 import struct
 from math import isnan
-#from color_filter import ColorFilter
-#LOW_COLOR = np.array([4, 68, 0])
-#HI_COLOR = np.array([14, 160, 255])
-#LOW_COLOR = np.array([13,0,0])
-#HI_COLOR = np.array([24,110,255])
-#LOW_COLOR = np.array([110,30,80])
-#HI_COLOR = np.array([126,109,255])
+
 LOW_COLOR = np.array([101,25,0])
 HI_COLOR = np.array([115,83,255])
  
