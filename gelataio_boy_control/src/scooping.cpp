@@ -119,9 +119,9 @@ bool ScoopingMain::go_home(std::function<void(bool)> finish_cb) {
     successful &= right_arm.goHome();
 
     if (successful) {
-        ROS_INFO("Scooping done without error");
+        ROS_INFO("Succesfully went home.");
     } else {
-        ROS_ERROR("Scooping finished with error");
+        ROS_ERROR("Couldn't go home.");
     }
     finish_cb(successful);
     return successful;
