@@ -12,6 +12,7 @@ class PointDetector:
 		"Chocolate": np.array([[11,0,0],[35,180,255]])
 		}
 
+	@staticmethod
 	def _segment(orig, K=4, ret_labels=True):
 		nrow, ncol, nchannel = orig.shape
 		
@@ -37,6 +38,7 @@ class PointDetector:
 
 		return img
 
+	@staticmethod
 	def _color_filter(image, low_color, high_color, ret_mask=True):
 		frame=cv2.GaussianBlur(image,(5,5),0)
 	
@@ -60,6 +62,7 @@ class PointDetector:
 		else:
 			return []
 	
+	@staticmethod
 	def _pixel2pc(mask, point_cloud):
 		
 		points = list()
@@ -79,6 +82,7 @@ class PointDetector:
 
 		return np.array(points)
 
+	@staticmethod
 	def _pixcnt2pc(mask, point_cloud):
 
 		cimg = np.zeros_like(mask)
@@ -91,7 +95,8 @@ class PointDetector:
 			return PointDetector._pixel2pc(cimg, point_cloud)
 		else:
 			return np.array(list())
-
+	
+	@staticmethod
 	def detect(zed_rgb, royale_depth, royale_pc, flavor):
 
 		if not flavor in PointDetector.flavor_color_map.keys():
@@ -109,7 +114,7 @@ class PointDetector:
 		warped_rgb = cv2.warpPerspective(zed_rgb, M, (dim_y, dim_x))
 		warped_mask = cv2.warpPerspective(mask, M, (dim_y, dim_x))
 
-		labels = segment(warped_rgb, ret_labels=True)
+		labels = PointDetector._segment(warped_rgb, ret_labels=True)
 		centers = labels[warped_mask == 255].tolist()
 
 		if len(centers) == 0:
@@ -120,7 +125,7 @@ class PointDetector:
 		centroid = c.most_common(1)[0][0]
 		new_mask = np.uint8(255*(labels == centroid))
 		
-		return ic._pixcnt2pc(new_mask, royale_pc)
+		return PointDetector._pixcnt2pc(new_mask, royale_pc)
 			
 
 
