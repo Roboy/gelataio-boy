@@ -12,12 +12,11 @@ using namespace roboy_control_msgs;
 using namespace std;
 
 
-ScoopingROS::ScoopingROS(ros::NodeHandle *handle) : nh(handle), app(handle, false), busy(false), executor(nullptr) {
-
-}
+ScoopingROS::ScoopingROS(ros::NodeHandle *handle) : nh(handle), app(handle, false), busy(false), executor(nullptr) {}
 
 void ScoopingROS::run() {
     scooping_srv = nh->advertiseService("scooping_planning/scoop", &ScoopingROS::scooping_cb, this);
+    go_home_srv = nh->advertiseService("scooping_planning/go_home", &ScoopingROS::go_home_cb, this);
     status_pub = nh->advertise<std_msgs::String>("scooping_planning/status", 5);
 
     ROS_INFO("Scooping planning ready and waiting for service requests...");
@@ -54,6 +53,14 @@ bool ScoopingROS::scooping_cb(TranslationalPTPMotion::Request &req, Translationa
     }
 
     return true;
+}
+
+bool ScoopingROS::go_home_cb(std_srvs::Empty::Request &req, std_srvs::Empty::Response &resp) {
+    ROS_INFO("I'm going home");
+
+    if (this->busy) {
+
+    }
 }
 
 
