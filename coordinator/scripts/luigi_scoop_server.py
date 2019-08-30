@@ -28,6 +28,7 @@ class ScoopServer:
   _feedback_delay = 5
 
   def __init__(self):
+    self.we_have_client_ = False
     self._action_name = 'luigi_scoop'
     self.doneScooping_ = False
     self._feedback.finished_scoops = []
@@ -59,11 +60,6 @@ class ScoopServer:
     except rospy.ServiceException, e:
       print "Service call failed: %s"%e
 
-  def SendFeedbackLuigi(self, feedback):
-    # publish the feedback 
-    self.server_.publish_feedback(self._feedback)
-
-
   # For now we set which flavor is where by hand (manually), unless vision can provide us with an api
   def GetFlavorStartingPoint(self, flavor):
     leftStartPoint = Point(x=-0.1, y=-0.4, z=0.25)
@@ -83,6 +79,8 @@ class ScoopServer:
 
     
   def ReceiveIceCreamOrder_(self, data):
+
+    self.we_have_client_ = True
 
     # success of the total scoping operation
     success = False
@@ -191,11 +189,14 @@ class ScoopServer:
       self.server_.set_succeeded(self._result)
 
   # This function is called every _feedback_delay seconds
-  def SendFeedbackLuigi(self, sc): 
-    self._feedback.status_message = self.scooping_human_status_
-    self.server_.publish_feedback(self._feedback)
-    s.enter(self._feedback_delay, 1, self.SendFeedbackLuigi, (sc,))
-
+  def SendFeedbackLuigi(self, sc):
+    if self.we_have_client_: 
+      self._feedback.status_message = self.scooping_human_status_
+      self.server_.publish_feedback(self._feedback)
+      s.enter(self._feedback_delay, 1, self.SendFeedbackLuigi, (sc,))
+    else:
+      rospy.loginfo('Luigi is Dead, move on!')
+      s.enter(self._feedback_delay, 1, self.SendFeedbackLuigi, (sc,))
 
 if __name__ == '__main__':
   
