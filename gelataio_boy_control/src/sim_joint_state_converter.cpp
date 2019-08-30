@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
         for (const auto &s : joint_names) ss << "\t" << i++ << ": " << s << endl;
         ROS_INFO_STREAM(ss.str());
 
-        ROS_INFO("Converted started successfully.");
+        ROS_INFO("Converter started successfully.");
         ros::spin();
     } else {
         ROS_ERROR("No parameter joint_names.");
