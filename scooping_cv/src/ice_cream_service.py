@@ -92,6 +92,11 @@ def findScoopingPoint(point_cloud):
     max_in_boundary = np.logical_and(in_boundary, Z_condition)
 
     valid_points = point_cloud[max_in_boundary]
+
+    if len(valid_points) == 0:
+        # If surface is relatively straight, return a random point within boundaries
+        valid_points = point_cloud[in_boundary]
+
     scoop_point = valid_points[np.random.choice(len(valid_points))]
 
     # ----- Visualization -----
@@ -112,9 +117,9 @@ def getServiceResponse(request):
     :return: service reponse
     """
     # Fake class call
-    #mesh = np.load(os.path.join(os.path.dirname(__file__), 'cnt_points.npy'))
-    #mesh = mesh[np.linspace(0,10000,700).astype('int')]
-    #mesh[:,2] += np.cos((mesh[:,0] ** 2 + mesh[:,1] ** 2) * 1000) / 25
+    mesh = np.load(os.path.join(os.path.dirname(__file__), 'cnt_points.npy'))
+    mesh = mesh[np.linspace(0,10000,700).astype('int')]
+    mesh[:,2] += np.cos((mesh[:,0] ** 2 + mesh[:,1] ** 2) * 1000) / 25
 
     global zed_cam_data
     zed_cam_data['flavour'] = request.flavor
@@ -123,7 +128,7 @@ def getServiceResponse(request):
     step_counter = 0
 
     # Repeat till mesh is found or step counter is too high
-    while(mesh == None and step_counter < 50):
+    while(mesh is None and step_counter < 50):
         # TODO: average mesh over X amount of steps
         step_counter += 1
 
@@ -133,9 +138,9 @@ def getServiceResponse(request):
             # Not enough data in zed_cam_data ... try again
             print("Waiting for camera data...")
     
-    if mesh == None:
+    if mesh is None:
         return DetectIceCreamResponse(Point(), Point(), 'Point cloud could not be detected')
-
+    
     # Find a scooping point
     scoop_point = findScoopingPoint(mesh)
 
