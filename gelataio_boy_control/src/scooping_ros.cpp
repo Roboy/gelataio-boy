@@ -58,7 +58,7 @@ bool ScoopingROS::scooping_cb(TranslationalPTPMotion::Request &req, Translationa
 bool ScoopingROS::go_home_cb(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &resp) {
     ROS_INFO("Go Home roboy, you are drunk ");
 
-    resp.message = "Not useful";
+    resp.message = "Going home";
 
     if (this->busy) {
         resp.success = false;
