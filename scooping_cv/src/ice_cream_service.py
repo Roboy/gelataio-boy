@@ -66,6 +66,12 @@ def findScoopingPoint(point_cloud):
     """
     Finds the highest point in the ice cream point cloud.
     """
+    # ----- Visualization -----
+    fig = plt.figure(figsize=(12,6))
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(point_cloud[:,0], point_cloud[:,1], point_cloud[:,2], c='blue', alpha=0.1)
+    # -------------------------
+    
     # Zero mean
     mesh = point_cloud - np.mean(point_cloud, axis=0)
 
@@ -95,6 +101,12 @@ def findScoopingPoint(point_cloud):
         valid_points = point_cloud[in_boundary]
 
     scoop_point = valid_points[np.random.choice(len(valid_points))]
+
+    # ----- Visualization -----
+    ax.scatter(mesh[:,0], mesh[:,1], mesh[:,2], c='green', alpha=0.1)
+    ax.scatter(scoop_point[0], scoop_point[1], scoop_point[2], c='red')
+    plt.show()
+    # -------------------------
 
     return scoop_point
 
@@ -126,6 +138,7 @@ def getServiceResponse(request):
         try: 
             print(zed_cam_data.keys())
             mesh = PointDetector.detect(**zed_cam_data)
+            mesh = mesh[np.linspace(0,len(mesh)-1,700).astype('int')]
         except TypeError as e:
             # Not enough data in zed_cam_data ... try again
             print("Waiting for camera data...")

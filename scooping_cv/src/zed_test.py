@@ -10,8 +10,8 @@ from cv_bridge import CvBridge, CvBridgeError
 import struct
 from math import isnan
 
-LOW_COLOR = np.array([101,25,0])
-HI_COLOR = np.array([115,83,255])
+LOW_COLOR = np.array([38,40,0])
+HI_COLOR = np.array([66,255,255])
  
 
 

@@ -9,7 +9,8 @@ from collections import Counter
 class PointDetector:
 	
 	flavor_color_map = {
-		"Chocolate": np.array([[11,0,0],[35,180,255]])
+		"Chocolate": np.array([[11,0,0],[35,180,255]]),
+		"Flakes": np.array([[38,40,0],[66,255,255]])
 		}
 
 	@staticmethod
