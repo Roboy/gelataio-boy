@@ -6,7 +6,6 @@ import numpy as np
 import math
 from sklearn import linear_model
 from pyquaternion import Quaternion
-import std_msgs, sensor_msgs
 import csv
 
 rospy.init_node('tracker_tf_broadcaster')
@@ -50,10 +49,10 @@ def process_transform(device_name, pose ):
     q_tracker = Quaternion(pose[6],pose[3],pose[4],pose[5])                 #*q_init1.inverse
     return q_tracker
 
-def _get_instance_eulers(initial_pose1, initial_pose2, initial_pose3):
-    q_tracker_1 = process_transform("tracker_1", initial_pose1)
-    q_tracker_2 = process_transform("tracker_2", initial_pose2)
-    q_tracker_3 = process_transform("tracker_3", initial_pose3)
+def _get_instance_eulers(initial_pose1, initial_pose2):
+    q_tracker_1 = process_transform("tracker_2", initial_pose1)
+    q_tracker_2 = process_transform("tracker_3", initial_pose2)
+    #q_tracker_3 = process_transform("tracker_3", initial_pose3)
 
     q_tracker_diff_12 = q_tracker_2*q_tracker_1.inverse
     #q_tracker_diff_23 = q_tracker_3*q_tracker_2.inverse
@@ -79,24 +78,25 @@ if __name__ == "__main__":
     side_values = [0.0, -1.57, 0.0]
     front_values = [-1.57, 0, -1.57]
     fist_up_values = [0.0, -1.57, 1.57]
+    arm_up_values =
 
     input("Relax your arm, put it down parallel to your torso with the palm facing towards you")
 
-    initial_pose1 = v.devices["tracker_1"].get_pose_quaternion()
-    initial_pose2 = v.devices["tracker_2"].get_pose_quaternion()
+    initial_pose1 = v.devices["tracker_2"].get_pose_quaternion()
+    initial_pose2 = v.devices["tracker_3"].get_pose_quaternion()
     #initial_pose3 = v.devices["tracker_3"].get_pose_quaternion()
 
     input("Point your right arm to the right, orthogonal to your body and bend your elbow so your hand points in front of you")
 
-    euler_side_12 = _get_instance_eulers(initial_pose1, initial_pose2, initial_pose3)
+    euler_side_12 = _get_instance_eulers(initial_pose1, initial_pose2)
 
     input("Point your right arm to the right, orthogonal to your body and bend your elbow so your hand points up")
 
-    euler_fist_up_12 = _get_instance_eulers(initial_pose1, initial_pose2, initial_pose3)
+    euler_fist_up_12 = _get_instance_eulers(initial_pose1, initial_pose2)
 
     input("Point your right arm infront of you, orthogonal to your body and parallel to the ground, and bend your elbow so your hand points left")
 
-    euler_front_12 = _get_instance_eulers(initial_pose1, initial_pose2, initial_pose3)
+    euler_front_12 = _get_instance_eulers(initial_pose1, initial_pose2)
 
     reg_shoulder = linear_model.LinearRegression()
     reg_shoulder.fit([[0,0,0], euler_side_12, euler_fist_up_12, euler_front_12], [relaxed_values, side_values, fist_up_values, front_values])
@@ -109,8 +109,11 @@ if __name__ == "__main__":
     csvfile =  open('calibration.csv', 'w')
     writer = csv.writer(csvfile)
 
-    writer.writerow (reg_shoulder.coef_[0] + [0,0,0] + [reg_shoulder.intercept_[0]])
-    writer.writerow (reg_shoulder.coef_[1] + [0,0,0] + [reg_shoulder.intercept_[1]])
-    writer.writerow (reg_shoulder.coef_[2] + [0,0,0] + [reg_shoulder.intercept_[2]])
+    print (reg_shoulder.coef_[0])
+    print ([0,0,0])
+    print (reg_shoulder.intercept_[0])
+    writer.writerow (np.concatenate((reg_shoulder.coef_[0], np.array([0,0,0]), np.array([reg_shoulder.intercept_[0]]))))
+    writer.writerow (np.concatenate((reg_shoulder.coef_[1], np.array([0,0,0]), np.array([reg_shoulder.intercept_[1]]))))
+    writer.writerow (np.concatenate((reg_shoulder.coef_[2], np.array([0,0,0]), np.array([reg_shoulder.intercept_[2]]))))
 
-    writer.writerow ([0,0,0] + reg_elbow.coef_ + [reg_elbow.intercept_])
+    #writer.writerow ([0,0,0] + reg_elbow.coef_ + [reg_elbow.intercept_])
