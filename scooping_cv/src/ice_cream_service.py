@@ -12,6 +12,7 @@ from scipy.spatial.transform import Rotation
 
 # Roboy service
 from roboy_cognition_msgs.srv import DetectIceCream, DetectIceCreamResponse
+from PointDetector import *
 
 # Required for development
 import os
@@ -42,21 +43,21 @@ def saveSensorDataZEDRGB(data):
     Save incoming RGB data from ZED camera
     """
     global zed_cam_data
-    data['zed_rgb'] = data
+    zed_cam_data['zed_rgb'] = data
 
 def saveSensorDataRoyalDepth(data):
     """
     Save incoming depth data from royal camera
     """
     global zed_cam_data
-    data['royale_depth'] = data
+    zed_cam_data['royale_depth'] = data
 
 def saveSensorDataRoyalPC(data):
     """
     Save incoming point cloud from royal camera
     """
     global zed_cam_data
-    data['royale_pc'] = data
+    zed_cam_data['royale_pc'] = data
 
 def findScoopingPoint(point_cloud):
     """
@@ -111,11 +112,29 @@ def getServiceResponse(request):
     :return: service reponse
     """
     # Fake class call
-    mesh = np.load(os.path.join(os.path.dirname(__file__), 'cnt_points.npy'))
-    mesh = mesh[np.linspace(0,10000,700).astype('int')]
+    #mesh = np.load(os.path.join(os.path.dirname(__file__), 'cnt_points.npy'))
+    #mesh = mesh[np.linspace(0,10000,700).astype('int')]
+    #mesh[:,2] += np.cos((mesh[:,0] ** 2 + mesh[:,1] ** 2) * 1000) / 25
 
-    mesh[:,2] += np.cos((mesh[:,0] ** 2 + mesh[:,1] ** 2) * 1000) / 25
+    global zed_cam_data
+    zed_cam_data['flavour'] = request.flavor
 
+    mesh = None
+    step_counter = 0
+
+    # Repeat till mesh is found or step counter is too high
+    while(mesh == None and step_counter < 50):
+        # TODO: average mesh over X amount of steps
+        step_counter += 1
+
+        try: 
+            mesh = PointDetector.detect(**zed_cam_data)
+        except TypeError:
+            # Not enough data in zed_cam_data ... try again
+            print("Waiting for camera data...")
+    
+    if mesh == None:
+        return DetectIceCreamResponse(Point(), Point(), 'Point cloud could not be detected')
 
     # Find a scooping point
     scoop_point = findScoopingPoint(mesh)
@@ -126,11 +145,11 @@ def getServiceResponse(request):
     start_point.y = scoop_point[1]
     start_point.z = scoop_point[2]
 
-    return DetectIceCreamResponse(start_point, Point(), 'OK')
+    return DetectIceCreamResponse(start_point, Point(), '')
 
 if __name__ == '__main__' :
     rospy.init_node('iceCreamMesh', anonymous=True)
-    
+
     # --- Init service ---
     rospy.Service('iceCreamMeshService', DetectIceCream, getServiceResponse)
 
