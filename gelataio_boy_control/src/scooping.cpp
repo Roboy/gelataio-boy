@@ -108,6 +108,25 @@ bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> f
     return successful;
 }
 
+bool ScoopingMain::go_home(std::function<void(bool)> finish_cb) {
+
+    stringstream ss; ss << "Current pose of right arm: " << endl << right_arm.getCurrentPose() << endl;
+    ROS_INFO_STREAM(ss.str());
+    bool successful=false;
+    this->active_arm = &right_arm;
+
+    ROS_INFO("Going home");
+    successful &= right_arm.goHome();
+
+    if (successful) {
+        ROS_INFO("Scooping done without error");
+    } else {
+        ROS_ERROR("Scooping finished with error");
+    }
+    finish_cb(successful);
+    return successful;
+}
+
 void ScoopingMain::createObstacles() {
 
     // --------------------- Ice Cream Box ------------------

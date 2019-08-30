@@ -55,12 +55,24 @@ bool ScoopingROS::scooping_cb(TranslationalPTPMotion::Request &req, Translationa
     return true;
 }
 
-bool ScoopingROS::go_home_cb(std_srvs::Empty::Request &req, std_srvs::Empty::Response &resp) {
-    ROS_INFO("I'm going home");
+bool ScoopingROS::go_home_cb(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &resp) {
+    ROS_INFO("Go Home roboy, you are drunk ");
+
+    resp.message = "Not useful";
 
     if (this->busy) {
-
+        resp.success = false;
+        ROS_ERROR("Can't go home right now, a scooping is still running.");
+    } else {
+        if (this->executor != nullptr) {
+            this->executor->join();
+            delete this->executor;
+            this->executor = nullptr;
+        }
+        resp.success = true;
+        this->busy = true;
+        executor = new std::thread(&ScoopingMain::go_home, &app, [this](bool success) {this->busy = false;});
     }
+
+    return true;
 }
-
-
