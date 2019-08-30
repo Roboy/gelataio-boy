@@ -13,12 +13,6 @@ static vector<string> joint_names;
 
 void jointStateCallback(const sensor_msgs::JointState &state) {
     sensor_msgs::JointState s = state;
-    for (int i = 0; i < 3; i++) {
-        stringstream ss; ss << "scooper_dummy_joint" << i;
-        s.name.push_back(ss.str());
-        s.position.push_back(0.0);
-        s.velocity.push_back(0.0);
-    }
     s.header.stamp = ros::Time::now();
     pub.publish(s);
     ROS_INFO_THROTTLE(10.0, "I'm alive.");
