@@ -180,7 +180,7 @@ bool ScoopingMain::approach_scoop_point(geometry_msgs::Point scoop_point) {
     wristConstraint.tolerance_below = .1;
     wristConstraint.tolerance_above = 3.14/2;
     wristConstraint.weight = 1.0;
-    //constraints.joint_constraints.push_back(wristConstraint);
+    constraints.joint_constraints.push_back(wristConstraint);
     right_arm.setPlanningTime(10.0);
     return right_arm.moveToPose(scooping_start, constraints);
 }
