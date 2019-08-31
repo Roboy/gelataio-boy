@@ -9,6 +9,9 @@ from pyquaternion import Quaternion
 import std_msgs
 from sensor_msgs.msg import JointState
 import csv
+import pickle
+from scipy.spatial.transform import Rotation as R
+
 rospy.init_node('tracker_tf_broadcaster')
 
 # Checks if a matrix is a valid rotation matrix.
@@ -91,15 +94,25 @@ if __name__ == "__main__":
 
     joint_target_publisher = rospy.Publisher('/joint_targets', JointState, queue_size=1)
 
+    reg_shoulder = pickle.load("calibration_file")
     while not rospy.is_shutdown():
         start = time.time()
 
-        print (coefficients[0][0], coefficients[0][1], coefficients[0][2], coefficients[0][9])
+        #print (coefficients[0][0], coefficients[0][1], coefficients[0][2], coefficients[0][9])
         euler_shoulder = _get_euler_angles_difference(torso_tracker_name, shoulder_tracker_name, initial_pose_torso, initial_pose_shoulder)
-        shoulder_axis0 = coefficients[0][0]*euler_shoulder[0] - coefficients[0][1]*euler_shoulder[1] + coefficients[0][2]*euler_shoulder[2] + coefficients[0][9]
-        shoulder_axis1 = coefficients[1][0]*euler_shoulder[0] - coefficients[1][1]*euler_shoulder[1] + coefficients[1][2]*euler_shoulder[2] + coefficients[1][9]
-        shoulder_axis2 = coefficients[2][0]*euler_shoulder[0] - coefficients[2][1]*euler_shoulder[1] + coefficients[2][2]*euler_shoulder[2] + coefficients[2][9]
+        #shoulder_axis0 = coefficients[0][0]*euler_shoulder[0] - coefficients[0][1]*euler_shoulder[1] + coefficients[0][2]*euler_shoulder[2] + coefficients[0][9]
+        #shoulder_axis1 = coefficients[1][0]*euler_shoulder[0] - coefficients[1][1]*euler_shoulder[1] + coefficients[1][2]*euler_shoulder[2] + coefficients[1][9]
+        #shoulder_axis2 = coefficients[2][0]*euler_shoulder[0] - coefficients[2][1]*euler_shoulder[1] + coefficients[2][2]*euler_shoulder[2] + coefficients[2][9]
         
+        mat = R.from_euler('xyz', euler_shoulder).as_dcm()
+        pred = reg_shoulder.predict([test.mat()])
+        predicted_mat = np.reshape(pred, (3,3))
+        pred_angles = R.from_dcm(predicted_mat).as_euler('xyz')
+
+        shoulder_axis0 = pred_angles[0]
+        shoulder_axis1 = pred_angles[1]
+        shoulder_axis2 = pred_angles[2]
+
         if track_elbow is True:
             euler_elbow = _get_euler_angles_difference(shoulder_tracker_name, forearm_tracker_name, initial_pose_shoulder, initial_pose_forearm)
             elbow_axis = coefficients[3][0]*euler_elbow[0] + coefficients[3][1]*euler_elbow[1] + coefficients[3][2]*euler_elbow[2] + coefficients[3][6]

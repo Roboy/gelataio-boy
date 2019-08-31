@@ -4,8 +4,10 @@ import triad_openvr
 import rospy
 import numpy as np
 import math
+import pickle
 from sklearn import linear_model
 from pyquaternion import Quaternion
+from scipy.spatial.transform import Rotation as R
 import csv
 
 rospy.init_node('tracker_tf_broadcaster')
@@ -105,7 +107,12 @@ if __name__ == "__main__":
     euler_side_shoulder = _get_euler_angles_difference(torso_tracker_name, shoulder_tracker_name, initial_pose_torso, initial_pose_shoulder)
     
     if track_writst is True:
-        input("Point your palm down")
+        input("Point your p relaxed_values = [0, 0, 0]
+    side_values = [0.0, 1.57, 0.0]
+    fist_up_values = [0.0, 1.57, -1.57]
+    arm_back_values = [1.57, 0.79, 0]
+    front_values = [-1.57, 0, -1.57]
+    arm_up_values = [0.0, 3.14, 1.57]alm down")
         euler_down_palm = _get_euler_angles_difference(forearm_tracker_name, palm_tracker_name, initial_pose_forearm, initial_pose_palm)
         input("Point your palm left")
         euler_left_palm = _get_euler_angles_difference(forearm_tracker_name, palm_tracker_name, initial_pose_forearm, initial_pose_palm)
@@ -137,19 +144,28 @@ if __name__ == "__main__":
 
     euler_relaxed_shoulder = _get_euler_angles_difference(torso_tracker_name, shoulder_tracker_name, initial_pose_torso, initial_pose_shoulder)
 
+    datapoints = [euler_relaxed_shoulder, euler_side_shoulder, euler_arm_back_shoulder, euler_fist_up_shoulder, euler_front_shoulder, euler_arm_up_shoulder]
+    targets = [relaxed_values, side_values, arm_back_values, fist_up_values, front_values, arm_up_values]
+
+    vectorized_datapoints = R.from_euler('xyz', datapoints).as_dcm()
+    vectorized_datapoints = np.array([a.flatten() for a in rotvecs])
+    vectorized_targets = R.from_euler('xyz', targets).as_dcm()
+    vectorized_targets = np.array([a.flatten() for a in vectorized_targets])
+
     reg_shoulder = linear_model.LinearRegression()
-    reg_shoulder.fit([euler_relaxed_shoulder, euler_side_shoulder, euler_arm_back_shoulder, euler_fist_up_shoulder, euler_front_shoulder, euler_arm_up_shoulder],
-                    [relaxed_values, side_values, arm_back_values, fist_up_values, front_values, arm_up_values])
+    reg_shoulder.fit(vectorized_datapoints, vectorized_targets)
 
-    csvfile =  open('calibration.csv', 'w')
-    writer = csv.writer(csvfile)
+    pickle.dump(reg_shoulder, "calibration_file")
 
-    #[array([0.6578727 , 0.45521055, 1.12019768]), array([ 0.24424409, -0.02194311,  0.07315386]), array([ 0.31908318,  0.43454081, -0.00398665]), array([ 0.94450428, -0.07541627,  0.07306826]), array([-0.43969506, -0.24915067,  0.81210489]), array([ 0.26728001, -1.29651049,  0.26622031])]
-    print ([euler_relaxed_shoulder, euler_side_shoulder, euler_arm_back_shoulder, euler_fist_up_shoulder, euler_front_shoulder, euler_arm_up_shoulder])
-    writer.writerow (np.concatenate((reg_shoulder.coef_[0], np.array([0,0,0,0,0,0]), np.array([reg_shoulder.intercept_[0]]))))
-    writer.writerow (np.concatenate((reg_shoulder.coef_[1], np.array([0,0,0,0,0,0]), np.array([reg_shoulder.intercept_[1]]))))
-    writer.writerow (np.concatenate((reg_shoulder.coef_[2], np.array([0,0,0,0,0,0]), np.array([reg_shoulder.intercept_[2]]))))
-    
+    #csvfile =  open('calibration.csv', 'w')
+    #writer = csv.writer(csvfile)
+
+    #[array([0.6578727, 0.45521055, 1.12019768]), array([ 0.24424409, -0.02194311,  0.07315386]), array([ 0.31908318,  0.43454081, -0.00398665]), array([ 0.94450428, -0.07541627,  0.07306826]), array([-0.43969506, -0.24915067,  0.81210489]), array([ 0.26728001, -1.29651049,  0.26622031])]
+    #print ([euler_relaxed_shoulder, euler_side_shoulder, euler_arm_back_shoulder, euler_fist_up_shoulder, euler_front_shoulder, euler_arm_up_shoulder])
+    #writer.writerow (np.concatenate((reg_shoulder.coef_[0], np.array([0,0,0,0,0,0]), np.array([reg_shoulder.intercept_[0]]))))
+    #writer.writerow (np.concatenate((reg_shoulder.coef_[1], np.array([0,0,0,0,0,0]), np.array([reg_shoulder.intercept_[1]]))))
+    #writer.writerow (np.concatenate((reg_shoulder.coef_[2], np.array([0,0,0,0,0,0]), np.array([reg_shoulder.intercept_[2]]))))
+
     if track_elbow is True:
         reg_elbow = linear_model.LinearRegression()
         reg_elbow.fit([euler_elbow_straight, euler_elbow_bent], [elbow_relaxed, elbow_bent])
