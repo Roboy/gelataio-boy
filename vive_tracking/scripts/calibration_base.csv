@@ -1,5 +1,6 @@
-shoulder0, shoulder1, shoulder2, elbow1, elbow2, elbow3,  bias
-0, 0, -1, 0, 0, 0, 0
-1, 0, 0, 0, 0, 0, 1.57
-0, -1, 0, 0, 0, 0, 0
-0, 0, 0, 0, 0, -1, 0
+shoulder0, shoulder1, shoulder2, elbow1, elbow2, elbow3, wrist1, wrist2, wrist3, bias
+0, 0, -1, 0, 0, 0, 0, 0, 0, 0
+1, 0, 0, 0, 0, 0, 0, 0, 0, 1.57
+0, -1, 0, 0, 0, 0, 0, 0, 0, 0
+0, 0, 0, 0, 0, -1, 0, 0, 0, 0
+0, 0, 0, 0, 0, -1, 0, -1, 0, 0
