@@ -64,9 +64,9 @@ def _get_euler_angles_difference(tracker_1_name, tracker_2_name, tracker_1_pose,
 if __name__ == "__main__":
     track_elbow = False
     track_wrist = False
-    torso_tracker_name = "tracker_2"
-    shoulder_tracker_name = "tracker_3"
-    forearm_tracker_name = "tracker_4"
+    torso_tracker_name = "tracker_1"
+    shoulder_tracker_name = "tracker_2"
+    forearm_tracker_name = "tracker_3"
     palm_tracker_name = "tracker_5"
 
 
@@ -86,7 +86,7 @@ if __name__ == "__main__":
     initial_pose_shoulder = v.devices[shoulder_tracker_name].get_pose_quaternion()
     if track_elbow is True:
         initial_pose_forearm =  v.devices[forearm_tracker_name].get_pose_quaternion()
-    if track_writst is True:
+    if track_wrist is True:
         initial_pose_palm =  v.devices[palm_tracker_name].get_pose_quaternion()
 
     joint_target_publisher = rospy.Publisher('/joint_targets', JointState, queue_size=1)
@@ -94,10 +94,11 @@ if __name__ == "__main__":
     while not rospy.is_shutdown():
         start = time.time()
 
+        print (coefficients[0][0], coefficients[0][1], coefficients[0][2], coefficients[0][9])
         euler_shoulder = _get_euler_angles_difference(torso_tracker_name, shoulder_tracker_name, initial_pose_torso, initial_pose_shoulder)
-        shoulder_axis0 = coefficients[0][0]*euler_shoulder[0] + coefficients[0][1]*euler_shoulder[1] + coefficients[0][2]*euler_shoulder[2] + coefficients[0][6]
-        shoulder_axis1 = coefficients[1][0]*euler_shoulder[0] + coefficients[1][1]*euler_shoulder[1] + coefficients[1][2]*euler_shoulder[2] + coefficients[1][6]
-        shoulder_axis2 = coefficients[2][0]*euler_shoulder[0] + coefficients[2][1]*euler_shoulder[1] + coefficients[2][2]*euler_shoulder[2] + coefficients[2][6]
+        shoulder_axis0 = coefficients[0][0]*euler_shoulder[0] - coefficients[0][1]*euler_shoulder[1] + coefficients[0][2]*euler_shoulder[2] + coefficients[0][9]
+        shoulder_axis1 = coefficients[1][0]*euler_shoulder[0] - coefficients[1][1]*euler_shoulder[1] + coefficients[1][2]*euler_shoulder[2] + coefficients[1][9]
+        shoulder_axis2 = coefficients[2][0]*euler_shoulder[0] - coefficients[2][1]*euler_shoulder[1] + coefficients[2][2]*euler_shoulder[2] + coefficients[2][9]
         
         if track_elbow is True:
             euler_elbow = _get_euler_angles_difference(shoulder_tracker_name, forearm_tracker_name, initial_pose_shoulder, initial_pose_forearm)
@@ -105,7 +106,7 @@ if __name__ == "__main__":
         else:
             elbow_axis = 0
 
-        if track_writst is True:
+        if track_wrist is True:
             euler_wrist = _get_euler_angles_difference(forearm_tracker_name, palm_tracker_name, initial_pose_forearm, initial_pose_palm)
             wrist_axis = coefficients[3][0]*euler_wrist[0] + coefficients[3][1]*euler_wrist[1] + coefficients[3][2]*euler_wrist[2] + coefficients[3][6]
         else:
@@ -114,7 +115,7 @@ if __name__ == "__main__":
 
 
         print ("Shoulder angles: ", euler_shoulder)
-        print ("Elbow angles: ", euler_23)
+        #print ("Elbow angles: ", euler_23)
 
 
         

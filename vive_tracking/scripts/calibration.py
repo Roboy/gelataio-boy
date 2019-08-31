@@ -65,9 +65,9 @@ if __name__ == "__main__":
     track_elbow = False
     track_writst = False
 
-    torso_tracker_name = "tracker_2"
-    shoulder_tracker_name = "tracker_3"
-    forearm_tracker_name = "tracker_4"
+    torso_tracker_name = "tracker_1"
+    shoulder_tracker_name = "tracker_2"
+    forearm_tracker_name = "tracker_3"
     palm_tracker_name = "tracker_5"
 
     v = triad_openvr.triad_openvr()
@@ -144,6 +144,8 @@ if __name__ == "__main__":
     csvfile =  open('calibration.csv', 'w')
     writer = csv.writer(csvfile)
 
+    #[array([0.6578727 , 0.45521055, 1.12019768]), array([ 0.24424409, -0.02194311,  0.07315386]), array([ 0.31908318,  0.43454081, -0.00398665]), array([ 0.94450428, -0.07541627,  0.07306826]), array([-0.43969506, -0.24915067,  0.81210489]), array([ 0.26728001, -1.29651049,  0.26622031])]
+    print ([euler_relaxed_shoulder, euler_side_shoulder, euler_arm_back_shoulder, euler_fist_up_shoulder, euler_front_shoulder, euler_arm_up_shoulder])
     writer.writerow (np.concatenate((reg_shoulder.coef_[0], np.array([0,0,0,0,0,0]), np.array([reg_shoulder.intercept_[0]]))))
     writer.writerow (np.concatenate((reg_shoulder.coef_[1], np.array([0,0,0,0,0,0]), np.array([reg_shoulder.intercept_[1]]))))
     writer.writerow (np.concatenate((reg_shoulder.coef_[2], np.array([0,0,0,0,0,0]), np.array([reg_shoulder.intercept_[2]]))))
@@ -151,13 +153,13 @@ if __name__ == "__main__":
     if track_elbow is True:
         reg_elbow = linear_model.LinearRegression()
         reg_elbow.fit([euler_elbow_straight, euler_elbow_bent], [elbow_relaxed, elbow_bent])
-        writer.writerow (np.concatenate((np.array([0,0,0]), reg_elbow.coef_[0], np.array([0,0,0]), np.array([reg_elbow.intercept_[0]]))))
+        writer.writerow (np.concatenate((np.array([0,0,0]), reg_elbow.coef_, np.array([0,0,0]), np.array([reg_elbow.intercept_]))))
     else:
         writer.writerow (np.array([0,0,0,0,0,0,0,0,0,0]))
 
     if track_writst is True:
         reg_writst = linear_model.LinearRegression()
         reg_writst.fit([euler_down_palm, euler_left_palm, euler_right_palm], [palm_down, palm_left, palm_right])
-        writer.writerow (np.concatenate((np.array([0,0,0,0,0,0]), reg_writst.coef_[0], np.array([reg_writst.intercept_[0]]))))
+        writer.writerow (np.concatenate((np.array([0,0,0,0,0,0]), reg_writst.coef_, np.array([reg_writst.intercept_]))))
     else:
         writer.writerow (np.array([0,0,0,0,0,0,0,0,0,0]))
