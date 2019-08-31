@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 # ROS
-import rospy, time
+import rospy, time, tf
 from sensor_msgs.msg import Image, PointCloud2
 from geometry_msgs.msg import Point
 from cv_bridge import CvBridge, CvBridgeError
@@ -22,9 +22,11 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from scipy import signal
 
-# Tmp memory
 zed_cam_data = {}
 bridge = CvBridge()
+
+tf_listener = None
+pc_publisher = None
 
 def findAngleBetweenVectors(vec_1, vec_2):
     """
@@ -62,6 +64,30 @@ def saveSensorDataRoyalPC(data):
     global zed_cam_data
     zed_cam_data['royale_pc'] = data
     
+def transformCam2Torso(point_cloud):
+    """
+    Transform from camera to torso frame
+    """
+    global tf_listener
+    (trans, rot) = tf_listener.lookupTransform('/zed_camera', '/torso', rospy.Time(0))
+    
+    rotZ = rotatePointCloud(point_cloud, rot[2], np.array([0,0,1]))
+    rotZY = rotatePointCloud(rotZ, rot[1], np.array([0,1,0]))
+    return rotatePointCloud(rotZY, rot[0], np.array([1,0,0])) + trans
+
+def getPointCloud2Msg(mesh):
+    """
+    Get PointCloud2 msg from an array
+    """
+    msg = PointCloud2()
+    msg.header.frame_id = "torso"
+
+    msg.width = mesh.shape[1]
+    msg.height = mesh.shape[0]
+    
+    msg.data = np.asarray(mesh, np.float32).tostring()
+    return msg
+
 def findScoopingPoint(point_cloud):
     """
     Finds the highest point in the ice cream point cloud.
@@ -120,14 +146,14 @@ def getServiceResponse(request):
     :return: service reponse
     """
     # Fake class call
-    #mesh = np.load(os.path.join(os.path.dirname(__file__), 'cnt_points.npy'))
-    #mesh = mesh[np.linspace(0,10000,700).astype('int')]
+    mesh = np.load(os.path.join(os.path.dirname(__file__), 'flakes.npy'))
+    #mesh = mesh[np.linspace(0,len(mesh)-1,700).astype('int')]
     #mesh[:,2] += np.cos((mesh[:,0] ** 2 + mesh[:,1] ** 2) * 1000) / 25
-
+    
     global zed_cam_data
     zed_cam_data['flavor'] = request.flavor
     
-    mesh = None
+    """mesh = None
     step_counter = 0
 
     # Repeat till mesh is found or step counter is too high
@@ -144,10 +170,14 @@ def getServiceResponse(request):
             print("Waiting for camera data...")
             print(e)
             time.sleep(1)
-    
+    """
     if mesh is None:
         return DetectIceCreamResponse(Point(), Point(), 'Point cloud could not be detected')
     
+    mesh = transformCam2Torso(mesh)
+    msg = getPointCloud2Msg(mesh)
+    print(msg)
+
     # Find a scooping point
     scoop_point = findScoopingPoint(mesh)
 
@@ -160,14 +190,19 @@ def getServiceResponse(request):
     return DetectIceCreamResponse(start_point, Point(), '')
 
 if __name__ == '__main__' :
-    rospy.init_node('iceCreamMesh', anonymous=True)
+    rospy.init_node('iceCreamService')
 
     # --- Init service ---
-    rospy.Service('iceCreamMeshService', DetectIceCream, getServiceResponse)
+    rospy.Service('iceCreamService', DetectIceCream, getServiceResponse)
 
     # --- Init subscribers ---
     rospy.Subscriber("/zed/zed_node/left_raw/image_raw_color", Image, saveSensorDataZEDRGB)
     rospy.Subscriber("/royale_camera_driver/depth_image", Image, saveSensorDataRoyalDepth)
     rospy.Subscriber("/royale_camera_driver/point_cloud", PointCloud2, saveSensorDataRoyalPC)
+    
+    # Init tf listener
+    tf_listener = tf.TransformListener()
+    # Init point cloud (for rviz) publisher
+    pc_publisher = rospy.Publisher("/ice_cream_pc", PointCloud2, queue_size=10)
 
     rospy.spin()
