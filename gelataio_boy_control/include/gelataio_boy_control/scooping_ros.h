@@ -11,7 +11,7 @@
 #include <ros/node_handle.h>
 #include "scooping.h"
 #include <roboy_control_msgs/TranslationalPTPMotion.h>
-
+#include <std_srvs/Trigger.h>
 
 class ScoopingROS {
 public:
@@ -20,6 +20,7 @@ public:
     void run();
 
     bool scooping_cb(roboy_control_msgs::TranslationalPTPMotion::Request &req, roboy_control_msgs::TranslationalPTPMotion::Response &resp);
+    bool go_home_cb(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &resp);
 
 
 private:
@@ -27,6 +28,7 @@ private:
     ScoopingMain app;
 
     ros::ServiceServer scooping_srv;
+    ros::ServiceServer go_home_srv;
     ros::Publisher status_pub;
 
     bool busy;

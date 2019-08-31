@@ -13,12 +13,6 @@ static vector<string> joint_names;
 
 void jointStateCallback(const sensor_msgs::JointState &state) {
     sensor_msgs::JointState s = state;
-    for (int i = 0; i < 3; i++) {
-        stringstream ss; ss << "scooper_dummy_joint" << i;
-        s.name.push_back(ss.str());
-        s.position.push_back(0.0);
-        s.velocity.push_back(0.0);
-    }
     s.header.stamp = ros::Time::now();
     pub.publish(s);
     ROS_INFO_THROTTLE(10.0, "I'm alive.");
@@ -39,7 +33,7 @@ int main(int argc, char **argv) {
         for (const auto &s : joint_names) ss << "\t" << i++ << ": " << s << endl;
         ROS_INFO_STREAM(ss.str());
 
-        ROS_INFO("Converted started successfully.");
+        ROS_INFO("Converter started successfully.");
         ros::spin();
     } else {
         ROS_ERROR("No parameter joint_names.");

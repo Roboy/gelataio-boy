@@ -1,7 +1,9 @@
 <launch>
 
-  <include file="start_real_test.launch">
-    <arg name="rviz" value="true" />
+  <arg name="rviz" default="false" />
+
+  <include file="$(find coordinator)/launch/start_real_test.launch">
+    <arg name="rviz" value="$(arg rviz)" />
     <arg name="luigi_is_fake" default="false" />
   </include>
 
