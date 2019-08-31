@@ -34,6 +34,7 @@ class ScoopServer:
     self._feedback.finished_scoops = []
 
     # Status as to be sent for luigig as a feedback
+    # This is always overriden to "more time" as requested from luigi
     self.scooping_human_status_ = 'Did not receive any ice cream order yet!'
     
     # Status as recived from scooping_planning/scoop
@@ -192,6 +193,8 @@ class ScoopServer:
   def SendFeedbackLuigi(self, sc):
     if self.we_have_client_: 
       self._feedback.status_message = self.scooping_human_status_
+
+      self._feedback.status_message = "more time"
       self.server_.publish_feedback(self._feedback)
       s.enter(self._feedback_delay, 1, self.SendFeedbackLuigi, (sc,))
     else:
