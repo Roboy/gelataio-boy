@@ -11,13 +11,15 @@ import sched, time
 # OrderIceCreamActionGoal, OrderIceCreamActionResult, OrderIceCreamFeedback 
 # OrderIceCreamGoal, OrderIceCreamResult
 from roboy_cognition_msgs.msg import *
+from roboy_cognition_msgs.srv import *
 
 from roboy_control_msgs.srv import TranslationalPTPMotion
 from geometry_msgs.msg import Point
 import numpy as np
 
-# First one is left box, second one is right box
-availableFlavors = ['choco', 'spagetti']
+# Map between flavors and points of scooping
+availableFlavors = {}
+vision_working = False
 
 # The number of steps we need to scoop a single scoop (tuned manually)
 scoopingSteps = 2
@@ -50,6 +52,20 @@ class ScoopServer:
     self.scooping_status_ = scooping_status
 
   # Arguments are of Pose type
+  def VisionServiceClient(self, flavor):
+    rospy.wait_for_service('iceCreamMeshService')
+    try:
+      VisionServiceClient_ = rospy.ServiceProxy('iceCreamMeshService', DetectIceCream)
+      resp = VisionServiceClient_(flavor)
+
+      # Do we use the end point rn?
+      # Should vision return best point and second best point instead?
+      startPoint = resp.start_scooping
+      return startPoint
+    except rospy.ServiceException, e:
+      print "Service call failed: %s"%e
+
+  # Arguments are of Pose type
   def TranslationalPTPMotionClient(self, startPosition, endPosition):
     rospy.wait_for_service('scooping_planning/scoop')
     try:
@@ -62,20 +78,28 @@ class ScoopServer:
 
   # For now we set which flavor is where by hand (manually), unless vision can provide us with an api
   def GetFlavorStartingPoint(self, flavor):
-    leftStartPoint = Point(x=-0.1, y=-0.4, z=0.25)
-    rightStartPoint = Point(x=-0.1, y=-0.4, z=0.25)
-    startingPoint = Point()
 
-    # Left ice cream box
-    if flavor == availableFlavors[0]:
-      startingPoint = leftStartPoint
-    elif flavor == availableFlavors[1]:
-      startingPoint = rightStartPoint
-    # Do we fancy a third ice cream box?
+    if vision_working:
+      rospy.loginfo('Getting starting point from vision')
+      startingPoint = self.VisionServiceClient(flavor)
+      availableFlavors[flavor] = startingPoint
+      return startingPoint
+
     else:
-      startingPoint = leftStartPoint
+      leftStartPoint = Point(x=-0.1, y=-0.4, z=0.25)
+      rightStartPoint = Point(x=-0.1, y=-0.4, z=0.25)
+      startingPoint = Point()
 
-    return startingPoint
+      # Left ice cream box
+      if flavor == availableFlavors[0]:
+        startingPoint = leftStartPoint
+      elif flavor == availableFlavors[1]:
+        startingPoint = rightStartPoint
+      # Do we fancy a third ice cream box?
+      else:
+        startingPoint = leftStartPoint
+
+      return startingPoint
 
     
   def ReceiveIceCreamOrder_(self, data):
