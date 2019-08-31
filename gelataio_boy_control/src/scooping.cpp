@@ -112,7 +112,7 @@ bool ScoopingMain::go_home(std::function<void(bool)> finish_cb) {
 
     stringstream ss; ss << "Current pose of right arm: " << endl << right_arm.getCurrentPose() << endl;
     ROS_INFO_STREAM(ss.str());
-    bool successful=false;
+    bool successful=true;
     this->active_arm = &right_arm;
 
     ROS_INFO("Going home");
