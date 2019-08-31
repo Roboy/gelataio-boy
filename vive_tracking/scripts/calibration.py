@@ -62,66 +62,102 @@ def _get_euler_angles_difference(tracker_1_name, tracker_2_name, tracker_1_pose,
 
 
 if __name__ == "__main__":
-    # use these to change publishing behaviour
-    head = False
-    shoulder_left = True
+    track_elbow = False
+    track_writst = False
 
     torso_tracker_name = "tracker_2"
     shoulder_tracker_name = "tracker_3"
+    forearm_tracker_name = "tracker_4"
+    palm_tracker_name = "tracker_5"
 
     v = triad_openvr.triad_openvr()
     v.print_discovered_objects()
 
 
-    #values for cardsflow
+    #Joint values for cardsflow
     relaxed_values = [0, 0, 0]
-    side_values = [0.0, -1.57, 0.0]
+    side_values = [0.0, 1.57, 0.0]
+    fist_up_values = [0.0, 1.57, -1.57]
+    arm_back_values = [1.57, 0.79, 0]
     front_values = [-1.57, 0, -1.57]
-    fist_up_values = [0.0, -1.57, 1.57]
-    arm_up_values = [0.0, -3.14, 1.57]
+    arm_up_values = [0.0, 3.14, 1.57]
+
+    elbow_relaxed = 0.0
+    elbow_bent = 1.57
+
+    palm_down = 0.0
+    palm_right = 1.57
+    palm_left = 1.57
+
+
 
     input("Relax your arm, put it down parallel to your torso with the palm facing towards you")
 
-    initial_pose_torso = v.devices["tracker_2"].get_pose_quaternion()
-    initial_pose_shoulder = v.devices["tracker_3"].get_pose_quaternion()
-    #initial_pose3 = v.devices["tracker_3"].get_pose_quaternion()
+    initial_pose_torso = v.devices[torso_tracker_name].get_pose_quaternion()
+    initial_pose_shoulder = v.devices[shoulder_tracker_name].get_pose_quaternion()
+    if track_elbow is True:
+        initial_pose_forearm =  v.devices[forearm_tracker_name].get_pose_quaternion()
+    if track_writst is True:
+        initial_pose_palm =  v.devices[palm_tracker_name].get_pose_quaternion()
 
     input("Point your right arm to the right, orthogonal to your body and bend your elbow so your hand points in front of you")
 
-    euler_side_12 = _get_euler_angles_difference(torso_tracker_name, shoulder_tracker_name, initial_pose_torso, initial_pose_shoulder)
+    euler_side_shoulder = _get_euler_angles_difference(torso_tracker_name, shoulder_tracker_name, initial_pose_torso, initial_pose_shoulder)
+    
+    if track_writst is True:
+        input("Point your palm down")
+        euler_down_palm = _get_euler_angles_difference(forearm_tracker_name, palm_tracker_name, initial_pose_forearm, initial_pose_palm)
+        input("Point your palm left")
+        euler_left_palm = _get_euler_angles_difference(forearm_tracker_name, palm_tracker_name, initial_pose_forearm, initial_pose_palm)
+        input("Point your palm right ")
+        euler_right_palm = _get_euler_angles_difference(forearm_tracker_name, palm_tracker_name, initial_pose_forearm, initial_pose_palm)
+
+    if track_elbow is True:
+        euler_elbow_bent = _get_euler_angles_difference(torso_tracker_name, forearm_tracker_name, initial_pose_shoulder, initial_pose_forearm)
+        input("Straighten your elbow ")
+        euler_elbow_straight = _get_euler_angles_difference(torso_tracker_name, forearm_tracker_name, initial_pose_shoulder, initial_pose_forearm)
+
+    input("Point your right arm back at 45 degrees, and bend your elbow so the whole surface of your arm is parallel to the ground")
+
+    euler_arm_back_shoulder = _get_euler_angles_difference(torso_tracker_name, shoulder_tracker_name, initial_pose_torso, initial_pose_shoulder)
 
     input("Point your right arm to the right, orthogonal to your body and bend your elbow so your hand points up")
 
-    euler_fist_up_12 = _get_euler_angles_difference(torso_tracker_name, shoulder_tracker_name, initial_pose_torso, initial_pose_shoulder)
+    euler_fist_up_shoulder = _get_euler_angles_difference(torso_tracker_name, shoulder_tracker_name, initial_pose_torso, initial_pose_shoulder)
 
     input("Point your right arm upwards, parallel to your body and bend your elbow so your hand points left")
 
-    euler_arm_up_12 = _get_euler_angles_difference(torso_tracker_name, shoulder_tracker_name, initial_pose_torso, initial_pose_shoulder)
+    euler_arm_up_shoulder = _get_euler_angles_difference(torso_tracker_name, shoulder_tracker_name, initial_pose_torso, initial_pose_shoulder)
 
     input("Point your right arm infront of you, orthogonal to your body and parallel to the ground, and bend your elbow so your hand points left")
 
-    euler_front_12 = _get_euler_angles_difference(torso_tracker_name, shoulder_tracker_name, initial_pose_torso, initial_pose_shoulder)
+    euler_front_shoulder = _get_euler_angles_difference(torso_tracker_name, shoulder_tracker_name, initial_pose_torso, initial_pose_shoulder)
     
     input("Relax your arm, put it down parallel to your torso with the palm facing towards you")
 
-    euler_relaxed_12 = _get_euler_angles_difference(torso_tracker_name, shoulder_tracker_name, initial_pose_torso, initial_pose_shoulder)
+    euler_relaxed_shoulder = _get_euler_angles_difference(torso_tracker_name, shoulder_tracker_name, initial_pose_torso, initial_pose_shoulder)
 
     reg_shoulder = linear_model.LinearRegression()
-    reg_shoulder.fit([euler_relaxed_12, euler_side_12, euler_fist_up_12, euler_front_12, euler_arm_up_12], [relaxed_values, side_values, fist_up_values, front_values, arm_up_values])
+    reg_shoulder.fit([euler_relaxed_shoulder, euler_side_shoulder, euler_arm_back_shoulder, euler_fist_up_shoulder, euler_front_shoulder, euler_arm_up_shoulder],
+                    [relaxed_values, side_values, arm_back_values, fist_up_values, front_values, arm_up_values])
 
-
-    #reg_elbow = linear_model.LinearRegression()
-    #eg_elbow.fit([euler_front_23, euler_bend_23], [0, 1.57])
-
-    
     csvfile =  open('calibration.csv', 'w')
     writer = csv.writer(csvfile)
 
-    print (reg_shoulder.coef_[0])
-    print ([0,0,0])
-    print (reg_shoulder.intercept_[0])
-    writer.writerow (np.concatenate((reg_shoulder.coef_[0], np.array([0,0,0]), np.array([reg_shoulder.intercept_[0]]))))
-    writer.writerow (np.concatenate((reg_shoulder.coef_[1], np.array([0,0,0]), np.array([reg_shoulder.intercept_[1]]))))
-    writer.writerow (np.concatenate((reg_shoulder.coef_[2], np.array([0,0,0]), np.array([reg_shoulder.intercept_[2]]))))
+    writer.writerow (np.concatenate((reg_shoulder.coef_[0], np.array([0,0,0,0,0,0]), np.array([reg_shoulder.intercept_[0]]))))
+    writer.writerow (np.concatenate((reg_shoulder.coef_[1], np.array([0,0,0,0,0,0]), np.array([reg_shoulder.intercept_[1]]))))
+    writer.writerow (np.concatenate((reg_shoulder.coef_[2], np.array([0,0,0,0,0,0]), np.array([reg_shoulder.intercept_[2]]))))
+    
+    if track_elbow is True:
+        reg_elbow = linear_model.LinearRegression()
+        reg_elbow.fit([euler_elbow_straight, euler_elbow_bent], [elbow_relaxed, elbow_bent])
+        writer.writerow (np.concatenate((np.array([0,0,0]), reg_elbow.coef_[0], np.array([0,0,0]), np.array([reg_elbow.intercept_[0]]))))
+    else:
+        writer.writerow (np.array([0,0,0,0,0,0,0,0,0,0]))
 
-    #writer.writerow ([0,0,0] + reg_elbow.coef_ + [reg_elbow.intercept_])
+    if track_writst is True:
+        reg_writst = linear_model.LinearRegression()
+        reg_writst.fit([euler_down_palm, euler_left_palm, euler_right_palm], [palm_down, palm_left, palm_right])
+        writer.writerow (np.concatenate((np.array([0,0,0,0,0,0]), reg_writst.coef_[0], np.array([reg_writst.intercept_[0]]))))
+    else:
+        writer.writerow (np.array([0,0,0,0,0,0,0,0,0,0]))
