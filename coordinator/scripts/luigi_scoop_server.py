@@ -5,6 +5,7 @@ roslib.load_manifest('coordinator')
 import rospy
 import actionlib
 from std_msgs.msg import *
+from std_srvs.srv import Trigger, TriggerRequest
 import sched, time
 
 # Imported msgs are OrderIceCreamAction, OrderIceCreamActionFeedback
@@ -34,6 +35,7 @@ class ScoopServer:
     self._feedback.finished_scoops = []
 
     # Status as to be sent for luigig as a feedback
+    # This is always overriden to "more time" as requested from luigi
     self.scooping_human_status_ = 'Did not receive any ice cream order yet!'
     
     # Status as recived from scooping_planning/scoop
@@ -48,6 +50,22 @@ class ScoopServer:
 
   def ScoopStatusCallback(self, scooping_status):
     self.scooping_status_ = scooping_status
+
+  # Arguments are of Pose type
+  def GoHome(self):
+    rospy.wait_for_service('scooping_planning/go_home')
+    try:
+      # TODO: Only call this when status is IDLE
+      goHome = rospy.ServiceProxy('scooping_planning/go_home', Trigger)
+
+      # Create an object of the type TriggerRequest. We nned a TriggerRequest for a Trigger service
+      req = TriggerRequest()
+
+      # Now send the request through the connection
+      resp = goHome(req)
+      return resp.success
+    except rospy.ServiceException, e:
+      print "Service call failed: %s"%e
 
   # Arguments are of Pose type
   def TranslationalPTPMotionClient(self, startPosition, endPosition):
@@ -177,6 +195,13 @@ class ScoopServer:
           #   #
       self._feedback.finished_scoops[scoop] = 1
 
+    wentHome = self.GoHome()
+
+    if wentHome:
+      rospy.loginfo('Went home')
+    else:
+      rospy.logwarn('Could not go home, the traffic is terrible')
+
     if success:
       self._result.success = True
       self._result.error_message = self.scooping_human_status_
@@ -192,6 +217,8 @@ class ScoopServer:
   def SendFeedbackLuigi(self, sc):
     if self.we_have_client_: 
       self._feedback.status_message = self.scooping_human_status_
+
+      self._feedback.status_message = "more time"
       self.server_.publish_feedback(self._feedback)
       s.enter(self._feedback_delay, 1, self.SendFeedbackLuigi, (sc,))
     else:
