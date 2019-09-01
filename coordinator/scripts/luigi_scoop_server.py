@@ -165,6 +165,8 @@ class ScoopServer:
           if not scoopingResponse:
             self.scooping_human_status_ = 'Failed to come up with a plan for step ' + str(i) + ' out of 5'
             success = False
+          else:
+            success = True
 
           r.sleep()
           
