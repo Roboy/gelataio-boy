@@ -1,31 +1,29 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(gelataio_boy_control)
+project(vive_tracking)
 
-add_compile_options(-std=c++11)
+## Compile as C++11, supported in ROS Kinetic and newer
+# add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  geometry_msgs
-  roscpp
   rospy
-  rviz
-  sensor_msgs
   std_msgs
   tf
   urdf
-  pluginlib
-  moveit_core
-  moveit_visual_tools
-  moveit_ros_planning
-  moveit_ros_planning_interface
-  moveit_ros_perception
+  xacro
+  geometry_msgs
+  roboy_middleware_msgs
 )
 
+
+
+
+
 ## System dependencies are found with CMake's conventions
-find_package(Boost REQUIRED COMPONENTS system)
-find_package(Eigen3 REQUIRED)
+# find_package(Boost REQUIRED COMPONENTS system)
+
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -39,7 +37,7 @@ find_package(Eigen3 REQUIRED)
 ## To declare and build messages, services or actions from within this
 ## package, follow these steps:
 ## * Let MSG_DEP_SET be the set of packages whose message types you use in
-##   your messages/services/actions (e.g. stds_msgs, actionlib_msgs, ...).
+##   your messages/services/actions (e.g. std_msgs, actionlib_msgs, ...).
 ## * In the file package.xml:
 ##   * add a build_depend tag for "message_generation"
 ##   * add a build_depend and a exec_depend tag for each package in MSG_DEP_SET
@@ -115,8 +113,8 @@ find_package(Eigen3 REQUIRED)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES scooping_cv
-  CATKIN_DEPENDS roscpp moveit_core moveit_visual_tools moveit_ros_planning_interface scooping_cv
-  DEPENDS EIGEN3
+#  CATKIN_DEPENDS gazebo_plugins geometry_msgs roscpp rospy rviz sensor_msgs std_msgs tf urdf xacro
+#  DEPENDS system_lib
 )
 
 ###########
@@ -126,14 +124,14 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  include
+# include
   ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
- add_library(${PROJECT_NAME}
-  src/hand_controller.cpp
- )
+# add_library(${PROJECT_NAME}
+#   src/${PROJECT_NAME}/scooping_cv.cpp
+# )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -143,7 +141,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(scooping_planning src/scooping_planning.cpp)
+# add_executable(${PROJECT_NAME}_node src/scooping_cv_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -156,13 +154,10 @@ add_executable(scooping_planning src/scooping_planning.cpp)
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(scooping_planning
-   ${catkin_LIBRARIES}
-   ${PROJECT_NAME}
- )
-target_link_libraries(${PROJECT_NAME}
-   ${catkin_LIBRARIES}
- )
+# target_link_libraries(${PROJECT_NAME}_node
+#   ${catkin_LIBRARIES}
+# )
+
 #############
 ## Install ##
 #############
@@ -185,10 +180,11 @@ target_link_libraries(${PROJECT_NAME}
 # )
 
 ## Mark cpp header files for installation
-install(DIRECTORY include/moveit/
-   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-   FILES_MATCHING PATTERN "*.h"
- )
+# install(DIRECTORY include/${PROJECT_NAME}/
+#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+#   FILES_MATCHING PATTERN "*.h"
+#   PATTERN ".svn" EXCLUDE
+# )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES
@@ -196,6 +192,19 @@ install(DIRECTORY include/moveit/
 #   # myfile2
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
+
+
+
+catkin_install_python(PROGRAMS
+  scripts/vr_puppet_republisher.py
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/bin
+)
+install(FILES
+  launch/republisher.launch
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)
+
+
 
 #############
 ## Testing ##

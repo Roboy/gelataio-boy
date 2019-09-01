@@ -1,0 +1,6 @@
+<launch>
+
+  <node name="fake_luigi_client" pkg="coordinator" type="fake_luigi_client.py" respawn="false" output="screen">
+  </node>
+
+</launch>

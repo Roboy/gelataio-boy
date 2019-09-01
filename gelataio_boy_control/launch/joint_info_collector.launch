@@ -1,0 +1,3 @@
+<launch>
+  <node name="joint_info_collector" pkg="gelataio_boy_control" type="joint_info_collector" respawn="false" output="screen"/>
+</launch>
