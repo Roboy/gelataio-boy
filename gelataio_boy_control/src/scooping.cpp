@@ -96,6 +96,15 @@ bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> f
         successful &= this->depart_from_scoop();
     }
 
+    if (successful) {
+        ROS_INFO("Dropping the ball");
+        geometry_msgs::Point destination;
+        destination.x = -0.3;
+        destination.y = -0.4;
+        destination.z = 0.4;
+        successful &= this->drop_ice(destination);
+    }
+
     ROS_INFO("Going home");
     successful &= right_arm.goHome();
 
@@ -156,7 +165,25 @@ void ScoopingMain::createObstacles() {
 }
 
 bool ScoopingMain::drop_ice(Point destination) {
-    ROS_ERROR("Not implemented.");
+    Pose drop_approach;
+    drop_approach.position = destination;
+
+    moveit_msgs::Constraints c;
+    moveit_msgs::JointConstraint dont_drop_ball_constraints;
+    dont_drop_ball_constraints.joint_name = "wrist_right";
+    dont_drop_ball_constraints.position = right_arm.jointStatus()["wrist_right"];
+    dont_drop_ball_constraints.tolerance_below = .15;
+    dont_drop_ball_constraints.tolerance_above = .15;
+    dont_drop_ball_constraints.weight = 1.0;
+    c.joint_constraints.push_back(dont_drop_ball_constraints);
+    right_arm.setPlanningTime(10.0);
+
+    bool success = right_arm.moveToPose(drop_approach, c);
+
+    right_arm.setPlanningTime(1.0);
+    success &= right_arm.moveJoint("wrist_right", -0.8);
+
+    return success;
 }
 
 bool ScoopingMain::approach_scoop_point(geometry_msgs::Point scoop_point) {
@@ -176,9 +203,9 @@ bool ScoopingMain::approach_scoop_point(geometry_msgs::Point scoop_point) {
     moveit_msgs::Constraints constraints;
     moveit_msgs::JointConstraint wristConstraint;
     wristConstraint.joint_name = "wrist_right";
-    wristConstraint.position = 0.8;
+    wristConstraint.position = -0.2;
     wristConstraint.tolerance_below = .1;
-    wristConstraint.tolerance_above = 3.14/2;
+    wristConstraint.tolerance_above = 1.0;
     wristConstraint.weight = 1.0;
     constraints.joint_constraints.push_back(wristConstraint);
     right_arm.setPlanningTime(10.0);
@@ -187,12 +214,24 @@ bool ScoopingMain::approach_scoop_point(geometry_msgs::Point scoop_point) {
 
 bool ScoopingMain::perform_scoop() {
     right_arm.setPlanningTime(1.0);
-    return right_arm.moveJoint("wrist_right", -0.5);
+    return right_arm.moveJoint("wrist_right", 1.4);
 }
 
 bool ScoopingMain::depart_from_scoop() {
-    right_arm.setPlanningTime(5.0);
-    ROS_WARN("Depart from scoop motion not yet implemented");
-    return true;
+    Pose current_pose = right_arm.getCurrentPose().pose;
+    Pose move_up(current_pose);
+    move_up.position.z += 0.05;
+
+    moveit_msgs::Constraints c;
+    moveit_msgs::JointConstraint dont_drop_ball_constraints;
+    dont_drop_ball_constraints.joint_name = "wrist_right";
+    dont_drop_ball_constraints.position = right_arm.jointStatus()["wrist_right"];
+    dont_drop_ball_constraints.tolerance_below = .15;
+    dont_drop_ball_constraints.tolerance_above = .15;
+    dont_drop_ball_constraints.weight = 1.0;
+    c.joint_constraints.push_back(dont_drop_ball_constraints);
+    right_arm.setPlanningTime(10.0);
+
+    return right_arm.moveToPose(move_up, c);
 }
 

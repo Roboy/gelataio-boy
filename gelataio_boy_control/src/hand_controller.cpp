@@ -24,7 +24,7 @@ HandController::PlanningResult HandController::plan(double tolerance) {
     for (const auto &m : this->jointStatus()) {
         ss << "\t" << m.first << ":\t" << m.second << endl;
     }
-    ROS_INFO_STREAM(ss.str());
+//    ROS_INFO_STREAM(ss.str());
 
     planning_result = this->m_move_group_ptr->plan(plan);
     ROS_INFO("Finished planning.");
@@ -66,17 +66,10 @@ bool HandController::planAndExecute() {
 
 }
 
-bool HandController::moveToPose(geometry_msgs::PoseStamped target_pose) {
-    this->m_move_group_ptr->setPoseTarget(target_pose);
-
-    return this->planAndExecute();
-}
-
 bool HandController::moveToPose(geometry_msgs::Pose target_pose, moveit_msgs::Constraints &constraints) {
     std::stringstream ss;
     ss << "Target pose for moveIT planning: " << std::endl << target_pose << std::endl;
-    ROS_INFO_STREAM(ss.str());
-
+//    ROS_INFO_STREAM(ss.str());
     this->m_move_group_ptr->setPoseTarget(target_pose);
     this->m_move_group_ptr->setPathConstraints(constraints);
     this->m_move_group_ptr->setPlanningTime(planning_time);
@@ -161,7 +154,6 @@ std::pair<bool, int> findInVector(const std::vector<T> &vecOfElements, const T &
 bool HandController::moveJoint(std::string joint_name, double target_angle) {
     moveit_msgs::Constraints c;
     this->m_move_group_ptr->setPathConstraints(c);
-    //Create map of jointName -> currentJointValue
     map<std::string, double> jointAngles = this->jointStatus();
 
     stringstream ss1, ss2;
@@ -177,8 +169,8 @@ bool HandController::moveJoint(std::string joint_name, double target_angle) {
     for (const auto &m : jointAngles) {
         ss2 << "\t" << m.first << "\t" << m.second << endl;
     }
-    ROS_INFO_STREAM(ss1.str());
-    ROS_INFO_STREAM(ss2.str());
+//    ROS_INFO_STREAM(ss1.str());
+//    ROS_INFO_STREAM(ss2.str());
 
     this->m_move_group_ptr->setJointValueTarget(jointAngles);
     return this->planAndExecute();
@@ -205,6 +197,8 @@ bool HandController::goHome() {
         desiredState[name.first] = 0.0;
     }
 
+    moveit_msgs::Constraints c;
+    this->m_move_group_ptr->setPathConstraints(c);
     this->m_move_group_ptr->setJointValueTarget(desiredState);
     return this->planAndExecute();
 }
