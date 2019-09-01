@@ -49,9 +49,14 @@ THe magic happens in the src/tracking/multi_obj_state_to_pose.py file, where the
 
 
 ## Example Usage
+If running it in a docker container, don't forget to mount the container using priveleged mode:
+`docker run -it --privileged -v /dev/bus/usb:/dev/bus/usb <container_name>`
 
 Start camera:  
 `roslaunch realsense_camera r200_nodelet_modify_params.launch` 
+ 
+Or to run it using D435 and realsense 2, use 
+`roslaunch realsense2_camera rs_camera.launch`
 
 Start service:    
 `roslaunch scooping_cv multi_object_tracker_service.launch`

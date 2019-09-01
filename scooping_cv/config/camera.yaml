@@ -3,7 +3,7 @@
 
 # depth_image_topic: /zed/zed_node/depth/depth_registered
 # camera_info_topic: /zed/zed_node/depth/camera_info 
-depth_image_topic: /camera/depth/image_raw_throttle
+depth_image_topic: /camera/depth/image_rect_raw_throttle
 camera_info_topic: /camera/depth/camera_info
 # depth_image_topic: /camera/depth/image
 # camera_info_topic: /camera/depth/camera_info

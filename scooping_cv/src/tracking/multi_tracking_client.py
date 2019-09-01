@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 import sys
 import rospy
@@ -14,7 +14,7 @@ from geometry_msgs.msg import PoseStamped
 from ar_track_alvar_msgs.msg import AlvarMarkers
 
 
-ar_marker = True
+ar_marker = False
 
 def track_object(object_name):
 
