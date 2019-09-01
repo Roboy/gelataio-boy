@@ -20,7 +20,7 @@ import numpy as np
 
 # Map between flavors and points of scooping
 availableFlavors = {}
-vision_working = False
+vision_working = True
 
 # The number of steps we need to scoop a single scoop (tuned manually)
 scoopingSteps = 2
