@@ -21,7 +21,7 @@ import numpy as np
 availableFlavors = ['choco', 'spagetti']
 
 # The number of steps we need to scoop a single scoop (tuned manually)
-scoopingSteps = 2
+scoopingSteps = 1
 
 class ScoopServer:
   _feedback = OrderIceCreamFeedback()
