@@ -80,8 +80,8 @@ class ScoopServer:
 
   # For now we set which flavor is where by hand (manually), unless vision can provide us with an api
   def GetFlavorStartingPoint(self, flavor):
-    leftStartPoint = Point(x=-0.1, y=-0.4, z=0.25)
-    rightStartPoint = Point(x=-0.1, y=-0.4, z=0.25)
+    leftStartPoint = Point(x=-0.27, y=-0.5, z=0.6)
+    rightStartPoint = Point(x=-0.27, y=-0.5, z=0.6)
     startingPoint = Point()
 
     # Left ice cream box
@@ -139,18 +139,17 @@ class ScoopServer:
       # Loop for how many scoops of this flavor, really luigi??
       for scoopPerFlavor in range(scoops[scoop]):
 
-        # Go to start point depending on the flavor
-        scoopingResponse = self.TranslationalPTPMotionClient(startingPoint, startingPoint)
-        if not scoopingResponse:
-          self.scooping_human_status_ = 'Failed to come up with a plan for step ' + str(i) + ' out of 5'
-          success = False
+        # # Go to start point depending on the flavor
+        # scoopingResponse = self.TranslationalPTPMotionClient(startingPoint, startingPoint)
+        # if not scoopingResponse:
+        #   self.scooping_human_status_ = 'Failed to come up with a plan for step ' + str(i) + ' out of 5'
+        success = True
 
         # Each scoop is done in scoopingSteps
         for i in range(scoopingSteps):
           # Wait for scooping_planning/status to be idle
           # Calculate new point
           # Send point to scooping_planning/scoop
-
 
           # Wait for scooping_planning/status to be idle
           while not str(self.scooping_status_.data) == 'IDLE' and not rospy.is_shutdown():
@@ -160,37 +159,25 @@ class ScoopServer:
           # If not IDLE, update scooping status
           self.scooping_human_status_ = str(self.scooping_status_.data) + ' in step ' + str(i) + ' out of 5'
 
-
           # Now for step 2 and 3
           # Move along the y-z plane (ice cream surface)     
-          scoopingResponse = self.TranslationalPTPMotionClient(Point(x=-0.1, y=-0.4, z=0.25), Point(x=-0.1, y=-0.3, z=0.25))
+          scoopingResponse = self.TranslationalPTPMotionClient(startingPoint, startingPoint)
           if not scoopingResponse:
             self.scooping_human_status_ = 'Failed to come up with a plan for step ' + str(i) + ' out of 5'
             success = False
 
+          r.sleep()
+          
+
+          # Wait for scooping_planning/status to be idle
+          while not str(self.scooping_status_.data) == 'IDLE' and not rospy.is_shutdown():
+            self.scooping_human_status_ = str(self.scooping_status_.data) + ' need more time'
+            rospy.sleep(1.)          
 
           # Has to sleep here because the rate we check for the scooping status is faster than
           # the scooping status publish rate, now sleep rate is 3hz, scoop publish rate is 5hz
           r.sleep()
-
-          # Fill up self._feedback.scoops[] with 1s for every scoop scooped
-
-          # For now doneScooping_ is set manually by trial and error
-          # Can vision confirm if the scoop has been filled? for now, No
-          # while not self.doneScooping_:
-          
-          # The scooper always starts at the top of the icecream box
-
-          # Use a dummy matrix for now
-          # Go to the highest point near the corner
-          # TODO: as Alona mentioned we have no idea what are the 
-          # cpablities of the hand righ now
-          # We only go horizantly (along the longest axis of the icecream box)
-          # surface = np.random.array((30, 20, 5))
-          # for i in surface.shape[0]:
-          #   for j in surface.shape[1]:
-          #     print(surface[i][j])
-     
+               
           #   # call scooping service with the points
           #   #
       self._feedback.finished_scoops[scoop] = 1
