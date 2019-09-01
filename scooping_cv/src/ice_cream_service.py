@@ -2,7 +2,7 @@
 
 # ROS
 import rospy, time, tf
-from sensor_msgs.msg import Image, PointCloud2
+from sensor_msgs.msg import Image, PointCloud2, PointField
 from geometry_msgs.msg import Point
 from cv_bridge import CvBridge, CvBridgeError
 
@@ -80,24 +80,30 @@ def getPointCloud2Msg(mesh):
     Get PointCloud2 msg from an array
     """
     msg = PointCloud2()
-    msg.header.frame_id = "torso"
+    msg.header.frame_id = 'torso'
 
-    msg.width = mesh.shape[1]
-    msg.height = mesh.shape[0]
+    msg.height = 1
+    msg.width = len(mesh)
     
+    msg.fields = [
+        PointField('x', 0, PointField.FLOAT32, 1),
+        PointField('y', 4, PointField.FLOAT32, 1),
+        PointField('z', 8, PointField.FLOAT32, 1)
+        ]
+    
+    msg.is_bigendian = False
+    msg.point_step = 12
+    msg.row_step = 12 * mesh.shape[0]
+    msg.is_dense = int(np.isfinite(mesh).all())
+
     msg.data = np.asarray(mesh, np.float32).tostring()
+
     return msg
 
 def findScoopingPoint(point_cloud):
     """
     Finds the highest point in the ice cream point cloud.
     """
-    # ----- Visualization -----
-    fig = plt.figure(figsize=(12,6))
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(point_cloud[:,0], point_cloud[:,1], point_cloud[:,2], c='blue', alpha=0.1)
-    # -------------------------
-    
     # Zero mean
     mesh = point_cloud - np.mean(point_cloud, axis=0)
 
@@ -128,12 +134,6 @@ def findScoopingPoint(point_cloud):
 
     scoop_point = valid_points[np.random.choice(len(valid_points))]
 
-    # ----- Visualization -----
-    ax.scatter(mesh[:,0], mesh[:,1], mesh[:,2], c='green', alpha=0.1)
-    ax.scatter(scoop_point[0], scoop_point[1], scoop_point[2], c='red')
-    plt.show()
-    # -------------------------
-
     return scoop_point
 
 def getServiceResponse(request):
@@ -150,7 +150,8 @@ def getServiceResponse(request):
     #mesh = mesh[np.linspace(0,len(mesh)-1,700).astype('int')]
     #mesh[:,2] += np.cos((mesh[:,0] ** 2 + mesh[:,1] ** 2) * 1000) / 25
     
-    global zed_cam_data
+    global zed_cam_data, pc_publisher
+
     zed_cam_data['flavor'] = request.flavor
     
     """mesh = None
@@ -174,9 +175,12 @@ def getServiceResponse(request):
     if mesh is None:
         return DetectIceCreamResponse(Point(), Point(), 'Point cloud could not be detected')
     
-    mesh = transformCam2Torso(mesh)
+    #mesh = transformCam2Torso(mesh)
+
+    # ----- RVIZ Visualization -----
     msg = getPointCloud2Msg(mesh)
-    print(msg)
+    pc_publisher.publish(msg)
+    # -------------------------
 
     # Find a scooping point
     scoop_point = findScoopingPoint(mesh)
