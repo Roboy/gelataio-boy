@@ -15,7 +15,7 @@
   <!-- Load the URDF, SRDF and other .yaml configuration files on the param server -->
   <include file="$(find kindyn)/launch/robot.launch">
     <arg name="robot_name" value="roboy_icecream"/>
-    <arg name="urdf_file_name" value="model.urdf"/>
+    <arg name="urdf_file_name" value="cardsflow.urdf"/>
     <arg name="simulated" value="false"/>
     <arg name="external_robot_state" value="true"/>
   </include>
