@@ -93,8 +93,9 @@ if __name__ == "__main__":
         initial_pose_palm =  v.devices[palm_tracker_name].get_pose_quaternion()
 
     joint_target_publisher = rospy.Publisher('/joint_targets', JointState, queue_size=1)
+    with open("calibration_file", 'rb') as pickle_file:
+        reg_shoulder = pickle.load(pickle_file)
 
-    reg_shoulder = pickle.load("calibration_file")
     while not rospy.is_shutdown():
         start = time.time()
 
@@ -105,7 +106,7 @@ if __name__ == "__main__":
         #shoulder_axis2 = coefficients[2][0]*euler_shoulder[0] - coefficients[2][1]*euler_shoulder[1] + coefficients[2][2]*euler_shoulder[2] + coefficients[2][9]
         
         mat = R.from_euler('xyz', euler_shoulder).as_dcm()
-        pred = reg_shoulder.predict([test.mat()])
+        pred = reg_shoulder.predict([mat.flatten()])
         predicted_mat = np.reshape(pred, (3,3))
         pred_angles = R.from_dcm(predicted_mat).as_euler('xyz')
 

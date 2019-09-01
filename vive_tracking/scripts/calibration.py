@@ -68,7 +68,7 @@ if __name__ == "__main__":
     track_writst = False
 
     torso_tracker_name = "tracker_1"
-    shoulder_tracker_name = "tracker_2"
+    shoulder_tracker_name = "tracker_3"
     forearm_tracker_name = "tracker_3"
     palm_tracker_name = "tracker_5"
 
@@ -105,14 +105,9 @@ if __name__ == "__main__":
     input("Point your right arm to the right, orthogonal to your body and bend your elbow so your hand points in front of you")
 
     euler_side_shoulder = _get_euler_angles_difference(torso_tracker_name, shoulder_tracker_name, initial_pose_torso, initial_pose_shoulder)
-    
+
     if track_writst is True:
-        input("Point your p relaxed_values = [0, 0, 0]
-    side_values = [0.0, 1.57, 0.0]
-    fist_up_values = [0.0, 1.57, -1.57]
-    arm_back_values = [1.57, 0.79, 0]
-    front_values = [-1.57, 0, -1.57]
-    arm_up_values = [0.0, 3.14, 1.57]alm down")
+        input("Point your palm down")
         euler_down_palm = _get_euler_angles_difference(forearm_tracker_name, palm_tracker_name, initial_pose_forearm, initial_pose_palm)
         input("Point your palm left")
         euler_left_palm = _get_euler_angles_difference(forearm_tracker_name, palm_tracker_name, initial_pose_forearm, initial_pose_palm)
@@ -148,24 +143,34 @@ if __name__ == "__main__":
     targets = [relaxed_values, side_values, arm_back_values, fist_up_values, front_values, arm_up_values]
 
     vectorized_datapoints = R.from_euler('xyz', datapoints).as_dcm()
-    vectorized_datapoints = np.array([a.flatten() for a in rotvecs])
+    vectorized_datapoints = np.array([a.flatten() for a in vectorized_datapoints])
     vectorized_targets = R.from_euler('xyz', targets).as_dcm()
     vectorized_targets = np.array([a.flatten() for a in vectorized_targets])
 
     reg_shoulder = linear_model.LinearRegression()
     reg_shoulder.fit(vectorized_datapoints, vectorized_targets)
 
-    pickle.dump(reg_shoulder, "calibration_file")
+    with open("calibration_file", 'wb') as pickle_file:
+        pickle.dump(reg_shoulder, pickle_file)
 
     #csvfile =  open('calibration.csv', 'w')
     #writer = csv.writer(csvfile)
 
     #[array([0.6578727, 0.45521055, 1.12019768]), array([ 0.24424409, -0.02194311,  0.07315386]), array([ 0.31908318,  0.43454081, -0.00398665]), array([ 0.94450428, -0.07541627,  0.07306826]), array([-0.43969506, -0.24915067,  0.81210489]), array([ 0.26728001, -1.29651049,  0.26622031])]
-    #print ([euler_relaxed_shoulder, euler_side_shoulder, euler_arm_back_shoulder, euler_fist_up_shoulder, euler_front_shoulder, euler_arm_up_shoulder])
-    #writer.writerow (np.concatenate((reg_shoulder.coef_[0], np.array([0,0,0,0,0,0]), np.array([reg_shoulder.intercept_[0]]))))
+    #[array([ 0.82367867,  1.23621104, -0.0194994 ]), array([-1.18829804,  0.68968749, -2.18202836]), array([-1.79264824, -0.56900638,  1.84069479]), array([-2.32802682,  0.3799543 ,  2.78882856]), array([2.0818828 , 0.59958306, 1.77945669]), array([-0.92680742,  0.32957477, -1.32674745])]
+
+    print ([euler_relaxed_shoulder, euler_side_shoulder, euler_arm_back_shoulder, euler_fist_up_shoulder, euler_front_shoulder, euler_arm_up_shoulder])
+
+
+    input('dsadas')
+    e1 = _get_euler_angles_difference(torso_tracker_name, shoulder_tracker_name, initial_pose_torso, initial_pose_shoulder)
+    input("dsa")
+    e2 = _get_euler_angles_difference(torso_tracker_name, shoulder_tracker_name, initial_pose_torso, initial_pose_shoulder)
+
+#writer.writerow (np.concatenate((reg_shoulder.coef_[0], np.array([0,0,0,0,0,0]), np.array([reg_shoulder.intercept_[0]]))))
     #writer.writerow (np.concatenate((reg_shoulder.coef_[1], np.array([0,0,0,0,0,0]), np.array([reg_shoulder.intercept_[1]]))))
     #writer.writerow (np.concatenate((reg_shoulder.coef_[2], np.array([0,0,0,0,0,0]), np.array([reg_shoulder.intercept_[2]]))))
-
+"""
     if track_elbow is True:
         reg_elbow = linear_model.LinearRegression()
         reg_elbow.fit([euler_elbow_straight, euler_elbow_bent], [elbow_relaxed, elbow_bent])
@@ -179,3 +184,4 @@ if __name__ == "__main__":
         writer.writerow (np.concatenate((np.array([0,0,0,0,0,0]), reg_writst.coef_, np.array([reg_writst.intercept_]))))
     else:
         writer.writerow (np.array([0,0,0,0,0,0,0,0,0,0]))
+"""
