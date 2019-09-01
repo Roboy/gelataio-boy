@@ -57,12 +57,6 @@ public:
 
     bool moveToPose(geometry_msgs::Pose target_pose, moveit_msgs::Constraints &contraints);
 
-    /**
-     * Move to pose.
-     * @param target_pose   Target pose with frame id
-     * @return true if successful
-     */
-    bool moveToPose(geometry_msgs::PoseStamped target_pose);
 
     /**
      * Move to poses.
@@ -111,6 +105,7 @@ public:
     enum Status get_status() {return this->status;}
 
 
+    std::map<std::string, double> jointStatus();
 
 private:
     struct PlanningResult {
@@ -118,7 +113,6 @@ private:
         moveit::planning_interface::MoveItErrorCode planning_status;
     };
 
-    std::map<std::string, double> jointStatus();
 
     PlanningResult plan(double tolerance=0.1);
 

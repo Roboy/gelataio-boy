@@ -125,7 +125,6 @@
     <disable_collisions link1="scooper_target" link2="shoulder_right_link2" reason="Never" />
     <disable_collisions link1="scooper_target" link2="sphere_link1" reason="Default" />
     <disable_collisions link1="scooper_target" link2="sphere_link2" reason="Adjacent" />
-    <disable_collisions link1="scooper_target" link2="zed_mini" reason="Never" />
     <disable_collisions link1="shoulder_left_link1" link2="shoulder_left_link2" reason="Adjacent" />
     <disable_collisions link1="shoulder_left_link1" link2="shoulder_right_link1" reason="Never" />
     <disable_collisions link1="shoulder_left_link1" link2="shoulder_right_link2" reason="Never" />
