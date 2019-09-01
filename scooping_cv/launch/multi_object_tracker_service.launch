@@ -1,0 +1,21 @@
+<launch>
+  <arg name="camera_config" default="$(find scooping_cv)/config/camera.yaml"/>
+  <arg name="filter_config" default="$(find scooping_cv)/config/particle_tracker.yaml"/>
+  <arg name="service_config" default="$(find scooping_cv)/config/object_tracker_services.yaml"/>
+
+  <node
+    name="multi_object_tracker_service"
+    type="multi_object_tracker_service"
+    pkg="scooping_cv"
+    output="screen"
+    respawn="false">
+    <!-- launch-prefix="xterm -bg FloralWhite -fg MistyRose4 -e" -->
+        <rosparam command="load" file="$(arg filter_config)" />
+        <rosparam command="load" file="$(arg camera_config)" />
+        <rosparam command="load" file="$(arg service_config)" />
+  </node>
+
+    <node name="foo_throttler" type="throttle" pkg="topic_tools" args="messages /camera/depth/image_rect_raw 10.0" />
+
+  <node name="multi_obj_state_to_pose" type="multi_obj_state_to_pose.py" pkg="scooping_cv" output="screen"/>    
+</launch>

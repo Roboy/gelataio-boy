@@ -64,7 +64,12 @@
   <build_depend>moveit_ros_perception</build_depend>
   <build_depend>moveit_visual_tools</build_depend>
   <build_depend>rviz_visual_tools</build_depend>
+<<<<<<< HEAD:gelatio_boy_control/package.xml
+  <build_depend>scooping_cv</build_depend>
+
+=======
   <build_depend>roboy_control_msgs</build_depend>
+>>>>>>> master:gelataio_boy_control/package.xml
   <build_export_depend>geometry_msgs</build_export_depend>
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>rospy</build_export_depend>
@@ -88,8 +93,13 @@
   <exec_depend>moveit_ros_perception</exec_depend>
   <exec_depend>moveit_visual_tools</exec_depend>
   <exec_depend>rviz_visual_tools</exec_depend>
+<<<<<<< HEAD:gelatio_boy_control/package.xml
+<!--   <exec_depend>scooping_cv</exec_depend>
+ -->
+=======
   <exec_depend>roboy_control_msgs</exec_depend>
 
+>>>>>>> master:gelataio_boy_control/package.xml
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->

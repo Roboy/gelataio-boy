@@ -116,7 +116,11 @@ find_package(Eigen3 REQUIRED)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES scooping_cv
+<<<<<<< HEAD:gelatio_boy_control/CMakeLists.txt
+  CATKIN_DEPENDS roscpp moveit_core moveit_visual_tools moveit_ros_planning_interface scooping_cv
+=======
   CATKIN_DEPENDS roscpp moveit_core moveit_visual_tools moveit_ros_planning_interface roboy_control_msgs
+>>>>>>> master:gelataio_boy_control/CMakeLists.txt
   DEPENDS EIGEN3
 )
 

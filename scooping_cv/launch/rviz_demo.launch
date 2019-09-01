@@ -1,0 +1,11 @@
+<launch>
+
+<!-- <node name="obj_state_to_pose" type="obj_state_to_pose.py" pkg="scooping_cv" output="screen"/> -->
+<!-- <node name="multi_obj_state_to_pose" type="multi_obj_state_to_pose.py" pkg="scooping_cv" output="screen"/> -->
+
+<node type="rviz" name="rviz" pkg="rviz" args="-d $(find scooping_cv)/launch/ar_tracking.rviz" />
+
+<!-- <node name="foo_throttler" type="throttle" pkg="topic_tools" args="messages /camera/depth/image_raw 10.0" /> -->
+
+
+</launch>

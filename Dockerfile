@@ -5,7 +5,6 @@ SHELL ["/bin/bash", "-c"]
 RUN cd /root && mkdir scooping_ws && cd scooping_ws && mkdir src && cd src && mkdir gelataio-boy
 
 WORKDIR /root/scooping_ws/src
-COPY . ./gelataio-boy
 
 #CARDSflow dependencies
 RUN apt update
@@ -23,4 +22,28 @@ RUN cd CARDSflow/qpOASES && mkdir build && cd build && cmake .. && make -j9 inst
 RUN apt install --yes --force-yes ros-melodic-moveit
 RUN apt install --yes --force-yes ros-$ROS_DISTRO-moveit-visual-tools ros-$ROS_DISTRO-gazebo-plugins
 
-RUN source /opt/ros/melodic/setup.bash && cd .. && catkin_make
+#Eigen for bayesian object tracking
+RUN wget http://bitbucket.org/eigen/eigen/get/3.2.10.tar.bz2
+RUN tar -xf 3.2.10.tar.bz2
+RUN cd eigen-eigen-b9cd8366d4e8 && mkdir build && cd build && cmake .. && make install
+
+#Bayesian object tracking
+RUN git clone https://github.com/filtering-library/fl
+RUN git clone https://github.com/bayesian-object-tracking/dbot
+RUN cd dbot && git checkout xenial-xerus-dev
+
+RUN git clone https://github.com/bayesian-object-tracking/dbot_ros
+RUN cd dbot_ros && git checkout xenial-xerus-kinetic-dev
+
+RUN git clone https://github.com/bayesian-object-tracking/dbot_ros_msgs
+RUN cd dbot_ros_msgs && git checkout xenial-xerus-kinetic-dev
+
+#Realsense camera libraries
+RUN apt-get install --yes --force-yes --install-recommends ros-$ROS_DISTRO-ddynamic-reconfigure
+RUN apt-key adv --keyserver keys.gnupg.net --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE || apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE
+RUN add-apt-repository "deb http://realsense-hw-public.s3.amazonaws.com/Debian/apt-repo bionic main" -u
+RUN apt-get --yes --force-yes install librealsense2-dkms librealsense2-utils librealsense2-dev librealsense2-dbg
+RUN git clone https://github.com/IntelRealSense/realsense-ros.git
+
+
+RUN source /opt/ros/melodic/setup.bash && cd .. && catkin_make -DCMAKE_BUILD_TYPE=Release -DDBOT_BUILD_GPU=On

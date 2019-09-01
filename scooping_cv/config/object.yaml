@@ -1,0 +1,7 @@
+
+object:
+  package:    scooping_cv
+  directory:  meshes/tracking
+  meshes:     [ cup.obj ]
+
+

@@ -63,7 +63,34 @@ class ImageConverter:
 		cv2.imshow('depth image', self.cv_image_rgb)
 		cv2.waitKey(1)
 
+    def get_rgb(self):
+        
+        # Show images.
+        cv2.imshow('depth image', self.cv_image_rgb)
+        cv2.waitKey(1)
+
 def main():
+<<<<<<< HEAD
+    ic = ImageConverter()
+	filt = ColorFilter("C")
+    rospy.init_node('image_converter', anonymous=True)
+    rospy.loginfo("Node running.")
+
+    # 30 FPS = 60 Hz
+    rate = rospy.Rate(60)
+
+    try:
+        while not rospy.is_shutdown():
+
+            if ic.callback_received:
+				cv2.imshow('filtered_img', filt.filter(ic.cv_image_rgb))
+				cv2.waitKey(1)
+
+            rate.sleep()
+    except KeyboardInterrupt:
+        print "Shutting down"
+    cv2.destroyAllWindows()
+=======
 	ic = ImageConverter()
 	filt = ColorFilter("C")
 	rospy.init_node('image_converter', anonymous=True)
@@ -87,6 +114,7 @@ def main():
 	except KeyboardInterrupt:
 		print "Shutting down"
 	cv2.destroyAllWindows()
+>>>>>>> master
 
 if __name__ == '__main__':
 	main()
