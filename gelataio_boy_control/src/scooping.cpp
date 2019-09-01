@@ -233,6 +233,8 @@ bool ScoopingMain::approach_scoop_point(geometry_msgs::Point scoop_point) {
     wristConstraint.weight = 1.0;
     constraints.joint_constraints.push_back(wristConstraint);
     right_arm.setPlanningTime(10.0);
+
+    if (cardsflow) cardsflow->moveJointTo("wrist_right", wristConstraint.position);
     return right_arm.moveToPose(scooping_start, constraints);
 }
 

@@ -62,19 +62,18 @@ bool CardsflowPlanExecutor::executePlan(moveit::planning_interface::MoveGroupInt
 
 bool CardsflowPlanExecutor::moveJointTo(std::string joint_name, double target) {
 
-    if (joint_name == "wrist_right") {
-        roboy_middleware_msgs::MotorCommand cmd;
-        cmd.id = 6;
-        cmd.motors.push_back(2);
-        cmd.set_points.push_back(rad2deg(target));
-        motor_command_pub.publish(cmd);
-    } else {
-        if (std::find(ignored_joints.begin(), ignored_joints.end(), joint_name) == ignored_joints.end()) {
-            sensor_msgs::JointState targets;
-            targets.name.push_back(joint_name);
-            targets.position.push_back(target);
-            targets.velocity.push_back(0.0);
-            joint_target_pub.publish(targets);
+    if (std::find(ignored_joints.begin(), ignored_joints.end(), joint_name) == ignored_joints.end()) {
+        if (joint_name == "wrist_right") {
+            roboy_middleware_msgs::MotorCommand cmd;
+            cmd.id = 6;
+            cmd.motors.push_back(2);
+            cmd.set_points.push_back(rad2deg(target));
+            motor_command_pub.publish(cmd);
         }
+        sensor_msgs::JointState targets;
+        targets.name.push_back(joint_name);
+        targets.position.push_back(target);
+        targets.velocity.push_back(0.0);
+        joint_target_pub.publish(targets);
     }
 }
