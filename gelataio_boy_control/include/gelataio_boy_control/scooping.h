@@ -25,6 +25,7 @@ public:
 
 
 protected:
+    bool start_scoop_appraoch_via();
     bool approach_scoop_point(geometry_msgs::Point scoop_point);
     bool perform_scoop();
     bool depart_from_scoop();

@@ -83,17 +83,30 @@ bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> f
     ROS_INFO_STREAM(ss.str());
 
     this->active_arm = &right_arm;
-    ROS_INFO("Moving to start point for scooping");
-    bool successful = this->approach_scoop_point(start);
+    ROS_INFO("Moving to the scene");
+    bool successful = this->start_scoop_appraoch_via();
+
+    if (successful) {
+        ROS_INFO("Moving to start point for scooping");
+        successful &= this->approach_scoop_point(start);
+    } else {
+        ROS_WARN("Skipping appraoch");
+    }
+
+    successful = true; //TODO
     if (successful) {
         ROS_INFO("Movement to the start point was successful :)");
         ROS_INFO("Performing the scoop");
         successful &= this->perform_scoop();
+    } else {
+        ROS_WARN("Skipping perform scoop");
     }
 
     if (successful) {
         ROS_INFO("Departing from the scoop stage");
         successful &= this->depart_from_scoop();
+    } else {
+        ROS_WARN("Skipping scoop departing");
     }
 
     if (successful) {
@@ -103,6 +116,8 @@ bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> f
         destination.y = -0.4;
         destination.z = 0.4;
         successful &= this->drop_ice(destination);
+    } else {
+        ROS_WARN("Skipping the drop");
     }
 
     ROS_INFO("Going home");
@@ -186,6 +201,15 @@ bool ScoopingMain::drop_ice(Point destination) {
     return success;
 }
 
+bool ScoopingMain::start_scoop_appraoch_via() {
+    Pose p;
+    p.position.x = -0.4;
+    p.position.y = -0.5;
+    p.position.z = 0.55;
+
+    return right_arm.moveToPose(p);
+}
+
 bool ScoopingMain::approach_scoop_point(geometry_msgs::Point scoop_point) {
     Pose scooping_start;
 
@@ -234,4 +258,5 @@ bool ScoopingMain::depart_from_scoop() {
 
     return right_arm.moveToPose(move_up, c);
 }
+
 
