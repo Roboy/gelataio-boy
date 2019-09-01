@@ -178,11 +178,15 @@ class ScoopServer:
 
           # Has to sleep here because the rate we check for the scooping status is faster than
           # the scooping status publish rate, now sleep rate is 3hz, scoop publish rate is 5hz
-          r.sleep()
+          r.sleep(0.5)
                
           #   # call scooping service with the points
           #   #
       self._feedback.finished_scoops[scoop] = 1
+
+    while not str(self.scooping_status_.data) == 'IDLE'
+      rospy.loginfo('Waiting for scooping to go idle')
+      rospy.sleep(1.)
 
     wentHome = self.GoHome()
 
