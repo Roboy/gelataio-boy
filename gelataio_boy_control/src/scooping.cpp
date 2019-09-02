@@ -90,10 +90,9 @@ bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> f
         ROS_INFO("Moving to start point for scooping");
         successful &= this->approach_scoop_point(start);
     } else {
-        ROS_WARN("Skipping appraoch");
+        ROS_WARN("Skipping approach");
     }
 
-    successful = true; //TODO
     if (successful) {
         ROS_INFO("Movement to the start point was successful :)");
         ROS_INFO("Performing the scoop");
@@ -190,6 +189,17 @@ bool ScoopingMain::drop_ice(Point destination) {
     dont_drop_ball_constraints.tolerance_below = .15;
     dont_drop_ball_constraints.tolerance_above = .15;
     dont_drop_ball_constraints.weight = 1.0;
+    vector<string> constrained_shoulder_axes = {"shoulder_right_axis0", "shoulder_right_axis2"};
+    map<string, double> joint_state = right_arm.jointStatus();
+    for (const auto &ax : constrained_shoulder_axes) {
+        moveit_msgs::JointConstraint ax_constraint;
+        ax_constraint.joint_name = ax;
+        ax_constraint.position = joint_state[ax];
+        ax_constraint.tolerance_below = .3;
+        ax_constraint.tolerance_above = .3;
+        ax_constraint.weight = 1.0;
+        c.joint_constraints.push_back(ax_constraint);
+    }
     c.joint_constraints.push_back(dont_drop_ball_constraints);
     right_arm.setPlanningTime(10.0);
 
@@ -202,12 +212,15 @@ bool ScoopingMain::drop_ice(Point destination) {
 }
 
 bool ScoopingMain::start_scoop_appraoch_via() {
-    Pose p;
-    p.position.x = -0.4;
-    p.position.y = -0.5;
-    p.position.z = 0.55;
+    map<string, double> via_point;
 
-    return right_arm.moveToPose(p);
+    via_point["shoulder_right_axis0"] = -1.57;
+    via_point["shoulder_right_axis1"] = 0.8;
+    via_point["shoulder_right_axis2"] = 1.7;
+    via_point["elbow_right"] = 1.8;
+
+    if (cardsflow) return cardsflow->moveJointsTo(via_point);
+    else return right_arm.moveJoints(via_point);
 }
 
 bool ScoopingMain::approach_scoop_point(geometry_msgs::Point scoop_point) {
@@ -232,6 +245,19 @@ bool ScoopingMain::approach_scoop_point(geometry_msgs::Point scoop_point) {
     wristConstraint.tolerance_above = 1.0;
     wristConstraint.weight = 1.0;
     constraints.joint_constraints.push_back(wristConstraint);
+
+    vector<string> constrained_shoulder_axes = {"shoulder_right_axis0", "shoulder_right_axis2"};
+    map<string, double> joint_state = right_arm.jointStatus();
+
+    for (const auto &ax : constrained_shoulder_axes) {
+        moveit_msgs::JointConstraint ax_constraint;
+        ax_constraint.joint_name = ax;
+        ax_constraint.position = joint_state[ax];
+        ax_constraint.tolerance_below = .3;
+        ax_constraint.tolerance_above = .3;
+        ax_constraint.weight = 1.0;
+        constraints.joint_constraints.push_back(ax_constraint);
+    }
     right_arm.setPlanningTime(10.0);
 
     if (cardsflow) cardsflow->moveJointTo("wrist_right", wristConstraint.position);
@@ -240,7 +266,8 @@ bool ScoopingMain::approach_scoop_point(geometry_msgs::Point scoop_point) {
 
 bool ScoopingMain::perform_scoop() {
     right_arm.setPlanningTime(1.0);
-    return right_arm.moveJoint("wrist_right", 1.4);
+    if (cardsflow) return cardsflow->moveJointTo("wrist_right", 1.4);
+    else return right_arm.moveJoint("wrist_right", 1.4);
 }
 
 bool ScoopingMain::depart_from_scoop() {
@@ -256,9 +283,37 @@ bool ScoopingMain::depart_from_scoop() {
     dont_drop_ball_constraints.tolerance_above = .15;
     dont_drop_ball_constraints.weight = 1.0;
     c.joint_constraints.push_back(dont_drop_ball_constraints);
+    vector<string> constrained_shoulder_axes = {"shoulder_right_axis0", "shoulder_right_axis2"};
+    map<string, double> joint_state = right_arm.jointStatus();
+    for (const auto &ax : constrained_shoulder_axes) {
+        moveit_msgs::JointConstraint ax_constraint;
+        ax_constraint.joint_name = ax;
+        ax_constraint.position = joint_state[ax];
+        ax_constraint.tolerance_below = .3;
+        ax_constraint.tolerance_above = .3;
+        ax_constraint.weight = 1.0;
+        c.joint_constraints.push_back(ax_constraint);
+    }
     right_arm.setPlanningTime(10.0);
 
     return right_arm.moveToPose(move_up, c);
 }
 
 
+bool ScoopingMain::init_pose(std::function<void(bool)> finish_cb) {
+
+    map<string, double> init_pose;
+    init_pose["shoulder_right_axis0"] = 0.0;
+    init_pose["shoulder_right_axis1"] = 1.0;
+    init_pose["shoulder_right_axis2"] = 0.0;
+    init_pose["elbow_right"] = 0.0;
+    init_pose["wrist_right"] = 0.0;
+
+    bool successful;
+
+    if (cardsflow) successful = cardsflow->moveJointsTo(init_pose);
+    else successful = right_arm.moveJoints(init_pose);
+
+    finish_cb(successful);
+    return successful;
+}

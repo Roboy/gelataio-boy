@@ -172,8 +172,7 @@ bool HandController::moveJoint(std::string joint_name, double target_angle) {
 //    ROS_INFO_STREAM(ss1.str());
 //    ROS_INFO_STREAM(ss2.str());
 
-    this->m_move_group_ptr->setJointValueTarget(jointAngles);
-    return this->planAndExecute();
+    return this->moveJoints(jointAngles);
 }
 
 std::map<std::string, double> HandController::jointStatus() {
@@ -200,6 +199,11 @@ bool HandController::goHome() {
     moveit_msgs::Constraints c;
     this->m_move_group_ptr->setPathConstraints(c);
     this->m_move_group_ptr->setJointValueTarget(desiredState);
+    return this->planAndExecute();
+}
+
+bool HandController::moveJoints(std::map<std::string, double> target) {
+    this->m_move_group_ptr->setJointValueTarget(target);
     return this->planAndExecute();
 }
 

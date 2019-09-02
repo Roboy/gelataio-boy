@@ -17,6 +17,7 @@ ScoopingROS::ScoopingROS(ros::NodeHandle *handle) : nh(handle), app(handle, fals
 void ScoopingROS::run() {
     scooping_srv = nh->advertiseService("scooping_planning/scoop", &ScoopingROS::scooping_cb, this);
     go_home_srv = nh->advertiseService("scooping_planning/go_home", &ScoopingROS::go_home_cb, this);
+    init_pose_srv = nh->advertiseService("scooping_planning/init_pose", &ScoopingROS::init_pose_cb, this);
     status_pub = nh->advertise<std_msgs::String>("scooping_planning/status", 5);
 
     ROS_INFO("Scooping planning ready and waiting for service requests...");
@@ -75,4 +76,25 @@ bool ScoopingROS::go_home_cb(std_srvs::Trigger::Request &req, std_srvs::Trigger:
     }
 
     return true;
+}
+
+bool ScoopingROS::init_pose_cb(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &resp) {
+    ROS_INFO("Moving to start pose");
+
+    resp.message = "Moving to init pose";
+
+    if (this->busy) {
+        resp.success = false;
+        resp.message = "Can't run now, we are running something else on Roboy";
+        ROS_ERROR_STREAM(resp.message);
+    } else {
+        if (this->executor != nullptr) {
+            this->executor->join();
+            delete this->executor;
+            this->executor = nullptr;
+        }
+        resp.success = true;
+        this->busy = true;
+        executor = new std::thread(&ScoopingMain::init_pose, &app, [this](bool success) {this->busy = false;});
+    }
 }

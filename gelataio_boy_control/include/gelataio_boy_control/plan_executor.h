@@ -19,6 +19,8 @@ public:
 
     virtual bool moveJointTo(std::string joint_name, double target);
 
+    virtual bool moveJointsTo(const std::map<std::string, double> &target);
+
 private:
     ros::Publisher joint_target_pub;
     ros::Publisher motor_command_pub;

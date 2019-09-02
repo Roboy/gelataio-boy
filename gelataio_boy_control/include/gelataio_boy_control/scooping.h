@@ -18,6 +18,7 @@ public:
 
     bool scoop_ice(geometry_msgs::Point start, geometry_msgs::Point end, std::function<void(bool)> finish_cb);
     bool go_home(std::function<void(bool)> finish_cb);
+    bool init_pose(std::function<void(bool)> finish_cb);
     std::string get_status() {return status;}
 
 
