@@ -94,6 +94,8 @@ public:
 
     bool moveJoint(std::string joint_name, double target_angle);
 
+    bool moveJoints(std::map<std::string, double> target);
+
     bool goHome();
 
     void setPlanningTime(double time) {this->planning_time = time;}

@@ -8,6 +8,8 @@
 #include <roboy_middleware_msgs/MotorCommand.h>
 #define rad2deg(rad) (rad/M_PI)*180.0
 
+using namespace std;
+
 CardsflowPlanExecutor::CardsflowPlanExecutor(ros::NodeHandle *nh) {
     joint_target_pub = nh->advertise<sensor_msgs::JointState>("/joint_targets", 1);
     motor_command_pub = nh->advertise<roboy_middleware_msgs::MotorCommand>("/roboy/middleware/MotorCommand", 1);
@@ -57,5 +59,31 @@ bool CardsflowPlanExecutor::executePlan(moveit::planning_interface::MoveGroupInt
         joint_target_pub.publish(targets);
     }
 
+    return true;
+}
+
+bool CardsflowPlanExecutor::moveJointTo(std::string joint_name, double target) {
+    map<string, double> m;
+    m[joint_name] = target;
+    return this->moveJointsTo(m);
+}
+
+bool CardsflowPlanExecutor::moveJointsTo(const std::map<std::string, double> &target) {
+    sensor_msgs::JointState js;
+    for (const auto &pair : target) {
+        if (std::find(ignored_joints.begin(), ignored_joints.end(), pair.first) == ignored_joints.end()) {
+            js.name.push_back(pair.first);
+            js.position.push_back(pair.second);
+            js.velocity.push_back(0.0);
+            if (pair.first == "wrist_right") {
+                roboy_middleware_msgs::MotorCommand cmd;
+                cmd.id = 6;
+                cmd.motors.push_back(2);
+                cmd.set_points.push_back(rad2deg(pair.second));
+                motor_command_pub.publish(cmd);
+            }
+        }
+    }
+    joint_target_pub.publish(js);
     return true;
 }
