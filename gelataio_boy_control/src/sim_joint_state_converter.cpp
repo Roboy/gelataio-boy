@@ -41,7 +41,7 @@ void jointStateCallback(const sensor_msgs::JointState &state) {
 
 void rickshawStateCallback(const std_msgs::Float32 &data) {
     steering_angle = data.data;
-    ROS_INFO_STREAM_THROTTLE(5.0, "Received steering angles: " << steering_angle);
+    ROS_INFO_STREAM_THROTTLE(10.0, "Received steering angles: " << steering_angle);
 }
 
 int main(int argc, char **argv) {
@@ -54,9 +54,10 @@ int main(int argc, char **argv) {
 
     if (ros::param::has("joint_names")) {
         auto sub = nh.subscribe("/cardsflow_joint_states", 10, jointStateCallback);
+        ros::Subscriber sub2;
         if(use_external_steering_angle) {
-          ROS_INFO("Subscribing rickshaw angle")
-          auto sub2 = nh.subscribe("/roboy/middleware/RickshawAngle", 10, rickshawStateCallback);
+          ROS_INFO("Subscribing rickshaw angle");
+          sub2 = nh.subscribe("/roboy/middleware/RickshawAngle", 10, rickshawStateCallback);
         }
 
         pub = nh.advertise<sensor_msgs::JointState>("/joint_states", 10);

@@ -51,7 +51,7 @@ bool CardsflowPlanExecutor::executePlan(moveit::planning_interface::MoveGroupInt
             cmd.id = 6;
             cmd.motors.push_back(2);
             cmd.set_points.push_back(rad2deg(state.positions[wrist_index]));
-            motor_command_pub.publish(cmd);
+            //motor_command_pub.publish(cmd);
         } else {
             ROS_WARN("Wrist right not found in the plan.");
         }
@@ -80,7 +80,7 @@ bool CardsflowPlanExecutor::moveJointsTo(const std::map<std::string, double> &ta
                 cmd.id = 6;
                 cmd.motors.push_back(2);
                 cmd.set_points.push_back(rad2deg(pair.second));
-                motor_command_pub.publish(cmd);
+                //motor_command_pub.publish(cmd);
             }
         }
     }
