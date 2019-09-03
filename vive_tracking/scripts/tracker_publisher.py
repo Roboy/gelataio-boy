@@ -8,6 +8,7 @@ import math
 import std_msgs
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import Point
 import roboy_middleware_msgs.srv 
 import warnings
 import csv
@@ -29,8 +30,8 @@ def _get_endeffector_coordinats(endeffector_name, topic_name):
         nonlocal endeffector_coordinates
         if p.header.frame_id == endeffector_name:
             endeffector_coordinates[0] = p.pose.position.x
-            endeffector_coordinates[1] = p.pose.position.x
-            endeffector_coordinates[2] = p.pose.position.x
+            endeffector_coordinates[1] = p.pose.position.y
+            endeffector_coordinates[2] = p.pose.position.z
 
     subscriber = rospy.Subscriber(topic_name, PoseStamped, callback=pose_callback)
     
@@ -67,8 +68,8 @@ if __name__ == "__main__":
         get_ik = rospy.ServiceProxy(inverse_kinematics_service, roboy_middleware_msgs.srv.InverseKinematics)
 
         try:
-
-            requested_pose = Pose(position = modified_position_scooper)
+            pos = Point(modified_position_scooper[0], modified_position_scooper[1], modified_position_scooper[2])
+            requested_pose = Pose(position = pos)
             it_request = roboy_middleware_msgs.srv.InverseKinematicsRequest(endeffector_name, 0, endeffector_name, requested_pose)
             ik = get_ik(it_request)
 
