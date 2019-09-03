@@ -22,7 +22,7 @@ void jointStateCallback(const sensor_msgs::JointState &state) {
         s.name.push_back(state.name[i]);
         s.velocity.push_back(state.velocity[i]);
 
-        if (use_external_steering_angle && (state.name[i] == "steering_angle")) {
+        if (use_external_steering_angle && (state.name[i] == "bike_steering")) {
             s.position.push_back(steering_angle);
         } else if (do_angle_conversion && (state.name[i] == "wrist_right")) {
             s.position.push_back(M_PI * state.position[i]/180.0);
@@ -54,8 +54,11 @@ int main(int argc, char **argv) {
 
     if (ros::param::has("joint_names")) {
         auto sub = nh.subscribe("/cardsflow_joint_states", 10, jointStateCallback);
-        if(use_external_steering_angle)
-            auto sub2 = nh.subscribe("/roboy/middleware/RickshawAngle", 10, rickshawStateCallback);
+        if(use_external_steering_angle) {
+          ROS_INFO("Subscribing rickshaw angle")
+          auto sub2 = nh.subscribe("/roboy/middleware/RickshawAngle", 10, rickshawStateCallback);
+        }
+
         pub = nh.advertise<sensor_msgs::JointState>("/joint_states", 10);
 
         ros::param::get("joint_names", joint_names);
