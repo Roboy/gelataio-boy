@@ -10,17 +10,18 @@
 
 using namespace std;
 
-CardsflowPlanExecutor::CardsflowPlanExecutor(ros::NodeHandle *nh) {
+CardsflowPlanExecutor::CardsflowPlanExecutor(ros::NodeHandle *nh) : nh(nh) {
     joint_target_pub = nh->advertise<sensor_msgs::JointState>("/joint_targets", 1);
     motor_command_pub = nh->advertise<roboy_middleware_msgs::MotorCommand>("/roboy/middleware/MotorCommand", 1);
     ignored_joints.emplace_back("scooper_dummy_joint0");
     ignored_joints.emplace_back("scooper_dummy_joint1");
     ignored_joints.emplace_back("scooper_dummy_joint2");
+
+    fake_wrist = true;
 }
 
 bool CardsflowPlanExecutor::executePlan(moveit::planning_interface::MoveGroupInterface::Plan &plan) {
     ROS_INFO("Moving robot using CARDSflow");
-
 
     ros::Duration lastTime(0);
 
@@ -51,7 +52,12 @@ bool CardsflowPlanExecutor::executePlan(moveit::planning_interface::MoveGroupInt
             cmd.id = 6;
             cmd.motors.push_back(2);
             cmd.set_points.push_back(rad2deg(state.positions[wrist_index]));
-            motor_command_pub.publish(cmd);
+            if (fake_wrist) {
+                nh->setParam("wrist_right_angle", cmd.set_points[0]);
+            } else {
+                ROS_WARN_THROTTLE(2.0, "Faking wrist.");
+                motor_command_pub.publish(cmd);
+            }
         } else {
             ROS_WARN("Wrist right not found in the plan.");
         }
@@ -80,7 +86,12 @@ bool CardsflowPlanExecutor::moveJointsTo(const std::map<std::string, double> &ta
                 cmd.id = 6;
                 cmd.motors.push_back(2);
                 cmd.set_points.push_back(rad2deg(pair.second));
-                motor_command_pub.publish(cmd);
+                if (fake_wrist) {
+                    ROS_WARN_THROTTLE(2.0, "Faking wrist.");
+                    nh->setParam("wrist_right_angle", cmd.set_points[0]);
+                } else {
+                    motor_command_pub.publish(cmd);
+                }
             }
         }
     }
