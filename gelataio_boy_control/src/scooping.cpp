@@ -11,7 +11,8 @@ using namespace geometry_msgs;
 using namespace std;
 
 ScoopingMain::ScoopingMain(ros::NodeHandle *handle, bool simulation_only)
-        : left_arm("left", 5), right_arm("right", 5), node_handle(handle), ice_box(nullptr), status("idle"), active_arm(&right_arm) {
+        : left_arm("left", 5), right_arm("right", 5), node_handle(handle), ice_box(nullptr), status("idle"),
+          active_arm(&right_arm) {
     if (simulation_only) { //Simulation
         left_hand = new DummyHand("left hand");
         left_arm.setHandInterface(left_hand);
@@ -47,11 +48,19 @@ ScoopingMain::~ScoopingMain() {
 void ScoopingMain::watch_status() {
     ros::Rate r(10.0);
     while (ros::ok()) {
-        switch(active_arm->get_status()) {
-            case HandController::IDLE: this->status = "IDLE"; break;
-            case HandController::PLANNING: this->status = "PLANNING"; break;
-            case HandController::EXECUTING: this->status = "EXECUTING"; break;
-            case HandController::ERROR: this->status = "ERROR"; break;
+        switch (active_arm->get_status()) {
+            case HandController::IDLE:
+                this->status = "IDLE";
+                break;
+            case HandController::PLANNING:
+                this->status = "PLANNING";
+                break;
+            case HandController::EXECUTING:
+                this->status = "EXECUTING";
+                break;
+            case HandController::ERROR:
+                this->status = "ERROR";
+                break;
         }
     }
 }
@@ -79,7 +88,8 @@ void ScoopingMain::defineEnvironment() {
 bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> finish_cb) {
 //    this->defineEnvironment();
 
-    stringstream ss; ss << "Current pose of right arm: " << endl << right_arm.getCurrentPose() << endl;
+    stringstream ss;
+    ss << "Current pose of right arm: " << endl << right_arm.getCurrentPose() << endl;
     ROS_INFO_STREAM(ss.str());
 
     this->active_arm = &right_arm;
@@ -133,9 +143,10 @@ bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> f
 
 bool ScoopingMain::go_home(std::function<void(bool)> finish_cb) {
 
-    stringstream ss; ss << "Current pose of right arm: " << endl << right_arm.getCurrentPose() << endl;
+    stringstream ss;
+    ss << "Current pose of right arm: " << endl << right_arm.getCurrentPose() << endl;
     ROS_INFO_STREAM(ss.str());
-    bool successful=true;
+    bool successful = true;
     this->active_arm = &right_arm;
 
     ROS_INFO("Going home");
@@ -170,8 +181,8 @@ void ScoopingMain::createObstacles() {
     ice_boxPose.position.y = -0.7;
     ice_boxPose.position.z = 0.2;
     const double tilt_angle = -20.0; // deg
-    ice_boxPose.orientation.w = cos((tilt_angle/2) / 180.0 * M_PI);
-    ice_boxPose.orientation.x = sin((tilt_angle/2) / 180.0 * M_PI);
+    ice_boxPose.orientation.w = cos((tilt_angle / 2) / 180.0 * M_PI);
+    ice_boxPose.orientation.x = sin((tilt_angle / 2) / 180.0 * M_PI);
     ice_boxPose.orientation.y = 0.0;
     ice_boxPose.orientation.z = 0.0;
     ice_box->primitive_poses.push_back(ice_boxPose);
@@ -206,7 +217,8 @@ bool ScoopingMain::drop_ice(Point destination) {
     bool success = right_arm.moveToPose(drop_approach, c);
 
     right_arm.setPlanningTime(1.0);
-    success &= right_arm.moveJoint("wrist_right", -0.8);
+    if (cardsflow) success &= this->interpolate_joint("wrist_right", right_arm.get_status()["wrist_right"], -0.8, ros::Duration(1.0));
+    else success &= right_arm.moveJoint("wrist_right", -0.8);
 
     return success;
 }
@@ -231,7 +243,7 @@ bool ScoopingMain::approach_scoop_point(geometry_msgs::Point scoop_point) {
     double roll = -20;
     double pitch = 40;
     double yaw = 45 + 90;
-    q_start.setRPY(roll/180*M_PI, pitch/180*M_PI, yaw/180*M_PI);
+    q_start.setRPY(roll / 180 * M_PI, pitch / 180 * M_PI, yaw / 180 * M_PI);
     scooping_start.orientation.x = q_start.x();
     scooping_start.orientation.y = q_start.y();
     scooping_start.orientation.z = q_start.z();
@@ -266,7 +278,7 @@ bool ScoopingMain::approach_scoop_point(geometry_msgs::Point scoop_point) {
 
 bool ScoopingMain::perform_scoop() {
     right_arm.setPlanningTime(1.0);
-    if (cardsflow) return cardsflow->moveJointTo("wrist_right", 1.4);
+    if (cardsflow) return this->interpolate_joint("wrist_right", right_arm.jointStatus()["wrist_right"], 1.4, ros::Duration(3.0));
     else return right_arm.moveJoint("wrist_right", 1.4);
 }
 
@@ -316,4 +328,13 @@ bool ScoopingMain::init_pose(std::function<void(bool)> finish_cb) {
 
     finish_cb(successful);
     return successful;
+}
+
+bool ScoopingMain::interpolate_joint(std::string joint_name, double from, double to, ros::Duration time, int steps) {
+    ros::Duration dt(time.toSec() / ((double) steps));
+    for (int i = 0; i < steps; i++) {
+        cardsflow->moveJointTo(joint_name, from + (to - from)*((double)i/steps));
+        dt.sleep();
+    }
+    return true;
 }
