@@ -34,7 +34,6 @@
     <end_effector name="scooper_link3" parent_link="torso" group="right_arm" />
 
     <!-- Our custom disabled collisions -->
-    <disable_collisions link1="bike_front" link2="scooper" reason="custom"/>
 
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
     <disable_collisions link1="arm_left_lower" link2="arm_left_upper" reason="Adjacent" />
@@ -75,8 +74,6 @@
     <disable_collisions link1="bike_back" link2="shoulder_right_link2" reason="Never" />
     <disable_collisions link1="bike_back" link2="torso" reason="Adjacent" />
     <disable_collisions link1="bike_front" link2="head" reason="Never" />
-    <disable_collisions link1="bike_front" link2="ice_left" reason="Adjacent" />
-    <disable_collisions link1="bike_front" link2="ice_right" reason="Adjacent" />
     <disable_collisions link1="bike_front" link2="neck_link1" reason="Never" />
     <disable_collisions link1="bike_front" link2="neck_link2" reason="Never" />
     <disable_collisions link1="bike_front" link2="shoulder_left_link1" reason="Never" />
@@ -91,11 +88,6 @@
     <disable_collisions link1="head" link2="shoulder_right_link1" reason="Never" />
     <disable_collisions link1="head" link2="shoulder_right_link2" reason="Never" />
     <disable_collisions link1="head" link2="torso" reason="Default" />
-    <disable_collisions link1="ice_left" link2="ice_right" reason="Default" />
-    <disable_collisions link1="ice_left" link2="neck_link1" reason="Never" />
-    <disable_collisions link1="ice_left" link2="neck_link2" reason="Never" />
-    <disable_collisions link1="ice_right" link2="neck_link1" reason="Never" />
-    <disable_collisions link1="ice_right" link2="neck_link2" reason="Never" />
     <disable_collisions link1="neck_link1" link2="neck_link2" reason="Adjacent" />
     <disable_collisions link1="neck_link1" link2="scooper" reason="Never" />
     <disable_collisions link1="neck_link1" link2="scooper_target" reason="Never" />

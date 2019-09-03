@@ -121,21 +121,12 @@ bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> f
     if (successful) {
         ROS_INFO("Dropping the ball");
         geometry_msgs::Point destination;
-        destination.x = -0.3;
-        destination.y = -0.4;
+        destination.x = -0.4;
+        destination.y = -0.3;
         destination.z = 0.4;
         successful &= this->drop_ice(destination);
     } else {
         ROS_WARN("Skipping the drop");
-    }
-
-    if (successful) {
-        ROS_INFO("Dropping the ball");
-        geometry_msgs::Point destination;
-        destination.x = -0.3;
-        destination.y = -0.4;
-        destination.z = 0.4;
-        successful &= this->drop_ice(destination);
     }
 
     ROS_INFO("Going home");
@@ -288,20 +279,20 @@ bool ScoopingMain::approach_scoop_point(geometry_msgs::Point scoop_point) {
 bool ScoopingMain::perform_scoop() {
     right_arm.setPlanningTime(1.0);
     if (cardsflow) return this->interpolate_joint("wrist_right", right_arm.jointStatus()["wrist_right"], 1.4, ros::Duration(3.0));
-    else return right_arm.moveJoint("wrist_right", 1.4);
+    else return right_arm.moveJoint("wrist_right", 1.8);
 }
 
 bool ScoopingMain::depart_from_scoop() {
     Pose current_pose = right_arm.getCurrentPose().pose;
     Pose move_up(current_pose);
-    move_up.position.z += 0.05;
+    move_up.position.z += 0.1;
 
     moveit_msgs::Constraints c;
     moveit_msgs::JointConstraint dont_drop_ball_constraints;
     dont_drop_ball_constraints.joint_name = "wrist_right";
     dont_drop_ball_constraints.position = right_arm.jointStatus()["wrist_right"];
-    dont_drop_ball_constraints.tolerance_below = .15;
-    dont_drop_ball_constraints.tolerance_above = .15;
+    dont_drop_ball_constraints.tolerance_below = .25;
+    dont_drop_ball_constraints.tolerance_above = .25;
     dont_drop_ball_constraints.weight = 1.0;
     c.joint_constraints.push_back(dont_drop_ball_constraints);
     vector<string> constrained_shoulder_axes = {"shoulder_right_axis0", "shoulder_right_axis2"};
