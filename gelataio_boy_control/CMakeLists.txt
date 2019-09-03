@@ -149,8 +149,6 @@ add_executable(scooping_planning src/main.cpp src/scooping.cpp src/scooping_ros.
 
 add_executable(sim_joint_state_converter src/sim_joint_state_converter.cpp)
 
-add_executable(joint_info_collector src/joint_info_collector.cpp src/JointInfoCollector.cpp)
-
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -171,9 +169,6 @@ target_link_libraries(${PROJECT_NAME}
  )
 
 target_link_libraries(sim_joint_state_converter
-        ${catkin_LIBRARIES})
-
-target_link_libraries(joint_info_collector
         ${catkin_LIBRARIES})
 #############
 ## Install ##

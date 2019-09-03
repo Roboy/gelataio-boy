@@ -32,6 +32,8 @@ protected:
     bool depart_from_scoop();
     bool drop_ice(geometry_msgs::Point destination);
 
+    bool interpolate_joint(std::string joint_name, double from, double to, ros::Duration time, int steps = 100);
+
     virtual void defineEnvironment();
 
     virtual void createObstacles();
