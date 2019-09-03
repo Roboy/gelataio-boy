@@ -7,6 +7,7 @@ import numpy as np
 import math
 import std_msgs
 from sensor_msgs.msg import JointState
+from geometry_msgs.msg import PoseStamped
 import roboy_middleware_msgs.srv 
 import warnings
 import csv
@@ -16,20 +17,28 @@ from scipy.spatial.transform import Rotation as R
 def _get_tracker_coordinates(tracker_name):
     v = triad_openvr.triad_openvr()
     pose_matrix = v.devices[controller_name].get_pose_matrix()
-    x = pose_mat[0][3]
-    y = pose_mat[1][3]
-    z = pose_mat[2][3]
+    x = pose_matrix[0][3]
+    y = pose_matrix[1][3]
+    z = pose_matrix[2][3]
     return np.array([x,y,z])
 
 def _get_endeffector_coordinats(endeffector_name, topic_name):
     endeffector_coordinates = np.zeros(3)
-    while endeffector_coordinates == np.zeros():
-        p = rospy.wait_for_message(topic_name, PoseStamped)
+    
+    def pose_callback(p):
+        nonlocal endeffector_coordinates
         if p.header.frame_id == endeffector_name:
             endeffector_coordinates[0] = p.pose.position.x
             endeffector_coordinates[1] = p.pose.position.x
             endeffector_coordinates[2] = p.pose.position.x
+
+    subscriber = rospy.Subscriber(topic_name, PoseStamped, callback=pose_callback)
+    
+    while np.allclose(endeffector_coordinates, np.zeros(3)):
+        rospy.Rate(100).sleep()
+    subscriber.unregister()
     return endeffector_coordinates
+   
 
 if __name__ == "__main__":
     controller_name = "controller_1"
