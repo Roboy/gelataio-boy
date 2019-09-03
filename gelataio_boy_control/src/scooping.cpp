@@ -111,32 +111,30 @@ bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> f
         ROS_WARN("Skipping perform scoop");
     }
 
-    if (successful) {
-        ROS_INFO("Departing from the scoop stage");
-        successful &= this->depart_from_scoop();
-    } else {
-        ROS_WARN("Skipping scoop departing");
-    }
+    // if (successful) {
+    //     ROS_INFO("Departing from the scoop stage");
+    //     successful &= this->depart_from_scoop();
+    // } else {
+    //     ROS_WARN("Skipping scoop departing");
+    // }
 
-    if (successful) {
-        ROS_INFO("Dropping the ball");
-        geometry_msgs::Point destination;
-        destination.x = -0.4;
-        destination.y = -0.3;
-        destination.z = 0.4;
-        successful &= this->drop_ice(destination);
-    } else {
-        ROS_WARN("Skipping the drop");
-    }
-
-    ROS_INFO("Going home");
-    successful &= right_arm.goHome();
-
-    if (successful) {
-        ROS_INFO("Scooping done without error");
-    } else {
-        ROS_ERROR("Scooping finished with error");
-    }
+    // if (successful) {
+    //     ROS_INFO("Dropping the ball");
+    //     geometry_msgs::Point destination;
+    //     destination.x = -0.4;
+    //     destination.y = -0.3;
+    //     destination.z = 0.4;
+    //     successful &= this->drop_ice(destination);
+    // } else {
+    //     ROS_WARN("Skipping the drop");
+    // }
+    // this->start_scoop_appraoch_via();
+    //
+    // if (successful) {
+    //     ROS_INFO("Scooping done without error");
+    // } else {
+    //     ROS_ERROR("Scooping finished with error");
+    // }
     finish_cb(successful);
     return successful;
 }
@@ -203,6 +201,7 @@ bool ScoopingMain::drop_ice(Point destination) {
     vector<string> constrained_shoulder_axes = {"shoulder_right_axis0", "shoulder_right_axis2"};
     map<string, double> joint_state = right_arm.jointStatus();
     for (const auto &ax : constrained_shoulder_axes) {
+      ROS_INFO_STREAM("Setting constraint: " << ax << ": " <<joint_state[ax]);
         moveit_msgs::JointConstraint ax_constraint;
         ax_constraint.joint_name = ax;
         ax_constraint.position = joint_state[ax];
@@ -216,9 +215,11 @@ bool ScoopingMain::drop_ice(Point destination) {
 
     bool success = right_arm.moveToPose(drop_approach, c, "bike_front");
 
-    right_arm.setPlanningTime(1.0);
-    if (cardsflow) success &= this->interpolate_joint("wrist_right", right_arm.get_status()["wrist_right"], -0.8, ros::Duration(1.0));
-    else success &= right_arm.moveJoint("wrist_right", -0.8);
+    if (cardsflow) success &= this->interpolate_joint("wrist_right", right_arm.get_status()["wrist_right"], 0.0, ros::Duration(1.0));
+    else {
+      right_arm.setPlanningTime(1.0);
+      success &= right_arm.moveJoint("wrist_right", 0.0);
+    }
 
     return success;
 }
@@ -230,9 +231,17 @@ bool ScoopingMain::start_scoop_appraoch_via() {
     via_point["shoulder_right_axis1"] = 0.8;
     via_point["shoulder_right_axis2"] = 1.7;
     via_point["elbow_right"] = 1.8;
+    via_point["wrist_right"] = 0.0;
+    bool result;
+    if (cardsflow) {
+      result = cardsflow->moveJointsTo(via_point);
+      ros::Duration wait(10.0);
+      ROS_INFO("Waiting to reach approach via point");
+      wait.sleep();
+    }
+    else result =right_arm.moveJoints(via_point);
 
-    if (cardsflow) return cardsflow->moveJointsTo(via_point);
-    else return right_arm.moveJoints(via_point);
+    return result;
 }
 
 bool ScoopingMain::approach_scoop_point(geometry_msgs::Point scoop_point) {
@@ -252,7 +261,7 @@ bool ScoopingMain::approach_scoop_point(geometry_msgs::Point scoop_point) {
     moveit_msgs::Constraints constraints;
     moveit_msgs::JointConstraint wristConstraint;
     wristConstraint.joint_name = "wrist_right";
-    wristConstraint.position = -0.2;
+    wristConstraint.position = 0;
     wristConstraint.tolerance_below = .1;
     wristConstraint.tolerance_above = 1.0;
     wristConstraint.weight = 1.0;
@@ -263,6 +272,7 @@ bool ScoopingMain::approach_scoop_point(geometry_msgs::Point scoop_point) {
 
     for (const auto &ax : constrained_shoulder_axes) {
         moveit_msgs::JointConstraint ax_constraint;
+        ROS_INFO_STREAM("Setting constraint: " << ax << ": " <<joint_state[ax]);
         ax_constraint.joint_name = ax;
         ax_constraint.position = joint_state[ax];
         ax_constraint.tolerance_below = .3;
@@ -279,7 +289,7 @@ bool ScoopingMain::approach_scoop_point(geometry_msgs::Point scoop_point) {
 bool ScoopingMain::perform_scoop() {
     right_arm.setPlanningTime(1.0);
     if (cardsflow) return this->interpolate_joint("wrist_right", right_arm.jointStatus()["wrist_right"], 1.4, ros::Duration(3.0));
-    else return right_arm.moveJoint("wrist_right", 1.8);
+    else return right_arm.moveJoint("wrist_right", 1.7);
 }
 
 bool ScoopingMain::depart_from_scoop() {
@@ -298,6 +308,7 @@ bool ScoopingMain::depart_from_scoop() {
     vector<string> constrained_shoulder_axes = {"shoulder_right_axis0", "shoulder_right_axis2"};
     map<string, double> joint_state = right_arm.jointStatus();
     for (const auto &ax : constrained_shoulder_axes) {
+      ROS_INFO_STREAM("Setting constraint: " << ax << ": " <<joint_state[ax]);
         moveit_msgs::JointConstraint ax_constraint;
         ax_constraint.joint_name = ax;
         ax_constraint.position = joint_state[ax];
