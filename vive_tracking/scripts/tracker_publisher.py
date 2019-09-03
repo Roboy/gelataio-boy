@@ -13,9 +13,8 @@ import csv
 import pickle
 from scipy.spatial.transform import Rotation as R
 
-rospy.init_node('tracker_tf_broadcaster')
-
 def _get_tracker_coordinates(tracker_name):
+    v = triad_openvr.triad_openvr()
     pose_matrix = v.devices[controller_name].get_pose_matrix()
     x = pose_mat[0][3]
     y = pose_mat[1][3]
@@ -44,13 +43,13 @@ if __name__ == "__main__":
     angle_publisher = rospy.Publisher('/joint_targets', JointState, queue_size=5)
         
 
-    initial_position_controller = _get_position_coordinates(controller_name)
+    initial_position_controller = _get_tracker_coordinates(controller_name)
     initial_position_scooper = _get_endeffector_coordinats(endeffector_name, robot_state_topic)
 
     while not rospy.is_shutdown():
         start = time.time()
 
-        current_position_controller = _get_position_coordinates(controller_name)
+        current_position_controller = _get_tracker_coordinates(controller_name)
         delta_position_controller = current_position_controller - initial_position_controller
         
         modified_position_scooper = initial_position_scooper + delta_position_controller        
