@@ -70,6 +70,7 @@ bool HandController::moveToPose(geometry_msgs::Pose target_pose, moveit_msgs::Co
     std::stringstream ss;
     ss << "Target pose for moveIT planning: " << std::endl << target_pose << std::endl;
 //    ROS_INFO_STREAM(ss.str());
+    this->m_move_group_ptr->setPoseReferenceFrame("torso");
     this->m_move_group_ptr->setPoseTarget(target_pose);
     this->m_move_group_ptr->setPathConstraints(constraints);
     this->m_move_group_ptr->setPlanningTime(planning_time);
@@ -208,3 +209,10 @@ bool HandController::moveJoints(std::map<std::string, double> target) {
 }
 
 
+bool HandController::moveToPose(geometry_msgs::Pose target_pose, moveit_msgs::Constraints &constraints, std::string reference_frame) {
+    this->m_move_group_ptr->setPoseReferenceFrame(reference_frame);
+    this->m_move_group_ptr->setPoseTarget(target_pose);
+    this->m_move_group_ptr->setPathConstraints(constraints);
+    this->m_move_group_ptr->setPlanningTime(planning_time);
+    return this->planAndExecute();
+}

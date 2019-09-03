@@ -57,6 +57,8 @@ public:
 
     bool moveToPose(geometry_msgs::Pose target_pose, moveit_msgs::Constraints &contraints);
 
+    bool moveToPose(geometry_msgs::Pose target_pose, moveit_msgs::Constraints &constraints, std::string reference_frame);
+
 
     /**
      * Move to poses.

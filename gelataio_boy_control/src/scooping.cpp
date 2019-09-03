@@ -129,15 +129,6 @@ bool ScoopingMain::scoop_ice(Point start, Point end, std::function<void(bool)> f
         ROS_WARN("Skipping the drop");
     }
 
-    if (successful) {
-        ROS_INFO("Dropping the ball");
-        geometry_msgs::Point destination;
-        destination.x = -0.3;
-        destination.y = -0.4;
-        destination.z = 0.4;
-        successful &= this->drop_ice(destination);
-    }
-
     ROS_INFO("Going home");
     successful &= right_arm.goHome();
 
@@ -223,7 +214,7 @@ bool ScoopingMain::drop_ice(Point destination) {
     c.joint_constraints.push_back(dont_drop_ball_constraints);
     right_arm.setPlanningTime(10.0);
 
-    bool success = right_arm.moveToPose(drop_approach, c);
+    bool success = right_arm.moveToPose(drop_approach, c, "bike_front");
 
     right_arm.setPlanningTime(1.0);
     if (cardsflow) success &= this->interpolate_joint("wrist_right", right_arm.get_status()["wrist_right"], -0.8, ros::Duration(1.0));
