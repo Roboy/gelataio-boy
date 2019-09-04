@@ -34,6 +34,7 @@ private:
     ros::Publisher status_pub;
 
     bool busy;
+    bool done;
     std::thread *executor;
 };
 

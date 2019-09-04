@@ -12,7 +12,7 @@ using namespace roboy_control_msgs;
 using namespace std;
 
 
-ScoopingROS::ScoopingROS(ros::NodeHandle *handle) : nh(handle), app(handle, false), busy(false), executor(nullptr) {}
+ScoopingROS::ScoopingROS(ros::NodeHandle *handle) : nh(handle), app(handle, false), busy(false), executor(nullptr), done(false) {}
 
 void ScoopingROS::run() {
     scooping_srv = nh->advertiseService("scooping_planning/scoop", &ScoopingROS::scooping_cb, this);
@@ -28,6 +28,9 @@ void ScoopingROS::run() {
     while (ros::ok()) {
         ros::spinOnce();
         status_msg.data = app.get_status();
+        if (this->done){
+            status_msg.data = "DONE";
+        }
         status_pub.publish(status_msg);
         loop_rate.sleep();
     }
@@ -50,7 +53,7 @@ bool ScoopingROS::scooping_cb(TranslationalPTPMotion::Request &req, Translationa
         resp.success = true;
         this->busy = true;
         executor = new std::thread(&ScoopingMain::scoop_ice, &app, req.start_point, req.end_point,
-                [this](bool success) {this->busy = false;});
+                [this](bool success) {this->busy = false; this->done = true;});
     }
 
     return true;
