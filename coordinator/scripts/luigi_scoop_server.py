@@ -92,30 +92,22 @@ class ScoopServer:
     # Do we fancy a third ice cream box?
     else:
       startingPoint = leftStartPoint
-
     return startingPoint
 
     
   def ReceiveIceCreamOrder_(self, data):
-
     self.we_have_client_ = True
 
     # success of the total scoping operation
     success = False
-
     # Scoops required
     scoops = data.scoops
-
     # flavors for each "scoops" ordered, not scoop :D
     flavors = data.flavors
-
     self.scooping_human_status_ = 'Received a new ice cream order'
     # intially no scoops has been scooped
     for i in scoops:
       self._feedback.finished_scoops.append(0)
-
-    scoops = data.scoops
-    flavors = data.flavors
 
     # start executing the action
     # check that preempt has not been requested by the client
@@ -125,93 +117,73 @@ class ScoopServer:
       success = False
 
     # success of the total scoping operation
-    success = True
+    success = False
 
     # The rate by which we check the scooping status change
-    r = rospy.Rate(3) # 3hz
+    r = rospy.Rate(5) # 3hz
+
+    # Call init service
 
     # We try to scoop in just five points sequence
     for scoop in range(len(scoops)):
-
-      # Go to the start point of the box, depending on the flavor
       startingPoint = self.GetFlavorStartingPoint(flavors[scoop])
-
-      # Loop for how many scoops of this flavor, really luigi??
       for scoopPerFlavor in range(scoops[scoop]):
-
-        # # Go to start point depending on the flavor
-        # scoopingResponse = self.TranslationalPTPMotionClient(startingPoint, startingPoint)
-        # if not scoopingResponse:
-        #   self.scooping_human_status_ = 'Failed to come up with a plan for step ' + str(i) + ' out of 5'
-        success = True
-
         # Each scoop is done in scoopingSteps
-        for i in range(scoopingSteps):
-          # Wait for scooping_planning/status to be idle
-          # Calculate new point
-          # Send point to scooping_planning/scoop
-
-          # Wait for scooping_planning/status to be idle
-          while not str(self.scooping_status_.data) == 'IDLE' and not rospy.is_shutdown():
-            self.scooping_human_status_ = str(self.scooping_status_.data) + ' need more time'
-            rospy.sleep(1.)
-
-          # If not IDLE, update scooping status
-          self.scooping_human_status_ = str(self.scooping_status_.data) + ' in step ' + str(i) + ' out of 5'
-
-          # Now for step 2 and 3
-          # Move along the y-z plane (ice cream surface)     
-          scoopingResponse = self.TranslationalPTPMotionClient(startingPoint, startingPoint)
-          if not scoopingResponse:
-            self.scooping_human_status_ = 'Failed to come up with a plan for step ' + str(i) + ' out of 5'
-            success = False
-          else:
-            success = True
-
+        # Wait for scooping_planning/status to be idle
+        while not str(self.scooping_status_.data) == 'IDLE' and not rospy.is_shutdown():
+          self.scooping_human_status_ = str(self.scooping_status_.data) + ' need more time'
           r.sleep()
-          
 
-          # Wait for scooping_planning/status to be idle
-          while not str(self.scooping_status_.data) == 'IDLE' and not rospy.is_shutdown():
-            self.scooping_human_status_ = str(self.scooping_status_.data) + ' need more time'
-            rospy.sleep(1.)          
+        scoopingResponse = self.TranslationalPTPMotionClient(startingPoint, startingPoint)
 
-          # Has to sleep here because the rate we check for the scooping status is faster than
-          # the scooping status publish rate, now sleep rate is 3hz, scoop publish rate is 5hz
-          rospy.sleep(1)
-               
-          #   # call scooping service with the points
-          #   #
+        rospy.loginfo(scoopingResponse)
+        if not scoopingResponse:
+          self.scooping_human_status_ = 'Scooping didnt start'
+
+        # Wait for scooping_planning/status to be idle
+        while not str(self.scooping_status_.data) == 'IDLE' and not rospy.is_shutdown():
+          self.scooping_human_status_ = str(self.scooping_status_.data) + ' need more time'
+          r.sleep()
+
+        j = 0
+        while str(self.scooping_status_.data) == 'IDLE' and j<10:
+          j+=1
+          r.sleep()
+
+        while str(self.scooping_status_.data) == 'EXECUTING' or str(self.scooping_status_.data) == 'PLANNING':
+          r.sleep()
+
+        rospy.loginfo(scoopingResponse)
+
       self._feedback.finished_scoops[scoop] = 1
+
+    success = True
 
     while not str(self.scooping_status_.data) == 'IDLE':
       rospy.loginfo('Waiting for scooping to go idle')
       rospy.sleep(1.)
 
     wentHome = self.GoHome()
-
     if wentHome:
       rospy.loginfo('Went home')
     else:
       rospy.logwarn('Could not go home, the traffic is terrible')
 
-    if success:
-      self._result.success = True
-      self._result.error_message = self.scooping_human_status_
-      self.server_.set_succeeded(self._result)      
-
     # Send result
-    if not success:
-      self._result.success = False
-      self._result.error_message = self.scooping_human_status_
-      self.server_.set_succeeded(self._result)
+    self._result.success = success
+    self._result.error_message = self.scooping_human_status_
+    self.server_.set_succeeded(self._result)
+    self._feedback.finished_scoops = []
 
   # This function is called every _feedback_delay seconds
   def SendFeedbackLuigi(self, sc):
-    if self.we_have_client_: 
+    if self.we_have_client_ and len(self._feedback.finished_scoops)>0:
       self._feedback.status_message = self.scooping_human_status_
 
       self._feedback.status_message = "more time"
+      if self._feedback.finished_scoops[len(self._feedback.finished_scoops)-1] ==1:
+        self._feedback.status_message = "Done"
+
       self.server_.publish_feedback(self._feedback)
       s.enter(self._feedback_delay, 1, self.SendFeedbackLuigi, (sc,))
     else:
@@ -229,6 +201,7 @@ if __name__ == '__main__':
   except KeyboardInterrupt, e:
     pass
 
-  s.enter(server._feedback_delay, 1, server.SendFeedbackLuigi, (s,))
+  rospy.Timer(rospy.Duration(server._feedback_delay), server.SendFeedbackLuigi)
+  # s.enter(server._feedback_delay, 1, server.SendFeedbackLuigi, (s,))
   s.run()
   rospy.spin()
