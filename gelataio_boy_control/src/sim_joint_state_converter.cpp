@@ -7,7 +7,7 @@
 #include <sensor_msgs/JointState.h>
 #include <std_msgs/Float32.h>
 
-#define FAKE_WRIST
+// #define FAKE_WRIST
 
 using namespace std;
 

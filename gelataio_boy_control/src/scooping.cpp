@@ -261,7 +261,7 @@ bool ScoopingMain::approach_scoop_point(geometry_msgs::Point scoop_point) {
     moveit_msgs::Constraints constraints;
     moveit_msgs::JointConstraint wristConstraint;
     wristConstraint.joint_name = "wrist_right";
-    wristConstraint.position = 0;
+    wristConstraint.position = 2.1;
     wristConstraint.tolerance_below = .1;
     wristConstraint.tolerance_above = 1.0;
     wristConstraint.weight = 1.0;
@@ -289,7 +289,7 @@ bool ScoopingMain::approach_scoop_point(geometry_msgs::Point scoop_point) {
 bool ScoopingMain::perform_scoop() {
     right_arm.setPlanningTime(1.0);
     if (cardsflow) return this->interpolate_joint("wrist_right", right_arm.jointStatus()["wrist_right"], 1.4, ros::Duration(3.0));
-    else return right_arm.moveJoint("wrist_right", 1.7);
+    else return right_arm.moveJoint("wrist_right", 0.87);
 }
 
 bool ScoopingMain::depart_from_scoop() {

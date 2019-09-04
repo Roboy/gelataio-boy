@@ -17,7 +17,7 @@ CardsflowPlanExecutor::CardsflowPlanExecutor(ros::NodeHandle *nh) : nh(nh) {
     ignored_joints.emplace_back("scooper_dummy_joint1");
     ignored_joints.emplace_back("scooper_dummy_joint2");
 
-    fake_wrist = true;
+    fake_wrist = false;
 }
 
 bool CardsflowPlanExecutor::executePlan(moveit::planning_interface::MoveGroupInterface::Plan &plan) {
