@@ -54,9 +54,10 @@ bool CardsflowPlanExecutor::executePlan(moveit::planning_interface::MoveGroupInt
             cmd.set_points.push_back(rad2deg(state.positions[wrist_index]));
             if (fake_wrist) {
                 nh->setParam("wrist_right_angle", cmd.set_points[0]);
-            } else {
                 ROS_WARN_THROTTLE(2.0, "Faking wrist.");
+            } else {
                 motor_command_pub.publish(cmd);
+                ROS_INFO_STREAM("Setting wrist to " << cmd.set_points[0]);
             }
         } else {
             ROS_WARN("Wrist right not found in the plan.");
@@ -91,6 +92,7 @@ bool CardsflowPlanExecutor::moveJointsTo(const std::map<std::string, double> &ta
                     nh->setParam("wrist_right_angle", cmd.set_points[0]);
                 } else {
                     motor_command_pub.publish(cmd);
+                    ROS_INFO_STREAM("Setting wrist to " << cmd.set_points[0]);
                 }
             }
         }

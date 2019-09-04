@@ -231,7 +231,7 @@ bool ScoopingMain::start_scoop_appraoch_via() {
     via_point["shoulder_right_axis1"] = 0.8;
     via_point["shoulder_right_axis2"] = 1.7;
     via_point["elbow_right"] = 1.8;
-    via_point["wrist_right"] = 0.0;
+    via_point["wrist_right"] = 2.1;
     bool result;
     if (cardsflow) {
       result = cardsflow->moveJointsTo(via_point);
