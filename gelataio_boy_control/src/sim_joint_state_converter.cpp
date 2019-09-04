@@ -36,8 +36,7 @@ void jointStateCallback(const sensor_msgs::JointState &state) {
 #else
             s.position.push_back(M_PI * state.position[i]/180.0);
 #endif
-        } else if (do_angle_conversion && (state.name[i] == "elbow_right")) {
-            double angle = state.position[i];
+        } else if (do_angle_conversion && (state.name[i] == "elbow_right")) { double angle = state.position[i];
             if (angle > M_PI) angle -= 2*M_PI;
             s.position.push_back(angle);
         } else {

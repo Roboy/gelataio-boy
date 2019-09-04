@@ -227,7 +227,7 @@ bool ScoopingMain::drop_ice(Point destination) {
 bool ScoopingMain::start_scoop_appraoch_via() {
     map<string, double> via_point;
 
-    via_point["shoulder_right_axis0"] = -1.57;
+    via_point["shoulder_right_axis0"] = -1.3;
     via_point["shoulder_right_axis1"] = 0.8;
     via_point["shoulder_right_axis2"] = 1.7;
     via_point["elbow_right"] = 1.8;
