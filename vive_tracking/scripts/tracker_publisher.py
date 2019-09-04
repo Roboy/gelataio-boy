@@ -48,7 +48,7 @@ def _get_single_joint_angle(joint_name, topic_name):
     return msg.position[i]
 
 def _get_endeffector_coordinats(endeffector_name, topic_name):
-    endeffector_cordinates = np.zeros(3)
+    endeffector_coordinates = np.zeros(3)
     
     def pose_callback(p):
         nonlocal endeffector_coordinates
@@ -103,6 +103,7 @@ if __name__ == "__main__":
     initial_position_scooper = _get_endeffector_coordinats(endeffector_name, robot_state_topic)
 
     joint_state = _get_default_joint_state(joint_state_topic_name, wrist_axis_name)
+    angle_publisher.publish(joint_state)
 
     while not rospy.is_shutdown():
         if _if_trigger_pressed(controller_name):
@@ -119,7 +120,7 @@ if __name__ == "__main__":
             
             modified_position_scooper = initial_position_scooper + delta_position_scooper  
             get_ik = rospy.ServiceProxy(inverse_kinematics_service, roboy_middleware_msgs.srv.InverseKinematics)
-            wrist_angle = _get_single_joint_angle(wrist_axis_name, joint_state_topic_name) _get_trackpad_movement(controller_name)
+            wrist_angle = _get_single_joint_angle(wrist_axis_name, joint_state_topic_name) + _get_trackpad_movement(controller_name)
             
             pos = Point(modified_position_scooper[0], modified_position_scooper[1], modified_position_scooper[2])
             requested_pose = Pose(position = pos)
