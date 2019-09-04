@@ -4,6 +4,10 @@ Steam:
 https://store.steampowered.com/about/ 
 plus SteamVR https://store.steampowered.com/app/250820/SteamVR/
 
+If using laptop, make sure that it is "VR-ready". 
+
+Use this workaround if you don't have a SteamVR HMD: http://help.triadsemi.com/en/articles/836917-steamvr-tracking-without-an-hmd
+
 
 OpenVR:
 `pip install openvr`
