@@ -25,6 +25,7 @@ from scipy import signal
 # Tmp memory
 zed_cam_data = {}
 bridge = CvBridge()
+pc_pub = None
 
 def findAngleBetweenVectors(vec_1, vec_2):
     """
@@ -39,19 +40,11 @@ def rotatePointCloud(point_cloud, angle, axis=np.array([1, 0, 0])):
     """
     R = Rotation.from_rotvec(angle * axis).as_dcm()
     return np.dot(point_cloud, R)
-
-def saveSensorDataZEDRGB(data):
-    """
-    Save incoming RGB data from ZED camera
-    """
-    global zed_cam_data, bridge
-    zed_cam_data['zed_rgb'] = bridge.imgmsg_to_cv2(data, "bgr8")
    
 def saveSensorDataRoyalDepth(data):
     """
     Save incoming depth data from royal camera
     """
-    
     global zed_cam_data, bridge
     zed_cam_data['royale_depth'] = bridge.imgmsg_to_cv2(data, "32FC1")
     
@@ -66,13 +59,9 @@ def findScoopingPoint(point_cloud):
     """
     Finds the highest point in the ice cream point cloud.
     """
-    # ----- Visualization -----
-    fig = plt.figure(figsize=(12,6))
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(point_cloud[:,0], point_cloud[:,1], point_cloud[:,2], c='blue', alpha=0.1)
-    # -------------------------
-    
     # Zero mean
+    print(point_cloud)
+    print(np.mean(point_cloud,axis=0))
     mesh = point_cloud - np.mean(point_cloud, axis=0)
 
     # PCA
@@ -102,12 +91,6 @@ def findScoopingPoint(point_cloud):
 
     scoop_point = valid_points[np.random.choice(len(valid_points))]
 
-    # ----- Visualization -----
-    ax.scatter(mesh[:,0], mesh[:,1], mesh[:,2], c='green', alpha=0.1)
-    ax.scatter(scoop_point[0], scoop_point[1], scoop_point[2], c='red')
-    plt.show()
-    # -------------------------
-
     return scoop_point
 
 def getServiceResponse(request):
@@ -120,11 +103,13 @@ def getServiceResponse(request):
     :return: service reponse
     """
     # Fake class call
-    #mesh = np.load(os.path.join(os.path.dirname(__file__), 'cnt_points.npy'))
+    mesh = np.load(os.path.join(os.path.dirname(__file__), 'flakes.npy'))
+
+    #print(mesh)
     #mesh = mesh[np.linspace(0,10000,700).astype('int')]
     #mesh[:,2] += np.cos((mesh[:,0] ** 2 + mesh[:,1] ** 2) * 1000) / 25
 
-    global zed_cam_data
+    """global zed_cam_data
     zed_cam_data['flavor'] = request.flavor
     
     mesh = None
@@ -138,7 +123,8 @@ def getServiceResponse(request):
         try: 
             print(zed_cam_data.keys())
             mesh = PointDetector.detect(**zed_cam_data)
-            mesh = mesh[np.linspace(0,len(mesh)-1,700).astype('int')]
+            print(mesh.shape)
+            #mesh = mesh[np.linspace(0,len(mesh)-1,700).astype('int')]
         except TypeError as e:
             # Not enough data in zed_cam_data ... try again
             print("Waiting for camera data...")
@@ -147,7 +133,7 @@ def getServiceResponse(request):
     
     if mesh is None:
         return DetectIceCreamResponse(Point(), Point(), 'Point cloud could not be detected')
-    
+    """
     # Find a scooping point
     scoop_point = findScoopingPoint(mesh)
 
@@ -166,8 +152,9 @@ if __name__ == '__main__' :
     rospy.Service('iceCreamMeshService', DetectIceCream, getServiceResponse)
 
     # --- Init subscribers ---
-    rospy.Subscriber("/zed/zed_node/left_raw/image_raw_color", Image, saveSensorDataZEDRGB)
-    rospy.Subscriber("/royale_camera_driver/depth_image", Image, saveSensorDataRoyalDepth)
-    rospy.Subscriber("/royale_camera_driver/point_cloud", PointCloud2, saveSensorDataRoyalPC)
+    rospy.Subscriber("/pico_flexx/image_depth", Image, saveSensorDataRoyalDepth)
+    rospy.Subscriber("/pico_flexx/points", PointCloud2, saveSensorDataRoyalPC)
+
+    pc_pub = rospy.Publisher("/ice_cream_points")
 
     rospy.spin()
