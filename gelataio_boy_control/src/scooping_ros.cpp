@@ -27,7 +27,10 @@ void ScoopingROS::run() {
 
     while (ros::ok()) {
         ros::spinOnce();
-        status_msg.data = app.get_status();
+        string status = app.get_status();
+        if (status == "IDLE" && this->busy) status_msg.data = "EXECUTING";
+        else status_msg.data = status;
+
         if (this->done == 1){
             status_msg.data = "DONE";
         } else if (this->done == 0) {

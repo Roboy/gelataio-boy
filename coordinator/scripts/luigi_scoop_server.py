@@ -116,6 +116,8 @@ class ScoopServer:
 
     self.InitPose()
 
+    rospy.sleep(1)
+
     while not str(self.scooping_status_.data) == 'DONE' and not rospy.is_shutdown():
       r.sleep()
 
@@ -147,18 +149,19 @@ class ScoopServer:
       for scoopPerFlavor in range(scoops[scoop]):
         # Each scoop is done in scoopingSteps
         # Wait for scooping_planning/status to be idle
-        while not str(self.scooping_status_.data) == 'IDLE' and not rospy.is_shutdown():
+        while not str(self.scooping_status_.data) in ["DONE", "FAIL", "IDLE"] and not rospy.is_shutdown():
           self.scooping_human_status_ = str(self.scooping_status_.data) + ' need more time'
           r.sleep()
 
         scoopingResponse = self.TranslationalPTPMotionClient(startingPoint, startingPoint)
 
+        while not str(self.scooping_status_.data) in ["DONE", "FAIL", "IDLE"] and not rospy.is_shutdown():
+          self.scooping_human_status_ = str(self.scooping_status_.data) + ' need more time'
+          r.sleep()
+
         rospy.loginfo(scoopingResponse)
         if not scoopingResponse:
           self.scooping_human_status_ = 'Scooping didnt start'
-
-        while not str(self.scooping_status_.data) == 'DONE' and not rospy.is_shutdown():
-          r.sleep()
 
         rospy.loginfo(scoopingResponse)
 
@@ -168,11 +171,14 @@ class ScoopServer:
 
     self.InitPose()
 
-    rospy.sleep(8.0)
+    while not str(self.scooping_status_.data) in ["DONE", "FAIL", "IDLE"] and not rospy.is_shutdown():
+      self.scooping_human_status_ = str(self.scooping_status_.data) + ' need more time'
+      r.sleep()
 
     wentHome = self.GoHome()
 
-    while not str(self.scooping_status_.data) == 'DONE':
+    while not str(self.scooping_status_.data) in ["DONE", "FAIL", "IDLE"] and not rospy.is_shutdown():
+      self.scooping_human_status_ = str(self.scooping_status_.data) + ' need more time'
       r.sleep()
 
     # Send result
