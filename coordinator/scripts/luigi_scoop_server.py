@@ -107,6 +107,8 @@ class ScoopServer:
 
     
   def ReceiveIceCreamOrder_(self, data):
+
+    self._feedback.finished_scoops = []
     self.we_have_client_ = True
 
     rospy.loginfo(data)
