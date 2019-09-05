@@ -5,13 +5,12 @@
   <arg name="luigi_is_fake" default="true" />
 
 <!-- without this the action server will give you an exception because it is sending the feedback to no where -->
-  <node if="$(arg luigi_is_fake)" name="fake_luigi_client" pkg="coordinator" type="fake_luigi_client.py" respawn="false" output="screen">
+<!--   <node if="$(arg luigi_is_fake)" name="fake_luigi_client" pkg="coordinator" type="fake_luigi_client.py" respawn="false" output="screen">
   </node>
   
-  <!-- recives the orderes from the lugig and send point to scooping -->
   <node name="luigi_scoop_server" pkg="coordinator" type="luigi_scoop_server.py" respawn="false" output="screen">
   </node>
-  
+ -->  
   <!-- scooping -->
   <node name="scooping_planning" pkg="gelataio_boy_control" type="scooping_planning" respawn="false" output="screen">
   </node>

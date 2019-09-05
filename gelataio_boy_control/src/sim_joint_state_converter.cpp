@@ -7,8 +7,6 @@
 #include <sensor_msgs/JointState.h>
 #include <std_msgs/Float32.h>
 
-//#define FAKE_WRIST
-
 using namespace std;
 
 static ros::NodeHandle *nh;
@@ -28,15 +26,9 @@ void jointStateCallback(const sensor_msgs::JointState &state) {
         if (use_external_steering_angle && (state.name[i] == "bike_steering")) {
             s.position.push_back(steering_angle);
         } else if (do_angle_conversion && (state.name[i] == "wrist_right")) {
-#ifdef FAKE_WRIST
-            double tmp;
-            nh->getParam("wrist_right_angle", tmp);
-            s.position.push_back(M_PI * tmp/180.0);
-            ROS_WARN_THROTTLE(5.0, "Taking the faked wrist angle");
-#else
-            s.position.push_back(M_PI * state.position[i]/180.0);
-#endif
-        } else if (do_angle_conversion && (state.name[i] == "elbow_right")) { double angle = state.position[i];
+            s.position.push_back(state.position[i]);
+        } else if ((state.name[i] == "elbow_right")) {
+            double angle = state.position[i];
             if (angle > M_PI) angle -= 2*M_PI;
             s.position.push_back(angle);
         } else {

@@ -12,7 +12,7 @@ using namespace roboy_control_msgs;
 using namespace std;
 
 
-ScoopingROS::ScoopingROS(ros::NodeHandle *handle) : nh(handle), app(handle, false), busy(false), executor(nullptr), done(false) {}
+ScoopingROS::ScoopingROS(ros::NodeHandle *handle) : nh(handle), app(handle, false), busy(false), executor(nullptr), done(2) {}
 
 void ScoopingROS::run() {
     scooping_srv = nh->advertiseService("scooping_planning/scoop", &ScoopingROS::scooping_cb, this);
@@ -28,9 +28,12 @@ void ScoopingROS::run() {
     while (ros::ok()) {
         ros::spinOnce();
         status_msg.data = app.get_status();
-        if (this->done){
+        if (this->done == 1){
             status_msg.data = "DONE";
+        } else if (this->done == 0) {
+            status_msg.data = "FAIL";
         }
+
         status_pub.publish(status_msg);
         loop_rate.sleep();
     }
@@ -41,6 +44,7 @@ bool ScoopingROS::scooping_cb(TranslationalPTPMotion::Request &req, Translationa
     ss << "Got scooping request: " << req << std::endl;
     ROS_INFO_STREAM(ss.str());
 
+    this->done=2;
     if (this->busy) {
         resp.success = false;
         ROS_ERROR("Can't start another scooping action while still running.");
@@ -53,7 +57,8 @@ bool ScoopingROS::scooping_cb(TranslationalPTPMotion::Request &req, Translationa
         resp.success = true;
         this->busy = true;
         executor = new std::thread(&ScoopingMain::scoop_ice, &app, req.start_point, req.end_point,
-                [this](bool success) {this->busy = false; this->done = true;});
+                [this](int success) {this->busy = false; this->done = success;
+        });
     }
 
     return true;
@@ -62,6 +67,7 @@ bool ScoopingROS::scooping_cb(TranslationalPTPMotion::Request &req, Translationa
 bool ScoopingROS::go_home_cb(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &resp) {
     ROS_INFO("Go Home roboy, you are drunk ");
 
+    this->done=2;
     resp.message = "Going home";
 
     if (this->busy) {
@@ -75,7 +81,13 @@ bool ScoopingROS::go_home_cb(std_srvs::Trigger::Request &req, std_srvs::Trigger:
         }
         resp.success = true;
         this->busy = true;
-        executor = new std::thread(&ScoopingMain::go_home, &app, [this](bool success) {this->busy = false;});
+        executor = new std::thread(&ScoopingMain::go_home, &app, [this](bool success) {
+            this->done=success;
+            ros::Duration dt(2.0);
+            dt.sleep();
+            this->done = 2;
+            this->busy = false;
+        });
     }
 
     return true;
@@ -85,6 +97,7 @@ bool ScoopingROS::init_pose_cb(std_srvs::Trigger::Request &req, std_srvs::Trigge
     ROS_INFO("Moving to start pose");
 
     resp.message = "Moving to init pose";
+    this->done=2;
 
     if (this->busy) {
         resp.success = false;
@@ -98,6 +111,12 @@ bool ScoopingROS::init_pose_cb(std_srvs::Trigger::Request &req, std_srvs::Trigge
         }
         resp.success = true;
         this->busy = true;
-        executor = new std::thread(&ScoopingMain::init_pose, &app, [this](bool success) {this->busy = false;});
+        executor = new std::thread(&ScoopingMain::init_pose, &app, [this](bool success) {
+            this->done = success;
+            ros::Duration dt(3.0);
+            dt.sleep();
+            this->done = 2;
+            this->busy = false;
+        });
     }
 }
