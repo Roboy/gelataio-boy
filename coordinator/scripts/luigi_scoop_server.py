@@ -172,7 +172,7 @@ class ScoopServer:
       rospy.loginfo(self._feedback.finished_scoops)
 
     # Scooped
-    if self.scooping_status_.data == 'DONE':
+    if self._feedback.finished_scoops[len(self._feedback.finished_scoops)]==1 and self.scooping_status_.data == 'DONE':
       success = True
     elif self.scooping_status_.data == 'FAIL':
       success = False
