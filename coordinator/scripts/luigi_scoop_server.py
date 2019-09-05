@@ -78,6 +78,17 @@ class ScoopServer:
     except rospy.ServiceException, e:
       print "Service call failed: %s"%e
 
+  # Arguments are of Pose type
+  def InitPose(self):
+    rospy.wait_for_service('scooping_planning/init_pose')
+    try:
+      # TODO: Only call this when status is IDLE
+      init_pose = rospy.ServiceProxy('scooping_planning/init_pose', Trigger)
+      resp = init_pose()
+      return resp.success
+    except rospy.ServiceException, e:
+      print "Service call failed: %s"%e
+
   # For now we set which flavor is where by hand (manually), unless vision can provide us with an api
   def GetFlavorStartingPoint(self, flavor):
     leftStartPoint = Point(x=0.0, y=-0.55, z=0.18)
@@ -123,6 +134,14 @@ class ScoopServer:
     r = rospy.Rate(5) # 3hz
 
     # Call init service
+    init_result = self.InitPose()
+
+    if not init_result:
+      rospy.loginfo('Cant go to init')
+      # rospy.shutdown()
+
+    # sleep for 5 seconds, waiting for init
+    rospy.sleep(5.)
 
     # We try to scoop in just five points sequence
     for scoop in range(len(scoops)):
@@ -142,19 +161,6 @@ class ScoopServer:
 
         while not str(self.scooping_status_.data) == 'DONE' and not str(self.scooping_status_.data)=='FAIL':
           r.sleep()
-
-        # Wait for scooping_planning/status to be idle
-        # while not str(self.scooping_status_.data) == 'IDLE' and not rospy.is_shutdown():
-        #   self.scooping_human_status_ = str(self.scooping_status_.data) + ' need more time'
-        #   r.sleep()
-
-        # j = 0
-        # while str(self.scooping_status_.data) == 'IDLE' and j<10:
-        #   j+=1
-        #   r.sleep()
-
-        # while str(self.scooping_status_.data) == 'EXECUTING' or str(self.scooping_status_.data) == 'PLANNING':
-        #   r.sleep()
 
       if str(self.scooping_status_.data) == 'DONE':
         self._feedback.finished_scoops[scoop] = 1
