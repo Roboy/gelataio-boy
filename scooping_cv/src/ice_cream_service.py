@@ -3,7 +3,7 @@
 # ROS
 import rospy, time, tf
 from sensor_msgs.msg import Image, PointCloud2, PointField
-from geometry_msgs.msg import Point
+from geometry_msgs.msg import Point, PointStamped
 from cv_bridge import CvBridge, CvBridgeError
 
 # Statistics
@@ -134,8 +134,8 @@ def getServiceResponse(request):
     :return: service reponse
     """
     # Fake class call
-    
-    global zed_cam_data, pc_publisher
+    mesh = np.load(os.path.join(os.path.dirname(__file__), 'flakes.npy'))
+    """global zed_cam_data, pc_publisher
 
     zed_cam_data['flavor'] = request.flavor
     
@@ -158,7 +158,7 @@ def getServiceResponse(request):
 
     if mesh is None:
         return DetectIceCreamResponse(Point(), Point(), 'Point cloud could not be detected')
-    
+    """
     mesh = transformCam2Torso(mesh)
 
     # ----- RVIZ Visualization -----
@@ -169,13 +169,18 @@ def getServiceResponse(request):
     # Find a scooping point
     scoop_point = findScoopingPoint(mesh)
 
+    point_stamped = PointStamped()
+    point_stamped.header.frame_id = "torso"
+
     # Prepare response
     start_point = Point()
     start_point.x = scoop_point[0]
     start_point.y = scoop_point[1]
     start_point.z = scoop_point[2]
 
-    return DetectIceCreamResponse(start_point, Point(), '')
+    point_stamped.point = start_point
+
+    return DetectIceCreamResponse(point_stamped, PointStamped(), '')
 
 if __name__ == '__main__' :
     rospy.init_node('iceCreamService')
