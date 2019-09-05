@@ -108,6 +108,16 @@ def pose_cb(data):
         global palm_pose
         palm_pose = [data.pose.position.x, data.pose.position.y, data.pose.position.z]
 
+def joint_state_filtering(joint_state, prev_joint_state, wrist_name):
+    name_list = []
+    angle_list = []
+    for i in range(len(joint_state.name)):
+        i_prev = prev_joint_state.name.index(joint_state.name[i])
+        name_list.append(joint_state.name[i])
+        angle_list.append(  0.4 * prev_joint_state.position[i_prev] + 
+                            0.6 * joint_state.position[i])
+    return _get_joint_state(name_list, angle_list, wrist_name)
+
 if __name__ == "__main__":
     controller_name = "controller_1"
     endeffector_name = "scooper"
@@ -126,7 +136,8 @@ if __name__ == "__main__":
     s = rospy.Service('take_control', SetBool, take_control_srv)
 
     joint_state = _get_default_joint_state(joint_state_topic_name, wrist_axis_name)
-    
+    prev_joint_state = joint_state
+
     wrist_publisher = rospy.Publisher('roboy/middleware/MotorCommand', MotorCommand)
     wrist_angle = 0.2
 
@@ -153,7 +164,7 @@ if __name__ == "__main__":
                     wrist_angle_prev = wrist_angle
 
 
-            if v.devices[controller_name].get_controller_inputs()['trigger']>0.5:
+            if _if_trigger_pressed(controller_name):
                 pose_matrix = v.devices[controller_name].get_pose_matrix()
                 if pose_matrix is None:
                     initial_position_scooper = [0.5,0,0]
@@ -162,6 +173,7 @@ if __name__ == "__main__":
                 initial_position_scooper = palm_pose
                 rospy.loginfo_throttle(0.1,initial_position_scooper)
                 # rospy.loginfo_throttle(0.1,palm_pose)
+                
             else:
                 pose_matrix = v.devices[controller_name].get_pose_matrix()
                 rospy.loginfo_throttle(1,pose_matrix)
@@ -188,8 +200,10 @@ if __name__ == "__main__":
 
                 try:
                     get_ik = rospy.ServiceProxy(inverse_kinematics_service, roboy_middleware_msgs.srv.InverseKinematics)
-                    ik = get_ik(ik_request);
-                    joint_state = _get_joint_state(ik.joint_names, ik.angles, wrist_axis_name)
+                    ik = get_ik(ik_request)
+                    new_joint_state = _get_joint_state(ik.joint_names, ik.angles, wrist_axis_name)
+                    joint_state = joint_state_filtering(new_joint_state, prev_joint_state, wrist_axis_name)
+                    prev_joint_state = joint_state
                 except rospy.ServiceException as exc:
                     print("Inverse Kinematics calculation wasn't successfull\n: " + str(exc))
 
