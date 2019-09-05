@@ -183,7 +183,7 @@ class ScoopServer:
 
     # Send result
     self._result.success = success
-    self._result.error_message = self.scooping_human_status_
+    self._result.error_message = 'Error in scooping'
     self.server_.set_succeeded(self._result)
     self._feedback.finished_scoops = []
 
