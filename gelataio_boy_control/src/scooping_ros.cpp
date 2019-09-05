@@ -30,8 +30,7 @@ void ScoopingROS::run() {
         status_msg.data = app.get_status();
         if (this->done == 1){
             status_msg.data = "DONE";
-        }
-        else if(this->done == 0){
+        } else if (this->done == 0) {
             status_msg.data = "FAIL";
         }
 

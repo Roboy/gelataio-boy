@@ -9,6 +9,7 @@
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <thread>
 #include "hand_controller.hpp"
+#include "emotions_interface.h"
 
 class ScoopingMain {
 public:
@@ -32,7 +33,7 @@ protected:
     bool depart_from_scoop();
     bool drop_ice(geometry_msgs::Point destination);
 
-    bool interpolate_joint(std::string joint_name, double from, double to, ros::Duration time, int steps = 100);
+    bool interpolate_joint(std::string joint_name, double from, double to, double time, int steps = 50);
 
     virtual void defineEnvironment();
 
@@ -50,6 +51,8 @@ private:
     HandController* active_arm;
 
     hand_interface *right_hand, *left_hand;
+
+    emotions_interface *emo;
 
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
 
