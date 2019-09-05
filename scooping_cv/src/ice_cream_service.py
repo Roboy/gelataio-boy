@@ -186,7 +186,7 @@ if __name__ == '__main__' :
     rospy.init_node('iceCreamService')
 
     # --- Init service ---
-    rospy.Service('iceCreamMeshService', DetectIceCream, getServiceResponse)
+    rospy.Service('iceCreamService', DetectIceCream, getServiceResponse)
 
     # --- Init subscribers ---
     rospy.Subscriber("/pico_flexx/image_depth", Image, saveSensorDataRoyalDepth)
