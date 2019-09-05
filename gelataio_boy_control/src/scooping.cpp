@@ -204,7 +204,7 @@ bool ScoopingMain::drop_ice(Point destination){
         drop_ball_pose["shoulder_right_axis0"] = -1.5;
         drop_ball_pose["shoulder_right_axis1"] = 0.9;
         drop_ball_pose["shoulder_right_axis2"] = 1.6;
-        drop_ball_pose["elbow_right"] = 1.0;
+        drop_ball_pose["elbow_right"] = 1.1;
         bool success = cardsflow->moveJointsTo(drop_ball_pose);
         ros::Duration wait(10.0);
         ROS_INFO("Waiting to reach approach via point");
