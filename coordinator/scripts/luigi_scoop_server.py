@@ -109,6 +109,7 @@ class ScoopServer:
   def ReceiveIceCreamOrder_(self, data):
     self.we_have_client_ = True
 
+    rospy.loginfo(data)
     # success of the total scoping operation
     success = False
     # Scoops required
@@ -117,7 +118,7 @@ class ScoopServer:
     flavors = data.flavors
     self.scooping_human_status_ = 'Received a new ice cream order'
     # intially no scoops has been scooped
-    for i in scoops:
+    for i in range(len(scoops)):
       self._feedback.finished_scoops.append(0)
 
     # start executing the action
