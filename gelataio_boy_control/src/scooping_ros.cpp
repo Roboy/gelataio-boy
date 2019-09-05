@@ -81,7 +81,11 @@ bool ScoopingROS::go_home_cb(std_srvs::Trigger::Request &req, std_srvs::Trigger:
         resp.success = true;
         this->busy = true;
         executor = new std::thread(&ScoopingMain::go_home, &app, [this](bool success) {this->busy = false; 
-            this->done=success;});
+            this->done=success;
+            ros::Duration dt(2.0);
+            dt.sleep();
+            this->done = 2;
+        });
     }
 
     return true;
