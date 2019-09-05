@@ -13,6 +13,8 @@ class PointDetector:
 		"Flakes": np.array([[38,40,0],[66,255,255]])
 		}
 
+	rgb_cam = cv2.VideoCapture(2)
+
 	@staticmethod
 	def _segment(orig, K=4, ret_labels=True):
 		nrow, ncol, nchannel = orig.shape
@@ -103,16 +105,20 @@ class PointDetector:
 		if not flavor in PointDetector.flavor_color_map.keys():
 			return None
 
+		ret_val, rgb_img = PointDetector.rgb_cam.read()
+		
+		while not ret_val:
+			ret_val, rgb_img = PointDetector.rgb_cam.read()
 		color_range = PointDetector.flavor_color_map[flavor]
 
-		mask = PointDetector._color_filter(zed_rgb, color_range[0], color_range[1], ret_mask=True)
+		mask = PointDetector._color_filter(rgb_img, color_range[0], color_range[1], ret_mask=True)
 		dim_x, dim_y = royale_depth.shape
 		# Transform rgb view to match depth cam view
 		pts1 = np.float32([[516,228],[503,367],[862,425],[903,301]])
 		pts2 = np.float32([[85,59],[83,96],[187,114],[200,79]])
 		M = cv2.getPerspectiveTransform(pts1, pts2)
 
-		warped_rgb = cv2.warpPerspective(zed_rgb, M, (dim_y, dim_x))
+		warped_rgb = cv2.warpPerspective(rgb_img, M, (dim_y, dim_x))
 		warped_mask = cv2.warpPerspective(mask, M, (dim_y, dim_x))
 
 		labels = PointDetector._segment(warped_rgb, ret_labels=True)

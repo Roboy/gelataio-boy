@@ -25,7 +25,6 @@ from scipy import signal
 zed_cam_data = {}
 bridge = CvBridge()
 
-tf_listener = None
 pc_publisher = None
 
 def findAngleBetweenVectors(vec_1, vec_2):
@@ -41,19 +40,11 @@ def rotatePointCloud(point_cloud, angle, axis=np.array([1, 0, 0])):
     """
     R = Rotation.from_rotvec(angle * axis).as_dcm()
     return np.dot(point_cloud, R)
-
-def saveSensorDataZEDRGB(data):
-    """
-    Save incoming RGB data from ZED camera
-    """
-    global zed_cam_data, bridge
-    zed_cam_data['zed_rgb'] = bridge.imgmsg_to_cv2(data, "bgr8")
    
 def saveSensorDataRoyalDepth(data):
     """
     Save incoming depth data from royal camera
     """
-    
     global zed_cam_data, bridge
     zed_cam_data['royale_depth'] = bridge.imgmsg_to_cv2(data, "32FC1")
     
@@ -68,12 +59,9 @@ def transformCam2Torso(point_cloud):
     """
     Transform from camera to torso frame
     """
-    global tf_listener
-    (trans, rot) = tf_listener.lookupTransform('/zed_camera', '/torso', rospy.Time(0))
-    
-    rotZ = rotatePointCloud(point_cloud, rot[2], np.array([0,0,1]))
-    rotZY = rotatePointCloud(rotZ, rot[1], np.array([0,1,0]))
-    return rotatePointCloud(rotZY, rot[0], np.array([1,0,0])) + trans
+    rotAroundX = rotatePointCloud(point_cloud, np.pi/2, np.array([1,0,0]))
+    rotAroundXZ = rotatePointCloud(rotAroundX, np.pi, np.array([0,0,1]))
+    return rotAroundXZ + np.array([0.01,-0.01, 0.25])
 
 def getPointCloud2Msg(mesh):
     """
@@ -146,15 +134,12 @@ def getServiceResponse(request):
     :return: service reponse
     """
     # Fake class call
-    mesh = np.load(os.path.join(os.path.dirname(__file__), 'flakes.npy'))
-    #mesh = mesh[np.linspace(0,len(mesh)-1,700).astype('int')]
-    #mesh[:,2] += np.cos((mesh[:,0] ** 2 + mesh[:,1] ** 2) * 1000) / 25
     
     global zed_cam_data, pc_publisher
 
     zed_cam_data['flavor'] = request.flavor
     
-    """mesh = None
+    mesh = None
     step_counter = 0
 
     # Repeat till mesh is found or step counter is too high
@@ -163,7 +148,6 @@ def getServiceResponse(request):
         step_counter += 1
 
         try: 
-            print(zed_cam_data.keys())
             mesh = PointDetector.detect(**zed_cam_data)
             mesh = mesh[np.linspace(0,len(mesh)-1,700).astype('int')]
         except TypeError as e:
@@ -171,11 +155,11 @@ def getServiceResponse(request):
             print("Waiting for camera data...")
             print(e)
             time.sleep(1)
-    """
+
     if mesh is None:
         return DetectIceCreamResponse(Point(), Point(), 'Point cloud could not be detected')
     
-    #mesh = transformCam2Torso(mesh)
+    mesh = transformCam2Torso(mesh)
 
     # ----- RVIZ Visualization -----
     msg = getPointCloud2Msg(mesh)
@@ -200,12 +184,9 @@ if __name__ == '__main__' :
     rospy.Service('iceCreamService', DetectIceCream, getServiceResponse)
 
     # --- Init subscribers ---
-    rospy.Subscriber("/zed/zed_node/left_raw/image_raw_color", Image, saveSensorDataZEDRGB)
-    rospy.Subscriber("/royale_camera_driver/depth_image", Image, saveSensorDataRoyalDepth)
-    rospy.Subscriber("/royale_camera_driver/point_cloud", PointCloud2, saveSensorDataRoyalPC)
-    
-    # Init tf listener
-    tf_listener = tf.TransformListener()
+    rospy.Subscriber("/pico_flexx/image_depth", Image, saveSensorDataRoyalDepth)
+    rospy.Subscriber("/pico_flexx/points", PointCloud2, saveSensorDataRoyalPC)
+
     # Init point cloud (for rviz) publisher
     pc_publisher = rospy.Publisher("/ice_cream_pc", PointCloud2, queue_size=10)
 
