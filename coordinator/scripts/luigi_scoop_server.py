@@ -149,7 +149,7 @@ class ScoopServer:
       for scoopPerFlavor in range(scoops[scoop]):
         # Each scoop is done in scoopingSteps
         # Wait for scooping_planning/status to be idle
-        while not str(self.scooping_status_.data) == 'IDLE' and not rospy.is_shutdown():
+        while not str(self.scooping_status_.data) == 'IDLE' and not str(self.scooping_status_.data) == 'DONE' and not str(self.scooping_status_.data) == 'FAIL' and not rospy.is_shutdown():
           self.scooping_human_status_ = str(self.scooping_status_.data) + ' need more time'
           r.sleep()
 
@@ -197,6 +197,8 @@ class ScoopServer:
 
     while not str(self.scooping_status_.data) == 'DONE' and not str(self.scooping_status_.data)=='FAIL':
       r.sleep()
+
+    self.__init__()
 
   # This function is called every _feedback_delay seconds
   def SendFeedbackLuigi(self, sc):
