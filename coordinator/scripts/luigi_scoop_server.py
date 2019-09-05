@@ -12,9 +12,10 @@ import sched, time
 # OrderIceCreamActionGoal, OrderIceCreamActionResult, OrderIceCreamFeedback 
 # OrderIceCreamGoal, OrderIceCreamResult
 from roboy_cognition_msgs.msg import *
+from roboy_cognition_msgs.srv import DetectIceCream
 
 from roboy_control_msgs.srv import TranslationalPTPMotion
-from geometry_msgs.msg import Point
+from geometry_msgs.msg import Point, PointStamped
 import numpy as np
 
 # First one is left box, second one is right box
@@ -57,13 +58,25 @@ class ScoopServer:
     try:
       # TODO: Only call this when status is IDLE
       goHome = rospy.ServiceProxy('scooping_planning/go_home', Trigger)
-
       # Create an object of the type TriggerRequest. We nned a TriggerRequest for a Trigger service
       req = TriggerRequest()
 
       # Now send the request through the connection
       resp = goHome(req)
       return resp.success
+    except rospy.ServiceException, e:
+      print "Service call failed: %s"%e
+
+  # Arguments are of Pose type
+  def GetPoint(self):
+    rospy.wait_for_service('/iceCreamMeshService')
+    try:
+      getPoint = rospy.ServiceProxy('/iceCreamMeshService', DetectIceCream)
+      req = 'flakes'
+      print("WE HAVE A POINT")
+      # Now send the request through the connection
+      resp = getPoint(req)
+      return resp.start_scooping
     except rospy.ServiceException, e:
       print "Service call failed: %s"%e
 
@@ -93,6 +106,7 @@ class ScoopServer:
     else:
       startingPoint = leftStartPoint
 
+    startingPoint = self.GetPoint()
     return startingPoint
 
     
@@ -134,8 +148,9 @@ class ScoopServer:
     for scoop in range(len(scoops)):
 
       # Go to the start point of the box, depending on the flavor
-      startingPoint = self.GetFlavorStartingPoint(flavors[scoop])
+      startingPoint = self.GetFlavorStartingPoint(flavors[scoop]).point
 
+      print(startingPoint)
       # Loop for how many scoops of this flavor, really luigi??
       for scoopPerFlavor in range(scoops[scoop]):
 
@@ -163,7 +178,7 @@ class ScoopServer:
 
           # Now for step 2 and 3
           # Move along the y-z plane (ice cream surface)     
-          scoopingResponse = self.TranslationalPTPMotionClient(Point(x=-0.1, y=-0.4, z=0.25), Point(x=-0.1, y=-0.3, z=0.25))
+          scoopingResponse = self.TranslationalPTPMotionClient(startingPoint, Point(x=-0.1, y=-0.3, z=0.25))
           if not scoopingResponse:
             self.scooping_human_status_ = 'Failed to come up with a plan for step ' + str(i) + ' out of 5'
             success = False

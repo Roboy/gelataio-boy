@@ -61,7 +61,7 @@ def transformCam2Torso(point_cloud):
     """
     rotAroundX = rotatePointCloud(point_cloud, np.pi/2, np.array([1,0,0]))
     rotAroundXZ = rotatePointCloud(rotAroundX, np.pi, np.array([0,0,1]))
-    return rotAroundXZ + np.array([0.01,-0.01, 0.25])
+    return rotAroundXZ + np.array([0.01,-0.01, 0.05])
 
 def getPointCloud2Msg(mesh):
     """
@@ -186,7 +186,7 @@ if __name__ == '__main__' :
     rospy.init_node('iceCreamService')
 
     # --- Init service ---
-    rospy.Service('iceCreamService', DetectIceCream, getServiceResponse)
+    rospy.Service('iceCreamMeshService', DetectIceCream, getServiceResponse)
 
     # --- Init subscribers ---
     rospy.Subscriber("/pico_flexx/image_depth", Image, saveSensorDataRoyalDepth)
