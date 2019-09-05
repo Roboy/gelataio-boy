@@ -140,7 +140,7 @@ class ScoopServer:
         if not scoopingResponse:
           self.scooping_human_status_ = 'Scooping didnt start'
 
-        while not str(self.scooping_status_.data) == 'DONE':
+        while not str(self.scooping_status_.data) == 'DONE' and not str(self.scooping_status_.data)=='FAIL':
           r.sleep()
 
         # Wait for scooping_planning/status to be idle
@@ -156,31 +156,41 @@ class ScoopServer:
         # while str(self.scooping_status_.data) == 'EXECUTING' or str(self.scooping_status_.data) == 'PLANNING':
         #   r.sleep()
 
-        rospy.loginfo(scoopingResponse)
+      if str(self.scooping_status_.data) == 'DONE':
+        self._feedback.finished_scoops[scoop] = 1
+      elif str(self.scooping_status_.data) == 'FAIL':
+        self._feedback.finished_scoops[scoop] = 0
 
-      self._feedback.finished_scoops[scoop] = 1
+      rospy.loginfo(self.scooping_status_.data)
+      rospy.loginfo(self._feedback.finished_scoops)
 
-    success = True
+    # Scooped
+    if self.scooping_status_.data == 'DONE':
+      success = True
+    elif self.scooping_status_.data == 'FAIL':
+      success = False
 
     # while not str(self.scooping_status_.data) == 'IDLE':
     #   rospy.loginfo('Waiting for scooping to go idle')
     #   rospy.sleep(1.)
-
-    wentHome = self.GoHome()
-
-    while not str(self.scooping_status_.data) == 'DONE':
-      r.sleep()
-
-    # if wentHome:
-    #   rospy.loginfo('Went home')
-    # else:
-    #   rospy.logwarn('Could not go home, the traffic is terrible')
 
     # Send result
     self._result.success = success
     self._result.error_message = self.scooping_human_status_
     self.server_.set_succeeded(self._result)
     self._feedback.finished_scoops = []
+
+    wentHome = self.GoHome()
+    # while not str(self.scooping_status_.data) == 'IDLE':
+    #   r.sleep()
+
+    if wentHome:
+      rospy.loginfo('Going home')
+    else:
+      rospy.logwarn('Could not go home, the traffic is terrible')
+
+    while not str(self.scooping_status_.data) == 'DONE' and not str(self.scooping_status_.data)=='FAIL':
+      r.sleep()
 
   # This function is called every _feedback_delay seconds
   def SendFeedbackLuigi(self, sc):

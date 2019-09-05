@@ -337,7 +337,7 @@ bool ScoopingMain::init_pose(std::function<void(bool)> finish_cb) {
     if (cardsflow) successful = cardsflow->moveJointsTo(init_pose);
     else successful = right_arm.moveJoints(init_pose);
 
-    finish_cb(successful);
+finish_cb(successful);
     return successful;
 }
 
