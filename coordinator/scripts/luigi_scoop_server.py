@@ -56,6 +56,7 @@ class ScoopServer:
     rospy.wait_for_service('scooping_planning/go_home')
     try:
       # TODO: Only call this when status is IDLE
+      rospy.loginfo("Going home")
       goHome = rospy.ServiceProxy('scooping_planning/go_home', Trigger)
 
       # Create an object of the type TriggerRequest. We nned a TriggerRequest for a Trigger service
@@ -67,9 +68,18 @@ class ScoopServer:
     except rospy.ServiceException, e:
       print "Service call failed: %s"%e
 
+  def InitPose(self):
+    rospy.loginfo("Init pose")
+    rospy.wait_for_service("scooping_planning/init_pose")
+    initPose = rospy.ServiceProxy('scooping_planning/init_pose', Trigger)
+    req = TriggerRequest()
+    resp = initPose(req)
+    return resp.success
+
   # Arguments are of Pose type
   def TranslationalPTPMotionClient(self, startPosition, endPosition):
     rospy.wait_for_service('scooping_planning/scoop')
+    rospy.loginfo("Scoop call")
     try:
       # TODO: Only call this when status is IDLE
       TranslationalPTPMotionServClient = rospy.ServiceProxy('scooping_planning/scoop', TranslationalPTPMotion)
@@ -100,6 +110,15 @@ class ScoopServer:
 
     # success of the total scoping operation
     success = False
+
+    # The rate by which we check the scooping status change
+    r = rospy.Rate(5) # 3hz
+
+    self.InitPose()
+
+    while not str(self.scooping_status_.data) == 'DONE' and not rospy.is_shutdown():
+      r.sleep()
+
     # Scoops required
     scoops = data.scoops
     # flavors for each "scoops" ordered, not scoop :D
@@ -119,8 +138,6 @@ class ScoopServer:
     # success of the total scoping operation
     success = False
 
-    # The rate by which we check the scooping status change
-    r = rospy.Rate(5) # 3hz
 
     # Call init service
 
@@ -140,21 +157,8 @@ class ScoopServer:
         if not scoopingResponse:
           self.scooping_human_status_ = 'Scooping didnt start'
 
-        while not str(self.scooping_status_.data) == 'DONE':
+        while not str(self.scooping_status_.data) == 'DONE' and not rospy.is_shutdown():
           r.sleep()
-
-        # Wait for scooping_planning/status to be idle
-        # while not str(self.scooping_status_.data) == 'IDLE' and not rospy.is_shutdown():
-        #   self.scooping_human_status_ = str(self.scooping_status_.data) + ' need more time'
-        #   r.sleep()
-
-        # j = 0
-        # while str(self.scooping_status_.data) == 'IDLE' and j<10:
-        #   j+=1
-        #   r.sleep()
-
-        # while str(self.scooping_status_.data) == 'EXECUTING' or str(self.scooping_status_.data) == 'PLANNING':
-        #   r.sleep()
 
         rospy.loginfo(scoopingResponse)
 
@@ -162,19 +166,14 @@ class ScoopServer:
 
     success = True
 
-    # while not str(self.scooping_status_.data) == 'IDLE':
-    #   rospy.loginfo('Waiting for scooping to go idle')
-    #   rospy.sleep(1.)
+    self.InitPose()
+
+    rospy.sleep(8.0)
 
     wentHome = self.GoHome()
 
     while not str(self.scooping_status_.data) == 'DONE':
       r.sleep()
-
-    # if wentHome:
-    #   rospy.loginfo('Went home')
-    # else:
-    #   rospy.logwarn('Could not go home, the traffic is terrible')
 
     # Send result
     self._result.success = success
@@ -194,7 +193,7 @@ class ScoopServer:
       self.server_.publish_feedback(self._feedback)
       s.enter(self._feedback_delay, 1, self.SendFeedbackLuigi, (sc,))
     else:
-      rospy.loginfo('Luigi is Dead, move on!')
+      rospy.loginfo('Luigi is dead, move on!')
       s.enter(self._feedback_delay, 1, self.SendFeedbackLuigi, (sc,))
 
 if __name__ == '__main__':

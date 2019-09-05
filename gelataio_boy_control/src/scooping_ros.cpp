@@ -57,7 +57,8 @@ bool ScoopingROS::scooping_cb(TranslationalPTPMotion::Request &req, Translationa
         resp.success = true;
         this->busy = true;
         executor = new std::thread(&ScoopingMain::scoop_ice, &app, req.start_point, req.end_point,
-                [this](int success) {this->busy = false; this->done = success;});
+                [this](int success) {this->busy = false; this->done = success;
+        });
     }
 
     return true;
@@ -80,11 +81,12 @@ bool ScoopingROS::go_home_cb(std_srvs::Trigger::Request &req, std_srvs::Trigger:
         }
         resp.success = true;
         this->busy = true;
-        executor = new std::thread(&ScoopingMain::go_home, &app, [this](bool success) {this->busy = false; 
+        executor = new std::thread(&ScoopingMain::go_home, &app, [this](bool success) {
             this->done=success;
             ros::Duration dt(2.0);
             dt.sleep();
             this->done = 2;
+            this->busy = false;
         });
     }
 
@@ -95,6 +97,7 @@ bool ScoopingROS::init_pose_cb(std_srvs::Trigger::Request &req, std_srvs::Trigge
     ROS_INFO("Moving to start pose");
 
     resp.message = "Moving to init pose";
+    this->done=2;
 
     if (this->busy) {
         resp.success = false;
@@ -108,6 +111,12 @@ bool ScoopingROS::init_pose_cb(std_srvs::Trigger::Request &req, std_srvs::Trigge
         }
         resp.success = true;
         this->busy = true;
-        executor = new std::thread(&ScoopingMain::init_pose, &app, [this](bool success) {this->busy = false;});
+        executor = new std::thread(&ScoopingMain::init_pose, &app, [this](bool success) {
+            this->done = success;
+            ros::Duration dt(3.0);
+            dt.sleep();
+            this->done = 2;
+            this->busy = false;
+        });
     }
 }
