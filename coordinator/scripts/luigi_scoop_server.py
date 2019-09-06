@@ -134,7 +134,8 @@ class ScoopServer:
     success = False
 
     # The rate by which we check the scooping status change
-    r = rospy.Rate(5) # 3hz
+    r = rospy.Rate(5) # 5hz
+    busy = rospy.Rate(1)
 
     # Call init service
     init_result = self.InitPose()
@@ -153,17 +154,18 @@ class ScoopServer:
         # Each scoop is done in scoopingSteps
         # Wait for scooping_planning/status to be idle
         while not str(self.scooping_status_.data) == 'IDLE' and not str(self.scooping_status_.data) == 'DONE' and not str(self.scooping_status_.data) == 'FAIL' and not rospy.is_shutdown():
-          self.scooping_human_status_ = str(self.scooping_status_.data) + ' need more time'
+          # excuting or planning
           r.sleep()
 
         scoopingResponse = self.TranslationalPTPMotionClient(startingPoint, startingPoint)
-
+        while not scoopingResponse:
+          busy.sleep() # 1 HZ
+          scoopingResponse = self.TranslationalPTPMotionClient(startingPoint, startingPoint)
+        
         rospy.loginfo(scoopingResponse)
-        if not scoopingResponse:
-          self.scooping_human_status_ = 'Scooping didnt start'
-
+        
         while not str(self.scooping_status_.data) == 'DONE' and not str(self.scooping_status_.data)=='FAIL':
-          r.sleep()
+          busy.sleep()
 
       if str(self.scooping_status_.data) == 'DONE':
         self._feedback.finished_scoops[scoop] = 1
@@ -178,10 +180,6 @@ class ScoopServer:
       success = True
     elif self.scooping_status_.data == 'FAIL':
       success = False
-
-    # while not str(self.scooping_status_.data) == 'IDLE':
-    #   rospy.loginfo('Waiting for scooping to go idle')
-    #   rospy.sleep(1.)
 
     # Send result
     self._result.success = success
