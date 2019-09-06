@@ -135,7 +135,7 @@ class ScoopServer:
 
     # The rate by which we check the scooping status change
     r = rospy.Rate(5) # 5hz
-    busy = rospy.Rate(1)
+    busy = rospy.Rate(0.5)
 
     # Call init service
     init_result = self.InitPose()
@@ -149,8 +149,10 @@ class ScoopServer:
 
     # We try to scoop in just five points sequence
     for scoop in range(len(scoops)):
+      print('Scoop in ', len(scoops))
       startingPoint = self.GetFlavorStartingPoint(flavors[scoop])
       for scoopPerFlavor in range(scoops[scoop]):
+        print('Scoops per flavor ', scoops[scoop])
         # Each scoop is done in scoopingSteps
         # Wait for scooping_planning/status to be idle
         while not str(self.scooping_status_.data) == 'DONE' and not str(self.scooping_status_.data) == 'FAIL' and not rospy.is_shutdown():
@@ -158,22 +160,22 @@ class ScoopServer:
           r.sleep()
 
         scoopingResponse = self.TranslationalPTPMotionClient(startingPoint, startingPoint)
-        while not scoopingResponse:
+        while not scoopingResponse and not rospy.is_shutdown():
           busy.sleep() # 1 HZ
           scoopingResponse = self.TranslationalPTPMotionClient(startingPoint, startingPoint)
-        
-        rospy.loginfo(scoopingResponse)
-        
-        while not str(self.scooping_status_.data) == 'DONE' and not str(self.scooping_status_.data)=='FAIL':
+
+        while not str(self.scooping_status_.data) == 'DONE' and not str(self.scooping_status_.data)=='FAIL' and not rospy.is_shutdown():
           busy.sleep()
 
-      if str(self.scooping_status_.data) == 'DONE':
-        self._feedback.finished_scoops[scoop] = 1
-      elif str(self.scooping_status_.data) == 'FAIL':
-        self._feedback.finished_scoops[scoop] = 0
+        if str(self.scooping_status_.data) == 'DONE':
+          self._feedback.finished_scoops[scoop] = 1
+        elif str(self.scooping_status_.data) == 'FAIL':
+          self._feedback.finished_scoops[scoop] = 0
 
-      rospy.loginfo(self.scooping_status_.data)
-      rospy.loginfo(self._feedback.finished_scoops)
+        rospy.loginfo(self.scooping_status_.data)
+        rospy.loginfo(self._feedback.finished_scoops)
+
+    print('last scoop is ', self._feedback.finished_scoops[len(self._feedback.finished_scoops)-1])
 
     # Scooped
     if self._feedback.finished_scoops[len(self._feedback.finished_scoops)-1]==1 and self.scooping_status_.data == 'DONE':
@@ -191,12 +193,17 @@ class ScoopServer:
     # while not str(self.scooping_status_.data) == 'IDLE':
     #   r.sleep()
 
+    while not wentHome and not rospy.is_shutdown():
+      busy.sleep() # 1 HZ
+      wentHome = self.GoHome(startingPoint, startingPoint)
+
+
     if wentHome:
       rospy.loginfo('Going home')
     else:
       rospy.logwarn('Could not go home, the traffic is terrible')
 
-    while not str(self.scooping_status_.data) == 'DONE' and not str(self.scooping_status_.data)=='FAIL':
+    while not str(self.scooping_status_.data) == 'DONE' and not str(self.scooping_status_.data)=='FAIL' and not rospy.is_shutdown():
       r.sleep()
 
     self.__init__()
