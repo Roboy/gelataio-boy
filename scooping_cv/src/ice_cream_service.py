@@ -26,6 +26,7 @@ zed_cam_data = {}
 bridge = CvBridge()
 
 pc_publisher = None
+point_publisher = None
 
 def findAngleBetweenVectors(vec_1, vec_2):
     """
@@ -134,8 +135,9 @@ def getServiceResponse(request):
     :return: service reponse
     """
     # Fake class call
-    #mesh = np.load(os.path.join(os.path.dirname(__file__), 'flakes.npy'))
-    global zed_cam_data, pc_publisher
+    mesh = np.load(os.path.join(os.path.dirname(__file__), 'flakes.npy'))
+    
+    """global zed_cam_data, pc_publisher
 
     zed_cam_data['flavor'] = request.flavor
     
@@ -158,7 +160,7 @@ def getServiceResponse(request):
 
     if mesh is None or len(mesh) < 100:
         return DetectIceCreamResponse(PointStamped(), PointStamped(), 'Could not detect ice-cream')
-
+    """
     mesh = transformCam2Torso(mesh)
 
     # ----- RVIZ Visualization -----
@@ -180,6 +182,8 @@ def getServiceResponse(request):
 
     point_stamped.point = start_point
 
+    point_publisher.publish(point_stamped)
+    
     return DetectIceCreamResponse(point_stamped, PointStamped(), '')
 
 if __name__ == '__main__' :
@@ -194,5 +198,6 @@ if __name__ == '__main__' :
 
     # Init point cloud (for rviz) publisher
     pc_publisher = rospy.Publisher("/ice_cream_pc", PointCloud2, queue_size=10)
+    point_publisher = rospy.Publisher("/ice_cream_scoop_point", PointStamped, queue_size=10)
 
     rospy.spin()

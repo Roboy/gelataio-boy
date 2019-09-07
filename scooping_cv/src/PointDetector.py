@@ -43,6 +43,9 @@ class PointDetector:
 
 	@staticmethod
 	def _getMask(image, low_color, high_color):
+		# Shift mean filtering
+		image = cv2.pyrMeanShiftFiltering(image, 5, 10)
+		
 		frame=cv2.GaussianBlur(image,(5,5),0)
 	
 		hsv=cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
