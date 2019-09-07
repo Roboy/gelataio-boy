@@ -9,8 +9,10 @@ from collections import Counter
 class PointDetector:
 	
 	flavor_color_map = {
-		"Chocolate": np.array([[11,0,0],[35,180,255]]),
-		"Flakes": np.array([[38,40,0],[66,255,255]])
+		"chocolate": np.array([[70,25,0],[98,255,255]]),
+		"flakes": np.array([[38,40,0],[66,255,255]]),
+		"vanilla": np.array([[70,25,0],[98,255,255]]),
+		"strawberry": np.array([[70,25,0],[98,255,255]])
 		}
 
 	@staticmethod
@@ -108,13 +110,13 @@ class PointDetector:
 		mask = PointDetector._color_filter(zed_rgb, color_range[0], color_range[1], ret_mask=True)
 		dim_x, dim_y = royale_depth.shape
 		# Transform rgb view to match depth cam view
-		pts1 = np.float32([[516,228],[503,367],[862,425],[903,301]])
-		pts2 = np.float32([[85,59],[83,96],[187,114],[200,79]])
+		pts1 = np.float32([[210,171],[240,274],[468,235],[408,136]])
+		pts2 = np.float32([[66,85],[76,126],[155,111],[133,73]])
 		M = cv2.getPerspectiveTransform(pts1, pts2)
 
 		warped_rgb = cv2.warpPerspective(zed_rgb, M, (dim_y, dim_x))
 		warped_mask = cv2.warpPerspective(mask, M, (dim_y, dim_x))
-
+		"""
 		labels = PointDetector._segment(warped_rgb, ret_labels=True)
 		centers = labels[warped_mask == 255].tolist()
 
@@ -125,8 +127,9 @@ class PointDetector:
 		c = Counter(centers)
 		centroid = c.most_common(1)[0][0]
 		new_mask = np.uint8(255*(labels == centroid))
+		"""
 		
-		return PointDetector._pixcnt2pc(new_mask, royale_pc)
+		return PointDetector._pixcnt2pc(warped_mask, royale_pc)
 			
 
 
