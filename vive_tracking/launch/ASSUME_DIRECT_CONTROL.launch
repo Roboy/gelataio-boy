@@ -1,6 +1,0 @@
-<launch>
-
-  <node name="vive_to_ik_publisher" pkg="vive_tracking" type="vive_to_ik_control.py" respawn="false" output="screen">
-  </node>
-
-</launch>

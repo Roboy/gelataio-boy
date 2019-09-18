@@ -1,0 +1,4 @@
+<launch>
+  <node name="vive_to_ik_control" pkg="vive_tracking" type="vive_to_ik_control.py" args="vive_control.yaml" respawn="false" output="screen">
+  </node>
+</launch>
