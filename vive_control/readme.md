@@ -52,7 +52,7 @@ pip install numpy scipy pyyaml
  
 ## Configuration
  
-Loot at readme in `vive_control/scripts`
+Look at readme in `vive_control/scripts`
  
 It is already configured for `roboy_icecream`, and it *should* be possible to easily configure it to work with other robots. 
  
