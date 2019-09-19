@@ -1,6 +1,7 @@
 <launch>
-
-  <node name="sim_joint_state_converter" pkg="gelataio_boy_control" type="sim_joint_state_converter" respawn="false" output="screen">
-  </node>
-
+  <arg name="do_angle_conversion" default="false"/>
+  <arg name="use_external_steering_angle" default="false"/>
+  <param name="do_angle_conversion" type="bool" value="$(arg do_angle_conversion)"  />
+  <param name="use_external_steering_angle" type="bool" value="$(arg use_external_steering_angle)"/>
+  <node name="sim_joint_state_converter" pkg="gelataio_boy_control" type="sim_joint_state_converter" respawn="false" output="screen" />
 </launch>

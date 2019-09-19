@@ -17,8 +17,15 @@ public:
 
     virtual bool executePlan(moveit::planning_interface::MoveGroupInterface::Plan &plan) override;
 
+    virtual bool moveJointTo(std::string joint_name, double target);
+
+    virtual bool moveJointsTo(const std::map<std::string, double> &target);
+
 private:
+    bool fake_wrist;
+    ros::NodeHandle *nh;
     ros::Publisher joint_target_pub;
+    ros::Publisher motor_command_pub;
     std::vector<std::string> ignored_joints;
 };
 

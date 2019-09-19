@@ -22,6 +22,7 @@ find_package(catkin REQUIRED COMPONENTS
   moveit_ros_planning_interface
   moveit_ros_perception
         roboy_control_msgs
+        roboy_middleware_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -116,7 +117,7 @@ find_package(Eigen3 REQUIRED)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES scooping_cv
-  CATKIN_DEPENDS roscpp moveit_core moveit_visual_tools moveit_ros_planning_interface roboy_control_msgs
+  CATKIN_DEPENDS roscpp moveit_core moveit_visual_tools moveit_ros_planning_interface roboy_control_msgs roboy_middleware_msgs
   DEPENDS EIGEN3
 )
 
@@ -134,7 +135,7 @@ include_directories(
 ## Declare a C++ library
  add_library(${PROJECT_NAME}
   src/hand_controller.cpp
-         src/plan_executor.cpp src/hand_interface.cpp)
+         src/plan_executor.cpp src/hand_interface.cpp src/emotions_interface.cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -147,8 +148,6 @@ include_directories(
 add_executable(scooping_planning src/main.cpp src/scooping.cpp src/scooping_ros.cpp)
 
 add_executable(sim_joint_state_converter src/sim_joint_state_converter.cpp)
-
-add_executable(joint_info_collector src/joint_info_collector.cpp src/JointInfoCollector.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -170,9 +169,6 @@ target_link_libraries(${PROJECT_NAME}
  )
 
 target_link_libraries(sim_joint_state_converter
-        ${catkin_LIBRARIES})
-
-target_link_libraries(joint_info_collector
         ${catkin_LIBRARIES})
 #############
 ## Install ##

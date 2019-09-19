@@ -42,10 +42,11 @@ if __name__ == '__main__':
         # Initializes a rospy node so that the SimpleActionClient can
         # publish and subscribe over ROS.
         rospy.init_node('luigi_scoop_client')
-        flavors = ['blue', 'red', 'spagitti lemon'] 
-        scoops = [1, 2, 1]
+        flavors = ['blue', 'white'] 
+        scoops = [1, 1]
         result = luigi_scoop_client(flavors, scoops)
         print(result)
         # print("Result:", ', '.join([str(n) for n in result]))
     except rospy.ROSInterruptException:
         print("program interrupted before completion")
+        

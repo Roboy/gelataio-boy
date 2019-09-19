@@ -57,12 +57,8 @@ public:
 
     bool moveToPose(geometry_msgs::Pose target_pose, moveit_msgs::Constraints &contraints);
 
-    /**
-     * Move to pose.
-     * @param target_pose   Target pose with frame id
-     * @return true if successful
-     */
-    bool moveToPose(geometry_msgs::PoseStamped target_pose);
+    bool moveToPose(geometry_msgs::Pose target_pose, moveit_msgs::Constraints &constraints, std::string reference_frame);
+
 
     /**
      * Move to poses.
@@ -100,6 +96,8 @@ public:
 
     bool moveJoint(std::string joint_name, double target_angle);
 
+    bool moveJoints(std::map<std::string, double> target);
+
     bool goHome();
 
     void setPlanningTime(double time) {this->planning_time = time;}
@@ -111,6 +109,7 @@ public:
     enum Status get_status() {return this->status;}
 
 
+    std::map<std::string, double> jointStatus();
 
 private:
     struct PlanningResult {
@@ -118,7 +117,6 @@ private:
         moveit::planning_interface::MoveItErrorCode planning_status;
     };
 
-    std::map<std::string, double> jointStatus();
 
     PlanningResult plan(double tolerance=0.1);
 
