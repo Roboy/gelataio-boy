@@ -2,7 +2,27 @@
 
 SS19 Full Body Control and Vision Team. We handle the vision and control parts for the ice-cream project.
 
-# Material
+# Code Organization
+
+Clone the repository into the `src` folder of your catkin workspace. Like this
+```
+cakin_ws/
+	build/
+		...
+	devel/
+		...
+	src/
+		CARDSflow/
+			...
+		gelatatio-boy/
+			<subpackages of our project>
+		<further packages if required>
+```
+
+Catkin build the packages recursively.
+
+
+# Slides, Videos & Diagrams
 
 ## Slides
 - [Midterm Slides](https://docs.google.com/presentation/d/1NewMwSdnp7RwAgcC_RcqNRAtOPzeC24GHkpUbu42Q8k/edit?usp=sharing)
