@@ -2,15 +2,9 @@
 
 SS19 Full Body Control and Vision Team. We handle the vision and control parts for the ice-cream project.
 
-### Vision Video
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=DI6FIhWma3Y
-" target="_blank"><img src="http://img.youtube.com/vi/DI6FIhWma3Y/0.jpg" 
-alt="Vision Video" width="240" height="180" border="10" /></a>
-
-### Final Video
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=F1awb4STJ84&list=PL5VpohfE5RnEzUAK9cNsspMwvD0zZquJI&index=4
-" target="_blank"><img src="http://img.youtube.com/vi/F1awb4STJ84/0.jpg" 
-alt="Final Video" width="240" height="180" border="10" /></a>
+| Vision Video | Final Video |
+| ------------ | ----------- |
+|<a href="http://www.youtube.com/watch?feature=player_embedded&v=DI6FIhWma3Y" target="_blank"><img src="http://img.youtube.com/vi/DI6FIhWma3Y/0.jpg" alt="Vision Video" width="240" height="180" border="10" /></a> | <a href="http://www.youtube.com/watch?feature=player_embedded&v=F1awb4STJ84&list=PL5VpohfE5RnEzUAK9cNsspMwvD0zZquJI&index=4" target="_blank"><img src="http://img.youtube.com/vi/F1awb4STJ84/0.jpg" alt="Final Video" width="240" height="180" border="10" /></a> |
 
 # Code Organization
 
