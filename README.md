@@ -1,4 +1,4 @@
-# :ice_cream: [Gelataio mode](https://en.wiktionary.org/wiki/gelataio) for Roboy :ice_cream:
+# :ice_cream: [Gelataio](https://en.wiktionary.org/wiki/gelataio) mode for [Roboy](roboy.org) :ice_cream:
 
 SS19 Full Body Control and Vision Team. We handle the vision and control parts for the ice-cream project.
 
