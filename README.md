@@ -1,4 +1,4 @@
-# gelataio-boy
+# :ice_cream: Gelataio mode for Roboy :ice_cream:
 
 SS19 Full Body Control and Vision Team. We handle the vision and control parts for the ice-cream project.
 
