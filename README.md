@@ -28,9 +28,9 @@ docker todo
 Command to launch one of the launch files using docker:
 ```bash
 docker todo
+```
 
 @Stanislav: Could you also push our docker to you docker hub. Then others can simply pull it and do not need to create and compile the docker on their own. This will make it significantly faster and easier to use our repository. Already building our container takes more than 10 mins so we wouldn't pass the "try it out for the impatient".
-```
 
 # Launch Files for Startup of all processes
 
