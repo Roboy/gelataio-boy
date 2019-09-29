@@ -6,7 +6,11 @@ import struct
 from math import isnan
 
 class PointDetector:
-	
+	"""
+	Class for point cloud extractation for a specific taste of ice cream
+	"""
+
+	# Mapping colors to taste
 	flavor_color_map = {
 		"chocolate": np.array([[70,25,0],[98,255,255]]),
 		"flakes": np.array([[38,40,0],[66,255,255]]),
@@ -14,10 +18,14 @@ class PointDetector:
 		"strawberry": np.array([[70,25,0],[98,255,255]])
 		}
 
+	# Web Cam connection
 	rgb_cam = cv2.VideoCapture(2)
 
 	@staticmethod
 	def _segment(orig, K=4, ret_labels=True):
+		"""
+		Segment using kmeans clustering
+		"""
 		nrow, ncol, nchannel = orig.shape
 		
 		X_coords = np.array([[i for i in range(nrow)] for _ in range(ncol)])
@@ -43,7 +51,10 @@ class PointDetector:
 		return img
 
 	@staticmethod
-	def _color_filter(image, low_color, high_color, ret_mask=True):
+	def _get_mask(image, low_color, high_color, ret_mask=True):
+		"""
+		Get mask of the ice cream
+		"""
 		frame=cv2.GaussianBlur(image,(5,5),0)
 	
 		hsv=cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -58,7 +69,9 @@ class PointDetector:
 	
 	@staticmethod
 	def _pixel2pc(mask, point_cloud):
-		
+		"""
+		Slicing out 2D mast from 3D point cloud
+		"""
 		points = list()
 		pc = point_cloud
 		
@@ -104,12 +117,15 @@ class PointDetector:
 
 		color_range = PointDetector.flavor_color_map[flavor]
 
-		mask = PointDetector._color_filter(rgb_img, color_range[0], color_range[1], ret_mask=True)
+		mask = PointDetector._get_mask(rgb_img, color_range[0], color_range[1], ret_mask=True)
 
 		dim_x, dim_y = royale_depth.shape
+
 		# Transform rgb view to match depth cam view
+		# (Requires prior calibration)
 		pts1 = np.float32([[210,171],[240,274],[468,235],[408,136]])
 		pts2 = np.float32([[66,85],[76,126],[155,111],[133,73]])
+
 		M = cv2.getPerspectiveTransform(pts1, pts2)
 
 		warped_rgb = cv2.warpPerspective(rgb_img, M, (dim_y, dim_x))
