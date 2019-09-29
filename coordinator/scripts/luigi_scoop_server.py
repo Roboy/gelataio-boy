@@ -69,13 +69,15 @@ class ScoopServer:
 
   # Arguments are of Pose type
   def GetPoint(self):
-    rospy.wait_for_service('/iceCreamMeshService')
+    print('getPoint')
+    rospy.wait_for_service('/iceCreamService')
     try:
-      getPoint = rospy.ServiceProxy('/iceCreamMeshService', DetectIceCream)
+      getPoint = rospy.ServiceProxy('/iceCreamService', DetectIceCream)
       req = 'flakes'
       print("WE HAVE A POINT")
       # Now send the request through the connection
       resp = getPoint(req)
+      print('getPoint::response')
       return resp.start_scooping
     except rospy.ServiceException, e:
       print "Service call failed: %s"%e

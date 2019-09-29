@@ -4,14 +4,14 @@ import cv2
 import numpy as np
 import struct
 from math import isnan
-from collections import Counter
-import copy
 
 class PointDetector:
 	
 	flavor_color_map = {
-		"Chocolate": np.array([[11,0,0],[35,180,255]]),
-		"Flakes": np.array([[38,40,0],[66,255,255]])
+		"chocolate": np.array([[70,25,0],[98,255,255]]),
+		"flakes": np.array([[38,40,0],[66,255,255]]),
+		"vanilla": np.array([[90,0,0],[110,255,255]]),
+		"strawberry": np.array([[70,25,0],[98,255,255]])
 		}
 
 	rgb_cam = cv2.VideoCapture(2)
@@ -19,7 +19,7 @@ class PointDetector:
 	@staticmethod
 	def _segment(orig, K=4, ret_labels=True):
 		nrow, ncol, nchannel = orig.shape
-
+		
 		X_coords = np.array([[i for i in range(nrow)] for _ in range(ncol)])
 		Y_coords = np.array([[i for _ in range(nrow)] for i in range(ncol)])
 
@@ -39,28 +39,29 @@ class PointDetector:
 		
 		img = cv2.applyColorMap(np.uint8((255/K)*label), cv2.COLORMAP_JET)
 		img = np.reshape(img, (nrow,ncol,nchannel))
+
 		return img
 
 	@staticmethod
-	def _getMask(image, low_color, high_color):
-		# Shift mean filtering
-		image = cv2.pyrMeanShiftFiltering(image, 5, 10)
-		
+	def _color_filter(image, low_color, high_color, ret_mask=True):
 		frame=cv2.GaussianBlur(image,(5,5),0)
 	
 		hsv=cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 		gray_img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 		mask = cv2.inRange(hsv, low_color, high_color)
 
-		mask = cv2.dilate(mask, np.ones((5,5),np.uint8), iterations=10)
-		return cv2.erode(mask, np.ones((5,5),np.uint8), iterations=2)
+		mask = cv2.dilate(mask, np.ones((5,5),np.uint8), iterations=2)
+		mask = cv2.erode(mask, np.ones((5,5),np.uint8), iterations=2)
+
+		return mask
+
 	
 	@staticmethod
 	def _pixel2pc(mask, point_cloud):
 		
 		points = list()
 		pc = point_cloud
-		print(mask)
+		
 		for (u,v), masked in np.ndenumerate(mask):
 			
 			if masked:
@@ -81,55 +82,53 @@ class PointDetector:
 		cimg = np.zeros_like(mask)
 		_, contours, hieararchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 		if len(contours) > 0:
+
+			c = max(contours, key=cv2.contourArea)
+			cv2.drawContours(cimg,[c],0,color=255,thickness=-1)
+			box = np.int0(cv2.boxPoints(cv2.minAreaRect(c)))
+
 			return PointDetector._pixel2pc(cimg, point_cloud)
 		else:
 			return np.array(list())
 	
 	@staticmethod
-	def detect( royale_depth, royale_pc, flavor):
+	def detect(royale_depth, royale_pc, flavor):
 
 		if not flavor in PointDetector.flavor_color_map.keys():
 			return None
 
-		color_range = PointDetector.flavor_color_map[flavor]
 		ret_val, rgb_img = PointDetector.rgb_cam.read()
 		
 		while not ret_val:
 			ret_val, rgb_img = PointDetector.rgb_cam.read()
-		
-		mask = PointDetector._getMask(rgb_img, color_range[0], color_range[1])
-		
-		if mask is None:
-			return None
 
-		cv2.imshow('Mask', mask)
-		if cv2.waitKey(1) == 27:
-			return
+		color_range = PointDetector.flavor_color_map[flavor]
+
+		mask = PointDetector._color_filter(rgb_img, color_range[0], color_range[1], ret_mask=True)
 
 		dim_x, dim_y = royale_depth.shape
 		# Transform rgb view to match depth cam view
-		pts1 = np.float32([[516,228],[503,367],[862,425],[903,301]])
-		pts2 = np.float32([[85,59],[83,96],[187,114],[200,79]])
+		pts1 = np.float32([[210,171],[240,274],[468,235],[408,136]])
+		pts2 = np.float32([[66,85],[76,126],[155,111],[133,73]])
 		M = cv2.getPerspectiveTransform(pts1, pts2)
 
 		warped_rgb = cv2.warpPerspective(rgb_img, M, (dim_y, dim_x))
 		warped_mask = cv2.warpPerspective(mask, M, (dim_y, dim_x))
-
+		
+		# Detection improvement with clustering, uncomment below
+		"""
 		labels = PointDetector._segment(warped_rgb, ret_labels=True)
 		centers = labels[warped_mask == 255].tolist()
-
 		if len(centers) == 0:
 			return None
 		
+		centroid = 0
 		c = Counter(centers)
 		centroid = c.most_common(1)[0][0]
 		new_mask = np.uint8(255*(labels == centroid))
+		"""
 
-		cv2.imshow('New Mask', new_mask)
-		if cv2.waitKey(1) == 27:
-			return
-
-		return PointDetector._pixcnt2pc(new_mask, royale_pc)
+		return PointDetector._pixel2pc(warped_mask, royale_pc)
 			
 
 

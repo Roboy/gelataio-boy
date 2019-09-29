@@ -135,9 +135,10 @@ def getServiceResponse(request):
     :return: service reponse
     """
     # Fake class call
-    mesh = np.load(os.path.join(os.path.dirname(__file__), 'flakes.npy'))
+    # Uncomment the line below to start the code on prerecorded data
+    #mesh = np.load(os.path.join(os.path.dirname(__file__), 'flakes.npy'))
     
-    """global zed_cam_data, pc_publisher
+    global zed_cam_data, pc_publisher
 
     zed_cam_data['flavor'] = request.flavor
     
@@ -146,7 +147,6 @@ def getServiceResponse(request):
 
     # Repeat till mesh is found or step counter is too high
     while (mesh is None or len(mesh) < 100) and step_counter < 50:
-        # TODO: average mesh over X amount of steps
         step_counter += 1
 
         try: 
@@ -160,7 +160,7 @@ def getServiceResponse(request):
 
     if mesh is None or len(mesh) < 100:
         return DetectIceCreamResponse(PointStamped(), PointStamped(), 'Could not detect ice-cream')
-    """
+
     mesh = transformCam2Torso(mesh)
 
     # ----- RVIZ Visualization -----
@@ -183,7 +183,7 @@ def getServiceResponse(request):
     point_stamped.point = start_point
 
     point_publisher.publish(point_stamped)
-    
+
     return DetectIceCreamResponse(point_stamped, PointStamped(), '')
 
 if __name__ == '__main__' :
