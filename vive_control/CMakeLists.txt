@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(vive_tracking)
+project(vive_control)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   urdf
   xacro
   geometry_msgs
+  sensor_msgs
   roboy_middleware_msgs
 )
 

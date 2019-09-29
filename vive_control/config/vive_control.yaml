@@ -1,0 +1,14 @@
+controller_name: controller_1
+endeffector_name: scooper
+inverse_kinematics_service: ik
+robot_state_topic: robot_state
+target_joint_angle_topic: joint_targets
+wrist_axis_name: wrist_right
+joint_state_topic_name:  cardsflow_joint_states
+wrist_motor_topic: roboy/middleware/MotorCommand
+wrist_simulated: True
+wrist_direct_motor_control: True
+filtering_alpha: 0.4
+wrist_max_angle: 160
+wrist_min_angle: 20
+sensitivity: 1

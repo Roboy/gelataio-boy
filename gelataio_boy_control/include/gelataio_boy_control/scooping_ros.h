@@ -21,6 +21,7 @@ public:
 
     bool scooping_cb(roboy_control_msgs::TranslationalPTPMotion::Request &req, roboy_control_msgs::TranslationalPTPMotion::Response &resp);
     bool go_home_cb(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &resp);
+    bool init_pose_cb(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &resp);
 
 
 private:
@@ -29,9 +30,11 @@ private:
 
     ros::ServiceServer scooping_srv;
     ros::ServiceServer go_home_srv;
+    ros::ServiceServer init_pose_srv;
     ros::Publisher status_pub;
 
     bool busy;
+    int done;
     std::thread *executor;
 };
 

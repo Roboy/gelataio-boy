@@ -22,7 +22,7 @@ import numpy as np
 availableFlavors = ['choco', 'spagetti']
 
 # The number of steps we need to scoop a single scoop (tuned manually)
-scoopingSteps = 2
+scoopingSteps = 1
 
 class ScoopServer:
   _feedback = OrderIceCreamFeedback()
@@ -93,10 +93,21 @@ class ScoopServer:
     except rospy.ServiceException, e:
       print "Service call failed: %s"%e
 
+  # Arguments are of Pose type
+  def InitPose(self):
+    rospy.wait_for_service('scooping_planning/init_pose')
+    try:
+      # TODO: Only call this when status is IDLE
+      init_pose = rospy.ServiceProxy('scooping_planning/init_pose', Trigger)
+      resp = init_pose()
+      return resp.success
+    except rospy.ServiceException, e:
+      print "Service call failed: %s"%e
+
   # For now we set which flavor is where by hand (manually), unless vision can provide us with an api
   def GetFlavorStartingPoint(self, flavor):
-    leftStartPoint = Point(x=-0.1, y=-0.4, z=0.25)
-    rightStartPoint = Point(x=-0.1, y=-0.4, z=0.25)
+    leftStartPoint = Point(x=0.0, y=-0.55, z=0.18)
+    rightStartPoint = Point(x=0.0, y=-0.55, z=0.18)
     startingPoint = Point()
 
     # Left ice cream box
@@ -114,24 +125,20 @@ class ScoopServer:
     
   def ReceiveIceCreamOrder_(self, data):
 
+    self._feedback.finished_scoops = []
     self.we_have_client_ = True
 
+    rospy.loginfo(data)
     # success of the total scoping operation
     success = False
-
     # Scoops required
     scoops = data.scoops
-
     # flavors for each "scoops" ordered, not scoop :D
     flavors = data.flavors
-
     self.scooping_human_status_ = 'Received a new ice cream order'
     # intially no scoops has been scooped
-    for i in scoops:
+    for i in range(len(scoops)):
       self._feedback.finished_scoops.append(0)
-
-    scoops = data.scoops
-    flavors = data.flavors
 
     # start executing the action
     # check that preempt has not been requested by the client
@@ -141,10 +148,21 @@ class ScoopServer:
       success = False
 
     # success of the total scoping operation
-    success = True
+    success = False
 
     # The rate by which we check the scooping status change
-    r = rospy.Rate(3) # 3hz
+    r = rospy.Rate(5) # 5hz
+    busy = rospy.Rate(0.5)
+
+    # Call init service
+    init_result = self.InitPose()
+
+    if not init_result:
+      rospy.loginfo('Cant go to init')
+      # rospy.shutdown()
+
+    # sleep for 5 seconds, waiting for init
+    rospy.sleep(5.)
 
     # We try to scoop in just five points sequence
     for scoop in range(len(scoops)):
@@ -155,87 +173,71 @@ class ScoopServer:
       print(startingPoint)
       # Loop for how many scoops of this flavor, really luigi??
       for scoopPerFlavor in range(scoops[scoop]):
-
-        # Go to start point depending on the flavor
-        scoopingResponse = self.TranslationalPTPMotionClient(startingPoint, startingPoint)
-        if not scoopingResponse:
-          self.scooping_human_status_ = 'Failed to come up with a plan for step ' + str(i) + ' out of 5'
-          success = False
-
+        print('Scoops per flavor ', scoops[scoop])
         # Each scoop is done in scoopingSteps
-        for i in range(scoopingSteps):
-          # Wait for scooping_planning/status to be idle
-          # Calculate new point
-          # Send point to scooping_planning/scoop
-
-
-          # Wait for scooping_planning/status to be idle
-          while not str(self.scooping_status_.data) == 'IDLE' and not rospy.is_shutdown():
-            self.scooping_human_status_ = str(self.scooping_status_.data) + ' need more time'
-            rospy.sleep(1.)
-
-          # If not IDLE, update scooping status
-          self.scooping_human_status_ = str(self.scooping_status_.data) + ' in step ' + str(i) + ' out of 5'
-
-
-          # Now for step 2 and 3
-          # Move along the y-z plane (ice cream surface)     
-          scoopingResponse = self.TranslationalPTPMotionClient(startingPoint, Point(x=-0.1, y=-0.3, z=0.25))
-          if not scoopingResponse:
-            self.scooping_human_status_ = 'Failed to come up with a plan for step ' + str(i) + ' out of 5'
-            success = False
-
-
-          # Has to sleep here because the rate we check for the scooping status is faster than
-          # the scooping status publish rate, now sleep rate is 3hz, scoop publish rate is 5hz
+        # Wait for scooping_planning/status to be idle
+        while not str(self.scooping_status_.data) == 'DONE' and not str(self.scooping_status_.data) == 'FAIL' and not rospy.is_shutdown():
+          # excuting or planning
           r.sleep()
 
-          # Fill up self._feedback.scoops[] with 1s for every scoop scooped
+        scoopingResponse = self.TranslationalPTPMotionClient(startingPoint, startingPoint)
+        while not scoopingResponse and not rospy.is_shutdown():
+          busy.sleep() # 1 HZ
+          scoopingResponse = self.TranslationalPTPMotionClient(startingPoint, startingPoint)
 
-          # For now doneScooping_ is set manually by trial and error
-          # Can vision confirm if the scoop has been filled? for now, No
-          # while not self.doneScooping_:
-          
-          # The scooper always starts at the top of the icecream box
+        while not str(self.scooping_status_.data) == 'DONE' and not str(self.scooping_status_.data)=='FAIL' and not rospy.is_shutdown():
+          busy.sleep()
 
-          # Use a dummy matrix for now
-          # Go to the highest point near the corner
-          # TODO: as Alona mentioned we have no idea what are the 
-          # cpablities of the hand righ now
-          # We only go horizantly (along the longest axis of the icecream box)
-          # surface = np.random.array((30, 20, 5))
-          # for i in surface.shape[0]:
-          #   for j in surface.shape[1]:
-          #     print(surface[i][j])
-     
-          #   # call scooping service with the points
-          #   #
-      self._feedback.finished_scoops[scoop] = 1
+        if str(self.scooping_status_.data) == 'DONE':
+          self._feedback.finished_scoops[scoop] = 1
+        elif str(self.scooping_status_.data) == 'FAIL':
+          self._feedback.finished_scoops[scoop] = 0
+
+        rospy.loginfo(self.scooping_status_.data)
+        rospy.loginfo(self._feedback.finished_scoops)
+
+    print('last scoop is ', self._feedback.finished_scoops[len(self._feedback.finished_scoops)-1])
+
+    # Scooped
+    if self._feedback.finished_scoops[len(self._feedback.finished_scoops)-1]==1 and self.scooping_status_.data == 'DONE':
+      success = True
+    elif self.scooping_status_.data == 'FAIL':
+      success = False
+
+    # Send result
+    self._result.success = success
+    self._result.error_message = 'Error in scooping' if not success else "success"
+    self.server_.set_succeeded(self._result)
+    self._feedback.finished_scoops = []
 
     wentHome = self.GoHome()
+    # while not str(self.scooping_status_.data) == 'IDLE':
+    #   r.sleep()
+
+    while not wentHome and not rospy.is_shutdown():
+      busy.sleep() # 1 HZ
+      wentHome = self.GoHome(startingPoint, startingPoint)
+
 
     if wentHome:
-      rospy.loginfo('Went home')
+      rospy.loginfo('Going home')
     else:
       rospy.logwarn('Could not go home, the traffic is terrible')
 
-    if success:
-      self._result.success = True
-      self._result.error_message = self.scooping_human_status_
-      self.server_.set_succeeded(self._result)      
+    while not str(self.scooping_status_.data) == 'DONE' and not str(self.scooping_status_.data)=='FAIL' and not rospy.is_shutdown():
+      r.sleep()
 
-    # Send result
-    if not success:
-      self._result.success = False
-      self._result.error_message = self.scooping_human_status_
-      self.server_.set_succeeded(self._result)
+    self.__init__()
 
   # This function is called every _feedback_delay seconds
   def SendFeedbackLuigi(self, sc):
-    if self.we_have_client_: 
+    if self.we_have_client_ and len(self._feedback.finished_scoops)>0:
       self._feedback.status_message = self.scooping_human_status_
 
       self._feedback.status_message = "more time"
+      if self._feedback.finished_scoops[len(self._feedback.finished_scoops)-1] ==1:
+        self._feedback.status_message = "Done"
+
       self.server_.publish_feedback(self._feedback)
       s.enter(self._feedback_delay, 1, self.SendFeedbackLuigi, (sc,))
     else:
@@ -253,6 +255,8 @@ if __name__ == '__main__':
   except KeyboardInterrupt, e:
     pass
 
-  s.enter(server._feedback_delay, 1, server.SendFeedbackLuigi, (s,))
+  rospy.Timer(rospy.Duration(server._feedback_delay), server.SendFeedbackLuigi)
+  # s.enter(server._feedback_delay, 1, server.SendFeedbackLuigi, (s,))
   s.run()
+  print("Action server ready")
   rospy.spin()
