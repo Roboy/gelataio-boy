@@ -12,9 +12,10 @@ import sched, time
 # OrderIceCreamActionGoal, OrderIceCreamActionResult, OrderIceCreamFeedback 
 # OrderIceCreamGoal, OrderIceCreamResult
 from roboy_cognition_msgs.msg import *
+from roboy_cognition_msgs.srv import DetectIceCream
 
 from roboy_control_msgs.srv import TranslationalPTPMotion
-from geometry_msgs.msg import Point
+from geometry_msgs.msg import Point, PointStamped
 import numpy as np
 
 # First one is left box, second one is right box
@@ -57,13 +58,27 @@ class ScoopServer:
     try:
       # TODO: Only call this when status is IDLE
       goHome = rospy.ServiceProxy('scooping_planning/go_home', Trigger)
-
       # Create an object of the type TriggerRequest. We nned a TriggerRequest for a Trigger service
       req = TriggerRequest()
 
       # Now send the request through the connection
       resp = goHome(req)
       return resp.success
+    except rospy.ServiceException, e:
+      print "Service call failed: %s"%e
+
+  # Arguments are of Pose type
+  def GetPoint(self):
+    print('getPoint')
+    rospy.wait_for_service('/iceCreamService')
+    try:
+      getPoint = rospy.ServiceProxy('/iceCreamService', DetectIceCream)
+      req = 'flakes'
+      print("WE HAVE A POINT")
+      # Now send the request through the connection
+      resp = getPoint(req)
+      print('getPoint::response')
+      return resp.start_scooping
     except rospy.ServiceException, e:
       print "Service call failed: %s"%e
 
@@ -103,6 +118,8 @@ class ScoopServer:
     # Do we fancy a third ice cream box?
     else:
       startingPoint = leftStartPoint
+
+    startingPoint = self.GetPoint()
     return startingPoint
 
     
@@ -149,8 +166,12 @@ class ScoopServer:
 
     # We try to scoop in just five points sequence
     for scoop in range(len(scoops)):
-      print('Scoop in ', len(scoops))
-      startingPoint = self.GetFlavorStartingPoint(flavors[scoop])
+
+      # Go to the start point of the box, depending on the flavor
+      startingPoint = self.GetFlavorStartingPoint(flavors[scoop]).point
+
+      print(startingPoint)
+      # Loop for how many scoops of this flavor, really luigi??
       for scoopPerFlavor in range(scoops[scoop]):
         print('Scoops per flavor ', scoops[scoop])
         # Each scoop is done in scoopingSteps

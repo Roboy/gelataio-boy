@@ -4,17 +4,28 @@ import cv2
 import numpy as np
 import struct
 from math import isnan
-from collections import Counter
 
 class PointDetector:
-	
+	"""
+	Class for point cloud extractation for a specific taste of ice cream
+	"""
+
+	# Mapping colors to taste
 	flavor_color_map = {
-		"Chocolate": np.array([[11,0,0],[35,180,255]]),
-		"Flakes": np.array([[38,40,0],[66,255,255]])
+		"chocolate": np.array([[70,25,0],[98,255,255]]),
+		"flakes": np.array([[38,40,0],[66,255,255]]),
+		"vanilla": np.array([[90,0,0],[110,255,255]]),
+		"strawberry": np.array([[70,25,0],[98,255,255]])
 		}
+
+	# Web Cam connection
+	rgb_cam = cv2.VideoCapture(2)
 
 	@staticmethod
 	def _segment(orig, K=4, ret_labels=True):
+		"""
+		Segment using kmeans clustering
+		"""
 		nrow, ncol, nchannel = orig.shape
 		
 		X_coords = np.array([[i for i in range(nrow)] for _ in range(ncol)])
@@ -40,7 +51,10 @@ class PointDetector:
 		return img
 
 	@staticmethod
-	def _color_filter(image, low_color, high_color, ret_mask=True):
+	def _get_mask(image, low_color, high_color):
+		"""
+		Get mask of the ice cream
+		"""
 		frame=cv2.GaussianBlur(image,(5,5),0)
 	
 		hsv=cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -50,22 +64,14 @@ class PointDetector:
 		mask = cv2.dilate(mask, np.ones((5,5),np.uint8), iterations=2)
 		mask = cv2.erode(mask, np.ones((5,5),np.uint8), iterations=2)
 
-		if ret_mask:
-			return mask
+		return mask
 
-		contours, hieararchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-		if len(contours) > 0:
-
-			c = max(contours, key=cv2.contourArea)
-			box = np.int0(cv2.boxPoints(cv2.minAreaRect(c)))
-			return box
-
-		else:
-			return []
 	
 	@staticmethod
 	def _pixel2pc(mask, point_cloud):
-		
+		"""
+		Slicing out 2D mast from 3D point cloud
+		"""
 		points = list()
 		pc = point_cloud
 		
@@ -87,37 +93,48 @@ class PointDetector:
 	def _pixcnt2pc(mask, point_cloud):
 
 		cimg = np.zeros_like(mask)
-		contours, hieararchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+		_, contours, hieararchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 		if len(contours) > 0:
 
 			c = max(contours, key=cv2.contourArea)
 			cv2.drawContours(cimg,[c],0,color=255,thickness=-1)
 			box = np.int0(cv2.boxPoints(cv2.minAreaRect(c)))
+
 			return PointDetector._pixel2pc(cimg, point_cloud)
 		else:
 			return np.array(list())
 	
 	@staticmethod
-	def detect(zed_rgb, royale_depth, royale_pc, flavor):
+	def detect(royale_depth, royale_pc, flavor):
 
 		if not flavor in PointDetector.flavor_color_map.keys():
 			return None
 
+		ret_val, rgb_img = PointDetector.rgb_cam.read()
+		
+		while not ret_val:
+			ret_val, rgb_img = PointDetector.rgb_cam.read()
+
 		color_range = PointDetector.flavor_color_map[flavor]
 
-		mask = PointDetector._color_filter(zed_rgb, color_range[0], color_range[1], ret_mask=True)
+		mask = PointDetector._get_mask(rgb_img, color_range[0], color_range[1])
+
 		dim_x, dim_y = royale_depth.shape
+
 		# Transform rgb view to match depth cam view
-		pts1 = np.float32([[516,228],[503,367],[862,425],[903,301]])
-		pts2 = np.float32([[85,59],[83,96],[187,114],[200,79]])
+		# (Requires prior calibration)
+		pts1 = np.float32([[210,171],[240,274],[468,235],[408,136]])
+		pts2 = np.float32([[66,85],[76,126],[155,111],[133,73]])
+
 		M = cv2.getPerspectiveTransform(pts1, pts2)
 
-		warped_rgb = cv2.warpPerspective(zed_rgb, M, (dim_y, dim_x))
+		warped_rgb = cv2.warpPerspective(rgb_img, M, (dim_y, dim_x))
 		warped_mask = cv2.warpPerspective(mask, M, (dim_y, dim_x))
-
+		
+		# Detection improvement with clustering, uncomment below
+		"""
 		labels = PointDetector._segment(warped_rgb, ret_labels=True)
 		centers = labels[warped_mask == 255].tolist()
-
 		if len(centers) == 0:
 			return None
 		
@@ -125,8 +142,9 @@ class PointDetector:
 		c = Counter(centers)
 		centroid = c.most_common(1)[0][0]
 		new_mask = np.uint8(255*(labels == centroid))
-		
-		return PointDetector._pixcnt2pc(new_mask, royale_pc)
+		"""
+
+		return PointDetector._pixel2pc(warped_mask, royale_pc)
 			
 
 

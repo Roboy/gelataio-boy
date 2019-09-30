@@ -1,9 +1,9 @@
 #! /usr/bin/env python
 
 # ROS
-import rospy, time
-from sensor_msgs.msg import Image, PointCloud2
-from geometry_msgs.msg import Point
+import rospy, time, tf
+from sensor_msgs.msg import Image, PointCloud2, PointField
+from geometry_msgs.msg import Point, PointStamped
 from cv_bridge import CvBridge, CvBridgeError
 
 # Statistics
@@ -22,9 +22,11 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from scipy import signal
 
-# Tmp memory
 zed_cam_data = {}
 bridge = CvBridge()
+
+pc_publisher = None
+point_publisher = None
 
 def findAngleBetweenVectors(vec_1, vec_2):
     """
@@ -39,19 +41,11 @@ def rotatePointCloud(point_cloud, angle, axis=np.array([1, 0, 0])):
     """
     R = Rotation.from_rotvec(angle * axis).as_dcm()
     return np.dot(point_cloud, R)
-
-def saveSensorDataZEDRGB(data):
-    """
-    Save incoming RGB data from ZED camera
-    """
-    global zed_cam_data, bridge
-    zed_cam_data['zed_rgb'] = bridge.imgmsg_to_cv2(data, "bgr8")
    
 def saveSensorDataRoyalDepth(data):
     """
     Save incoming depth data from royal camera
     """
-    
     global zed_cam_data, bridge
     zed_cam_data['royale_depth'] = bridge.imgmsg_to_cv2(data, "32FC1")
     
@@ -62,16 +56,43 @@ def saveSensorDataRoyalPC(data):
     global zed_cam_data
     zed_cam_data['royale_pc'] = data
     
+def transformCam2Torso(point_cloud):
+    """
+    Transform from camera to torso frame
+    """
+    rotAroundX = rotatePointCloud(point_cloud, np.pi/2, np.array([1,0,0]))
+    rotAroundXZ = rotatePointCloud(rotAroundX, np.pi, np.array([0,0,1]))
+    return rotAroundXZ + np.array([0.01,-0.01, 0.05])
+
+def getPointCloud2Msg(mesh):
+    """
+    Get PointCloud2 msg from an array
+    """
+    msg = PointCloud2()
+    msg.header.frame_id = 'torso'
+
+    msg.height = 1
+    msg.width = len(mesh)
+    
+    msg.fields = [
+        PointField('x', 0, PointField.FLOAT32, 1),
+        PointField('y', 4, PointField.FLOAT32, 1),
+        PointField('z', 8, PointField.FLOAT32, 1)
+        ]
+    
+    msg.is_bigendian = False
+    msg.point_step = 12
+    msg.row_step = 12 * mesh.shape[0]
+    msg.is_dense = int(np.isfinite(mesh).all())
+
+    msg.data = np.asarray(mesh, np.float32).tostring()
+
+    return msg
+
 def findScoopingPoint(point_cloud):
     """
     Finds the highest point in the ice cream point cloud.
     """
-    # ----- Visualization -----
-    fig = plt.figure(figsize=(12,6))
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(point_cloud[:,0], point_cloud[:,1], point_cloud[:,2], c='blue', alpha=0.1)
-    # -------------------------
-    
     # Zero mean
     mesh = point_cloud - np.mean(point_cloud, axis=0)
 
@@ -102,12 +123,6 @@ def findScoopingPoint(point_cloud):
 
     scoop_point = valid_points[np.random.choice(len(valid_points))]
 
-    # ----- Visualization -----
-    ax.scatter(mesh[:,0], mesh[:,1], mesh[:,2], c='green', alpha=0.1)
-    ax.scatter(scoop_point[0], scoop_point[1], scoop_point[2], c='red')
-    plt.show()
-    # -------------------------
-
     return scoop_point
 
 def getServiceResponse(request):
@@ -120,36 +135,44 @@ def getServiceResponse(request):
     :return: service reponse
     """
     # Fake class call
-    #mesh = np.load(os.path.join(os.path.dirname(__file__), 'cnt_points.npy'))
-    #mesh = mesh[np.linspace(0,10000,700).astype('int')]
-    #mesh[:,2] += np.cos((mesh[:,0] ** 2 + mesh[:,1] ** 2) * 1000) / 25
+    # Uncomment the line below to start the code on prerecorded data
+    #mesh = np.load(os.path.join(os.path.dirname(__file__), 'flakes.npy'))
+    
+    global zed_cam_data, pc_publisher
 
-    global zed_cam_data
     zed_cam_data['flavor'] = request.flavor
     
     mesh = None
     step_counter = 0
 
     # Repeat till mesh is found or step counter is too high
-    while(mesh is None and step_counter < 50):
-        # TODO: average mesh over X amount of steps
+    while (mesh is None or len(mesh) < 100) and step_counter < 50:
         step_counter += 1
 
         try: 
-            print(zed_cam_data.keys())
             mesh = PointDetector.detect(**zed_cam_data)
-            mesh = mesh[np.linspace(0,len(mesh)-1,700).astype('int')]
+            print(mesh)
         except TypeError as e:
             # Not enough data in zed_cam_data ... try again
             print("Waiting for camera data...")
             print(e)
             time.sleep(1)
-    
-    if mesh is None:
-        return DetectIceCreamResponse(Point(), Point(), 'Point cloud could not be detected')
-    
+
+    if mesh is None or len(mesh) < 100:
+        return DetectIceCreamResponse(PointStamped(), PointStamped(), 'Could not detect ice-cream')
+
+    mesh = transformCam2Torso(mesh)
+
+    # ----- RVIZ Visualization -----
+    msg = getPointCloud2Msg(mesh)
+    pc_publisher.publish(msg)
+    # -------------------------
+
     # Find a scooping point
     scoop_point = findScoopingPoint(mesh)
+
+    point_stamped = PointStamped()
+    point_stamped.header.frame_id = "torso"
 
     # Prepare response
     start_point = Point()
@@ -157,17 +180,24 @@ def getServiceResponse(request):
     start_point.y = scoop_point[1]
     start_point.z = scoop_point[2]
 
-    return DetectIceCreamResponse(start_point, Point(), '')
+    point_stamped.point = start_point
+
+    point_publisher.publish(point_stamped)
+
+    return DetectIceCreamResponse(point_stamped, PointStamped(), '')
 
 if __name__ == '__main__' :
-    rospy.init_node('iceCreamMesh', anonymous=True)
+    rospy.init_node('iceCreamService')
 
     # --- Init service ---
-    rospy.Service('iceCreamMeshService', DetectIceCream, getServiceResponse)
+    rospy.Service('iceCreamService', DetectIceCream, getServiceResponse)
 
     # --- Init subscribers ---
-    rospy.Subscriber("/zed/zed_node/left_raw/image_raw_color", Image, saveSensorDataZEDRGB)
-    rospy.Subscriber("/royale_camera_driver/depth_image", Image, saveSensorDataRoyalDepth)
-    rospy.Subscriber("/royale_camera_driver/point_cloud", PointCloud2, saveSensorDataRoyalPC)
+    rospy.Subscriber("/pico_flexx/image_depth", Image, saveSensorDataRoyalDepth)
+    rospy.Subscriber("/pico_flexx/points", PointCloud2, saveSensorDataRoyalPC)
+
+    # Init point cloud (for rviz) publisher
+    pc_publisher = rospy.Publisher("/ice_cream_pc", PointCloud2, queue_size=10)
+    point_publisher = rospy.Publisher("/ice_cream_scoop_point", PointStamped, queue_size=10)
 
     rospy.spin()
