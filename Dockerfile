@@ -14,9 +14,9 @@ RUN apt install --yes --force-yes gdb libeigen3-dev libxml2-dev coinor-libipopt-
 RUN cd /root && git clone https://github.com/nlohmann/json && cd json && mkdir build && cd build && cmake .. && make -j8 && make install
 
 RUN git clone --recursive https://github.com/CARDSflow/CARDSflow
-RUN cd CARDSflow/kindyn && git checkout master
-RUN cd CARDSflow/roboy_communication && git checkout master
-RUN cd CARDSflow/robots && git checkout hackathon
+RUN cd CARDSflow/kindyn && git checkout friday-branch
+RUN cd CARDSflow/roboy_communication && git checkout master && mkdir build && cd build && cmake .. && make -j9 && make install
+RUN cd CARDSflow/robots && git checkout friday-branch
 RUN cd CARDSflow/iDynTree && mkdir build && cd build && cmake .. && make -j9 && make install
 RUN cd CARDSflow/qpOASES && mkdir build && cd build && cmake .. && make -j9 install
 
