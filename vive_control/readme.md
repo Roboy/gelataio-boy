@@ -3,13 +3,22 @@
 This is a ROS package to manually control a Roboy's arm with a VIVE controller to assist in situations, where path planning or regular control are inaccessible. 
  
 It assumes, that you have a working kindyn with correct robot's model and working IK. (Installation: https://cardsflow.readthedocs.io/Usage/0_installation.html)
+
+
+If you have nothing installed, you can use the bash script (in the /scripts directory) for quick-and-dirty installation of all dependencies, including CARDSflow:
+
+```
+sudo bash install_dependencies.sh
+```
+
+It will leave you with everything except for Steam installed. Because the package relies havily on Steam and OpenVR, we decided not to put it in the Docker container.
  
 ## Disclaimer
 It was tested before the Roboy SS19 finals on `roboy_icecream`, but was slightly refactored afterwards without the access to some the equipment. If any issues arise - feel free to submit a new issue.
  
 Also, it doesn't use the controller orientation, only position, because of the stability issues. Instead, you can manually move the wrist using the controller's trackpad.
  
-## Other dependencies
+## Dependencies
  
 **Steam**:
  
@@ -24,6 +33,8 @@ If you are using a laptop, make sure that it is VR-ready.
 Use this workaround if you don't have a SteamVR HMD: http://help.triadsemi.com/en/articles/836917-steamvr-tracking-without-an-hmd
  
 Attention! This workaround may still not work on your hardware. In these situations, your only option is to attach a working headset.
+
+Also attention: if you successfully installed everything using the bash script, you don't need to manually install other dependencies bellow. 
  
 **OpenVR**:
  
