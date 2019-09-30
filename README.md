@@ -32,6 +32,37 @@ docker todo
 
 @Stanislav: Could you also push our docker to you docker hub. Then others can simply pull it and do not need to create and compile the docker on their own. This will make it significantly faster and easier to use our repository. Already building our container takes more than 10 mins so we wouldn't pass the "try it out for the impatient".
 
+## Vision Module
+To run the vision module, pull the image from docker hub
+```bash
+> docker pull hbdo/roboy_cv:v5
+```
+
+Execute this command to run the image with webcam and ToF camera. You may need to unload and reload uvcvideo kernel if the container can't detect the webcam.
+```bash
+#sudo modprobe -r uvcvideo
+#sudo modprobe uvcvideo nodrop=1 timeout=5000 quirks=0x80
+
+> docker run --privileged --network host -it hbdo/roboy_cv:v5 bash
+```
+
+Inside the container, you need to start ToF camera driver with this command:
+```bash
+root@container> roslaunch pico_flexx_driver pico_flexx_driver.launch
+```
+
+In another terminal, you can start the ice cream service with:
+```bash
+> docker exec -it <container_id> bash
+root@container:/cv> python ice_cream_service.py
+```
+
+To make requests to the service, use this command from any terminal connected to the same ROS network:
+```bash
+> rosservice call /iceCreamMeshService "<flavor>"
+```
+You can test this by replacing `<flavor>` with `chocolate`, `flakes`, or `strawberry`
+
 # Launch Files for Startup of all processes
 
 We provide a set of launch files launching a couple of ROS nodes dependent on which setup you have. We distinguish real and sim environments. Real means for have roboy and the FPGA's running and have the hardware in the loop during execution. For sim environments there is no Roboy hardware and you use rviz to show the world state, e.g. you are in a simulated environment.
