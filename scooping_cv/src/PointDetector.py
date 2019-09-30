@@ -51,7 +51,7 @@ class PointDetector:
 		return img
 
 	@staticmethod
-	def _get_mask(image, low_color, high_color, ret_mask=True):
+	def _get_mask(image, low_color, high_color):
 		"""
 		Get mask of the ice cream
 		"""
@@ -117,7 +117,7 @@ class PointDetector:
 
 		color_range = PointDetector.flavor_color_map[flavor]
 
-		mask = PointDetector._get_mask(rgb_img, color_range[0], color_range[1], ret_mask=True)
+		mask = PointDetector._get_mask(rgb_img, color_range[0], color_range[1])
 
 		dim_x, dim_y = royale_depth.shape
 
