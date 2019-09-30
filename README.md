@@ -1,6 +1,7 @@
 # :ice_cream: [Gelataio](https://en.wiktionary.org/wiki/gelataio) mode for [Roboy](https://roboy.org/) :ice_cream:
 
-SS19 Full Body Control and Vision Team. We handle the vision and control parts for the ice-cream project.
+This is a repository with all the packages used by the scooping team while developing scooping procedure for Roboy. Here you can find everything regarding scooping, planning, vision, etc.
+
 
 | Vision Video | Final Video |
 | ------------ | ----------- |
@@ -12,56 +13,55 @@ SS19 Full Body Control and Vision Team. We handle the vision and control parts f
 - [Sprint Sync 1](https://docs.google.com/presentation/d/12Hat28XKuapki89IOibCmz_zspT1Y5xjBFHNrMO4YSE/edit#slide=id.g3ec4627452_0_202)
 - [Sprint Sync 2](https://docs.google.com/presentation/d/1Jai6Dpnfc-tcUIdtP4Eqru7uiEwxb5YKbDpsJK-65wQ/edit#slide=id.g3ecef60b9d_0_7)
 
-## Architecture Diagram
+## Package list
+
+Our project was organized in semi-independent packages, most of which can be configured to perform other tasks:
+
+- **coordinator** - a.k.a. "workflow module" responsible to the coordination of all other submodules, interfacing with Luigi (human interaction package), services and message delivery
+- **gelataio_boy_control** - main control package for arm control and path execution
+- **moveit_roboy_icecream** - configuration files for moveit and path planning
+
+These packages should be used simultaneously using the launch procedure from below. We also have two supplementary packages with their own user manuals in respecting folders:
+- **scooping_cv** - computer vision package for icecream recognition and surface detection
+- **vive_control** - package for direct arm control using a VR controller
+
+## Architecture 
 
 ![Arch Diagram](doc/arch.png)
 
-# Run using Docker
+# Installation using Docker
 
-TODO: @Stanislav
 
-Command to build the docker: 
-```bash
-docker todo
+Our main packages are supposed to be used inside a docker container. You can pull it from the hub using the following command:
+```
+docker pull stlukyanenko/gelataio-control:latest
 ```
 
-Command to launch one of the launch files using docker:
-```bash
-docker todo
+And run the pulled image using:
+```
+docker run --privileged --network host -it stlukyanenko/gelataio-control:latest
 ```
 
-@Stanislav: Could you also push our docker to you docker hub. Then others can simply pull it and do not need to create and compile the docker on their own. This will make it significantly faster and easier to use our repository. Already building our container takes more than 10 mins so we wouldn't pass the "try it out for the impatient".
+# Manual installation
 
-## Vision Module
-To run the vision module, pull the image from docker hub
-```bash
-> docker pull hbdo/roboy_cv:v5
+Generally, the docker image should suffice, but if you want to run it without it, you need to:
+
+[Install CARDSflow](https://cardsflow.readthedocs.io/Usage/0_installation.html)
+
+Checkout the branches of it's submodules to the branches used by the control package:
+
+```
+kindyn => friday-branch
+roboy_communication => master
+robots => friday-branch
 ```
 
-Execute this command to run the image with webcam and ToF camera. You may need to unload and reload uvcvideo kernel if the container can't detect the webcam.
-```bash
-#sudo modprobe -r uvcvideo
-#sudo modprobe uvcvideo nodrop=1 timeout=5000 quirks=0x80
+and install MoveIt:
 
-> docker run --privileged --network host -it hbdo/roboy_cv:v5 bash
+```
+sudo apt install ros-$ROS_DISTRO-moveit ros-$ROS_DISTRO-moveit-visual-tools  ros-$ROS_DISTRO-gazebo-plugins
 ```
 
-Inside the container, you need to start ToF camera driver with this command:
-```bash
-root@container> roslaunch pico_flexx_driver pico_flexx_driver.launch
-```
-
-In another terminal, you can start the ice cream service with:
-```bash
-> docker exec -it <container_id> bash
-root@container:/cv> python ice_cream_service.py
-```
-
-To make requests to the service, use this command from any terminal connected to the same ROS network:
-```bash
-> rosservice call /iceCreamMeshService "<flavor>"
-```
-You can test this by replacing `<flavor>` with `chocolate`, `flakes`, or `strawberry`
 
 # Launch Files for Startup of all processes
 

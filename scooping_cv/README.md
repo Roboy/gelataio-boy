@@ -4,6 +4,37 @@
 
 Given the desired flavour received from Luigi team, extract the corresponding point cloud and find best scooping point.
 
+## Vision Module launch
+To run the vision module, pull the image from docker hub
+```bash
+> docker pull hbdo/roboy_cv:v5
+```
+
+Execute this command to run the image with webcam and ToF camera. You may need to unload and reload uvcvideo kernel if the container can't detect the webcam.
+```bash
+#sudo modprobe -r uvcvideo
+#sudo modprobe uvcvideo nodrop=1 timeout=5000 quirks=0x80
+
+> docker run --privileged --network host -it hbdo/roboy_cv:v5 bash
+```
+
+Inside the container, you need to start ToF camera driver with this command:
+```bash
+root@container> roslaunch pico_flexx_driver pico_flexx_driver.launch
+```
+
+In another terminal, you can start the ice cream service with:
+```bash
+> docker exec -it <container_id> bash
+root@container:/cv> python ice_cream_service.py
+```
+
+To make requests to the service, use this command from any terminal connected to the same ROS network:
+```bash
+> rosservice call /iceCreamMeshService "<flavor>"
+```
+You can test this by replacing `<flavor>` with `chocolate`, `flakes`, or `strawberry`
+
 #### ROS topics and services
 Communication protocol: ```roboy_cognition_msgs::DetectIceCream```
 
